@@ -2,6 +2,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { PostItem } from "./PostItem";
+import { Movie } from "../context/tmdb-client";
+
 
 export interface Post {
   id: number;
@@ -12,14 +14,21 @@ export interface Post {
   avatar_url?: string;
   like_count?: number;
   comment_count?: number;
+  movie_id?: number | null;
+  movie?: Movie;
 }
 
-const fetchPosts = async (): Promise<Post[]> => {
-  const { data, error } = await supabase.rpc("get_posts_with_counts");
+const fetchPosts = async (): Promise<(Post & { movie?: Movie })[]> => {
+  const { data, error } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      movie:movie_id (*)
+    `)
+    .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);
-
-  return data as Post[];
+  return data;
 };
 
 export const PostList = () => {
