@@ -36,3 +36,109 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Image zoom container */
+.image-zoom-wrapper {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.zoomable-image {
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+  touch-action: none;
+}
+
+/* Prevent unwanted behaviors */
+.no-touch-action {
+  touch-action: none;
+}
+
+/* Prevent double-tap zoom */
+.no-double-tap-zoom {
+  touch-action: manipulation;
+}
+
+/* Smooth transitions */
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Zoom cursor */
+.cursor-move {
+  cursor: move;
+}
+
+body {
+  overscroll-behavior: none;
+
+}
+
+.image-zoom-container {
+  touch-action: auto;
+}
+
+:root {
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom); /* This handles the bottom URL bar */
+  --sal: env(safe-area-inset-left);
+}
+
+/* Apply safe area insets to your main container */
+.main-container {
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
+  min-height: calc(100vh - var(--sat) - var(--sab));
+}
+
+@supports (height: 100dvh) {
+  .full-viewport {
+    height: 100dvh;
+  }
+}
+
+@supports not (height: 100dvh) {
+  .full-viewport {
+    height: 100vh;
+  }
+}
+
+/* Handle iOS bottom bar specifically */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .ios-padding {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+  }
+}
+
+/* Only add this for mobile zoom */
+@media (pointer: coarse) {
+  .mobile-zoom-container {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    touch-action: none;
+  }
+  
+  .mobile-zoom-image {
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+  }
+  
+  .mobile-zoom-image.reset-transition {
+    transition: transform 0.2s ease-out;
+  }
+}
+
+/* Prevent page zoom */
+html {
+  touch-action: manipulation;
+  overflow-x: hidden;
+}
+
+

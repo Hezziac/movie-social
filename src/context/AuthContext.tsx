@@ -1,9 +1,12 @@
+// src/context/AuthContext.tsx
 import { User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../supabase-client";
+// We no longer import useNavigate here because redirects should not happen in the context.
 
 interface AuthContextType {
   user: User | null;
+  loading: boolean;
   signInWithGitHub: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => void;
@@ -13,38 +16,32 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  // We remove the useNavigate hook from here.
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // The only job of this listener is to update the user and loading state.
       setUser(session?.user ?? null);
+      setLoading(false);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
+    // Initial check to set the user state immediately on load
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      setLoading(false);
     });
 
     return () => {
-      listener.subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
-  }, []);
+  }, []); // The dependency array is now empty because it should only run once.
 
+  // The rest of your functions are fine.
   const handleOAuthLogin = async (provider: "github" | "google") => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({ provider });
-
-      if (error?.message.includes("already registered")) {
-        const originalProvider = error.message.split("'")[1]; // Extracts 'google' or 'github'
-        
-        // Prompt user to log in with original provider first
-        const { error: originalError } = await supabase.auth.signInWithOAuth({
-          provider: originalProvider as "github" | "google",
-        });
-
-        if (!originalError) {
-          // Link the new provider after successful login
-          await supabase.auth.linkIdentity({ provider });
-        }
-      }
+      if (error) throw error;
     } catch (err) {
       console.error("OAuth error:", err);
     }
@@ -58,13 +55,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await handleOAuthLogin("google");
   };
 
-  const signOut = () => {
-    supabase.auth.signOut();
+  const signOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      // The onAuthStateChange listener will handle updating the user state to null.
+      // We can also force a redirect here if needed.
+      window.location.replace('/');
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ user, signInWithGitHub, signInWithGoogle, signOut }}
+    <AuthContext.Provider
+      value={{ user, loading, signInWithGitHub, signInWithGoogle, signOut }}
     >
       {children}
     </AuthContext.Provider>

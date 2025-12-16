@@ -1,22 +1,40 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { supabase } from "../supabase-client";
+import { supabase } from "../supabase-client"; 
+import { useAuth } from "../context/AuthContext"; 
 
 interface CommunityInput {
-  name: string;
+  title: string; // Use 'title' to match DB column name
   description: string;
+  creator_id: string; // Must include the creator's ID
+  slug: string; // Add slug for unique URL path
 }
+
+// Function now requires the full payload
 const createCommunity = async (community: CommunityInput) => {
+  // Supabase will automatically handle the 'type' default of 'public' and 'created_at'
   const { error, data } = await supabase.from("communities").insert(community);
 
   if (error) throw new Error(error.message);
   return data;
 };
 
+// Simple utility function to create a URL-friendly slug
+const createSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "") // Remove all non-word chars
+    .replace(/[\s_-]+/g, "-") // Replace spaces with -
+    .replace(/^-+|-+$/g, ""); // Remove leading/trailing -
+};
+
+
 export const CreateCommunity = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const { user } = useAuth(); // Get the current user from context
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -30,7 +48,21 @@ export const CreateCommunity = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutate({ name, description });
+
+    if (!user) {
+      alert("You must be logged in to create a community.");
+      return;
+    }
+    
+    const slug = createSlug(name);
+
+    // Ensure all required RLS fields and NOT NULL DB fields are sent
+    mutate({
+      title: name,
+      description: description,
+      creator_id: user.id, // CRITICAL: This satisfies the RLS policy
+      slug: slug // CRITICAL: Required for unique URL/database constraint
+    });
   };
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4">

@@ -1,0 +1,10 @@
+{
+  "run_prettier": false,
+  "include": [
+    "src"
+  ],
+  "web_server_url": "http://localhost:5173",
+  "editor": "url:vscode://file/%FILENAME:%LINE:%COLUMN",
+  "run": "npm run dev",
+  "tailwind": true
+}

@@ -30,7 +30,8 @@ const fetchCommunity = async (id: number): Promise<Community | null> => {
     console.error("Community fetch error:", error);
     return null;
   }
-  console.log("DATA: ", data);
+  // DEBUG
+  // console.log("DATA: ", data);
   return data;
 };
 
@@ -62,7 +63,14 @@ export const CommunityDisplay = ({ communityId }: Props) => {
   // 3. Destructure the parallel results
   const [community, posts] = data || [null, []];
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+  
   if (error) return <div>Error loading data</div>;
 
   return (

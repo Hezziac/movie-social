@@ -60,21 +60,29 @@ export const PostDetail = ({ postId }: Props) => {
 
       {/* Post Content with Image */}
       <div className="relative mb-6">
-        {/* Main Post Image */}
-        <div className="relative aspect-[4/3] md:aspect-video bg-gray-800 rounded-xl overflow-hidden">
-          <img
-            src={data.image_url}
-            alt={data.title}
-            className="w-full h-full object-cover"
-          />
+        {/* Main Post Image - Only show if image_url exists */}
+        {data.image_url && (
+          <div className="relative aspect-[4/3] md:aspect-video bg-gray-800 rounded-xl overflow-hidden mb-4">
+            {data.image_url && !data.image_url.startsWith("blob:") ? (
+              <img
+                src={data.image_url}
+                alt={data.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                Image unavailable
+              </div>
+            )}
           
           {/* Movie Tile (if exists) */}
           {data.movie && (
-            <div className="absolute bottom-4 left-4 z-10">
-              <MovieTile movie={data.movie} />
-            </div>
-          )}
-        </div>
+              <div className="absolute bottom-4 left-4 z-10">
+                <MovieTile movie={data.movie} />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Post Text Content */}
         <div className="mt-4 text-gray-300 whitespace-pre-line">

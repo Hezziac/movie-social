@@ -1,24 +1,33 @@
+// CommunityList.tsx
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { Link } from "react-router";
 
+// FIX: ID is bigint (number in JS) and columns are title/description
 export interface Community {
-  id: number;
-  name: string;
-  description: string;
+  id: number; 
+  title: string; 
+  description: string; 
   created_at: string;
 }
+
 export const fetchCommunities = async (): Promise<Community[]> => {
   const { data, error } = await supabase
     .from("communities")
-    .select("*")
+    // FIX: Select the correct column names (title, description)
+    .select("id, title, description, created_at") 
+    // CRITICAL: Filter by type='public' to satisfy RLS for public display
+    .eq('type', 'public') 
     .order("created_at", { ascending: false });
+
+    console.log("Fetched communities:", { data, error });
 
   if (error) throw new Error(error.message);
   return data as Community[];
 };
 
 export const CommunityList = () => {
+  // Assuming the pathing for the imports is correct for your file structure
   const { data, error, isLoading } = useQuery<Community[], Error>({
     queryKey: ["communities"],
     queryFn: fetchCommunities,
@@ -34,30 +43,32 @@ export const CommunityList = () => {
     );
 
   return (
-<div className="max-w-7xl mx-auto p-8 bg-gray-800/50 backdrop-blur-lg rounded-2xl border border-gray-700/30 shadow-xl">
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {data?.map((community) => (
-      <div
-        key={community.id}
-        className="border border-white/10 rounded-lg hover:-translate-y-1 transition-transform overflow-hidden bg-gray-900/70 backdrop-blur-sm"
-      >
-        {/* Placeholder image */}
-        <div className="h-48 bg-gradient-to-br from-gray-800 to-gray-700 flex items-center justify-center">
-          <span className="text-xl text-white/50">Genre Image</span>
-        </div>
-        
-        <div className="p-4">
-          <Link
-            to={`/community/${community.id}`}
-            className="text-2xl font-bold text-purple-500 hover:underline"
+    <div className="max-w-7xl mx-auto p-8 bg-gray-800/50 backdrop-blur-lg rounded-2xl border border-gray-700/30 shadow-xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {data?.map((community) => (
+          <div
+            key={community.id}
+            className="border border-white/10 rounded-lg hover:-translate-y-1 transition-transform overflow-hidden bg-gray-900/70 backdrop-blur-sm"
           >
-            {community.name}
-          </Link>
-          <p className="text-gray-400 mt-2">{community.description}</p>
-        </div>
+            {/* Placeholder image */}
+            <div className="h-48 bg-gradient-to-br from-gray-800 to-gray-700 flex items-center justify-center">
+              <span className="text-xl text-white/50">Genre Image</span>
+            </div>
+            
+            <div className="p-4">
+              <Link
+                to={`/community/${community.id}`}
+                className="text-2xl font-bold text-purple-500 hover:underline"
+              >
+                {/* FIX: Use community.title */}
+                {community.title}
+              </Link>
+              {/* FIX: Use community.description */}
+              <p className="text-gray-400 mt-2">{community.description}</p>
+            </div>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
-</div>
+    </div>
   );
 };
