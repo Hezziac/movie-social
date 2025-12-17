@@ -1,14 +1,16 @@
 // supabase-client.ts
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-const SUPABASE_URL = "https://yyblhuywriupksisxazw.supabase.co"; // can also put in env file
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const SUPABASE_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined) ?? "https://yyblhuywriupksisxazw.supabase.co";
 
-// debugs
-// if (!SUPABASE_URL) console.log("Missing Supabase URL");
-// if (!import.meta.env.VITE_SUPABASE_ANON_KEY) console.log("Missing Anon Key");
+if (!supabaseAnonKey) {
+    // Helpful runtime message to make deployments easier to debug
+    console.error(
+        "Missing VITE_SUPABASE_ANON_KEY environment variable.\n" +
+            "Set VITE_SUPABASE_ANON_KEY to your Supabase anon/public key in your .env and in your hosting provider settings.\n" +
+            "Do NOT use the service_role key in the browser."
+    );
+}
 
-export const supabase = createClient(
-    SUPABASE_URL,
-    supabaseAnonKey
-);
+export const supabase = createClient(SUPABASE_URL, supabaseAnonKey ?? "");
