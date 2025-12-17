@@ -41,6 +41,10 @@ export const useProfileData = (username: string | undefined) => {
         image_url,
         content,
         created_at,
+        movie_id,
+        movie_title,
+        movie_poster_path,
+        movie_release_date,
         votes(count),
         comments(count),
         profiles(username, avatar_url)
@@ -75,7 +79,7 @@ export const useProfileData = (username: string | undefined) => {
         
         // Now, fetch the posts for this specific user.
         const posts = await fetchUserPosts(profileData.id);
-        setUserPosts(posts);
+        setUserPosts(posts as PostWithRelations[]);
         setStats(prevStats => ({
             ...prevStats,
             posts: posts.length
