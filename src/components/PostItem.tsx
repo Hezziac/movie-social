@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { Post } from "./PostList";
 import { MovieTile } from "./MovieTile";
-import { Movie } from "../context/tmdb-client";
+// import { Movie } from "../context/tmdb-client";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { useState, useRef, useEffect } from "react";
 import { useGesture } from "@use-gesture/react";
@@ -81,7 +81,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
         }
       },
 
-      onDrag: ({ movement: [mx, my], delta: [dx, dy], cancel, event }) => {
+      onDrag: ({ movement: [mx, my], delta: [dx, dy], cancel }) => {
         if (!pinchStarted) return cancel?.();
         if (zoom <= 1) return cancel?.();
         const newX = lastOffsetRef.current.x + dx + mx;

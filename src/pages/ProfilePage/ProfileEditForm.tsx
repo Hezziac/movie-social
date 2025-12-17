@@ -85,7 +85,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, user,
         <AvatarUpload
           uid={user.id}
           url={profile.avatar_url} // Pass current avatar URL
-          onUpload={(event, newUrl) => {
+          onUpload={(_event, newUrl) => {
             setAvatarUrl(newUrl); // Update local state with new avatar URL
             // Optionally, you might want to auto-save here or indicate unsaved changes
           }}

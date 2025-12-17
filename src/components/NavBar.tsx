@@ -1,6 +1,6 @@
 //NavBar.tsx
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router"; // Fixed import (use "react-router-dom" instead of "react-router")
+import { Link } from "react-router"; // Fixed import (use "react-router-dom" instead of "react-router")
 import { useAuth } from "../context/AuthContext";
 import {
   GitHub,
@@ -18,7 +18,7 @@ export const Navbar = () => {
   const { signInWithGitHub, signInWithGoogle, signOut, user } = useAuth();
   const [profile, setProfile] = useState<any | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const closeNav = () => {
     setMenuOpen(false);
@@ -164,7 +164,7 @@ export const Navbar = () => {
       <MovieSearchModal 
         isOpen={searchOpen} 
         onClose={() => setSearchOpen(false)} 
-        onSelect={(movie) => {
+        onSelect={(_movie) => {
           setSearchOpen(false);
           // Redirect to a specific movie view if needed
           // navigate(`/movie/${movie.id}`); 

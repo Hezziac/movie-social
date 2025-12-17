@@ -30,7 +30,6 @@ export const CreatePost = () => {
   const [communityId, setCommunityId] = useState<number | null>(null);
 
   // ImageUploader state
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null); // This holds the Supabase public URL
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>("original");
   
@@ -285,8 +284,7 @@ export const CreatePost = () => {
 
       {/* ImageUploader handles image upload, aspect ratio, and preview */}
       <ImageUploader
-        onImageChange={(file, url, aspectRatio) => {
-          setImageFile(file);
+        onImageChange={(_file, url, aspectRatio) => {
           setImageUrl(url);
           setSelectedAspectRatio(aspectRatio);
         }}

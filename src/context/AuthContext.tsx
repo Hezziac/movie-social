@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // We remove the useNavigate hook from here.
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       // The only job of this listener is to update the user and loading state.
       setUser(session?.user ?? null);
       setLoading(false);
