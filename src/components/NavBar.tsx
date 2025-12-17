@@ -99,7 +99,7 @@ export const Navbar = () => {
               <div className="flex items-center space-x-4">
                 {/* Avatar and Display Name as link to profile */}
                 <Link
-                  to={profile?.username ? `/${profile.username}` : "/profile"}
+                  to={profile?.username ? `/profile/${profile.username}` : "/profile"}
                   className="flex items-center space-x-2 group"
                 >
                   {profile?.avatar_url ? (

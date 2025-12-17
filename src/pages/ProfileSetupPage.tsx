@@ -30,7 +30,7 @@ export function ProfileSetupPage() {
         .single()
         .then(({ data }) => {
           if (data && data.username) {
-            navigate(`/${data.username}`);
+            navigate(`/profile/${data.username}`);
           }
         });
       console.log("initialLoad && user");
@@ -80,7 +80,7 @@ export function ProfileSetupPage() {
       if (error) throw error;
 
       // After successful profile creation, redirect to the dynamic URL
-      navigate(`/${username}`);
+      navigate(`/profile/${username}`);
     } catch (err) {
       console.error("Profile creation error:", err);
       setError("Failed to create profile. Please try again.");

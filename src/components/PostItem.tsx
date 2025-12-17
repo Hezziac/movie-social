@@ -237,7 +237,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
             {/* Header */}
             {/* 💡 1. Wrap the avatar and info with a Link to the profile using the username */}
             <div className="flex items-center gap-3 p-4 absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/70 to-transparent">
-              <Link to={`/${post.username}`} className="flex items-center gap-3">
+              <Link to={`/profile/${post.username}`} className="flex items-center gap-3">
                 {post.avatar_url ? (
                   <img
                     src={post.avatar_url}
