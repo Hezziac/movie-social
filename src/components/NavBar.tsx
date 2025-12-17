@@ -1,6 +1,6 @@
 //NavBar.tsx
 import { useState, useEffect } from "react";
-import { Link } from "react-router"; // Fixed import (use "react-router-dom" instead of "react-router")
+import { Link, useNavigate } from "react-router"; // Fixed import (use "react-router-dom" instead of "react-router")
 import { useAuth } from "../context/AuthContext";
 import {
   GitHub,
@@ -8,12 +8,17 @@ import {
   Menu,
   Close,
   AccountCircle,
+  Search,
 } from "@mui/icons-material";
 import { supabase } from "../supabase-client";
+import { MovieSearchModal } from "./MovieSearchModal";
+
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { signInWithGitHub, signInWithGoogle, signOut, user } = useAuth();
   const [profile, setProfile] = useState<any | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const navigate = useNavigate();
 
   const closeNav = () => {
     setMenuOpen(false);
@@ -49,17 +54,24 @@ export const Navbar = () => {
         <div className="flex justify-between items-center h-full">
           {/* Logo */}
           <Link to="/" className="font-mono text-xl font-bold text-white">
-            Movie<span className="text-purple-500">.social</span>
+            Social<span className="text-purple-500">.Cine</span>
           </Link>
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Home
-            </Link>
+            {user ? (
+              <Link
+                to="/search"
+                className="text-gray-300 hover:text-white transition-colors flex items-center gap-1"
+              >
+                <Search />
+                <span>Search</span>
+              </Link>
+            ) : (
+              <Link to="/" className="text-gray-300 hover:text-white transition-colors">
+                Home
+              </Link>
+            )}
 
             <Link
               to="/communities"
@@ -69,19 +81,14 @@ export const Navbar = () => {
             </Link>
             {user && (
             <>
-            <Link
-              to="/create"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Create Post
-            </Link>
-            
-            <Link
-              to="/community/create"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Create Community
-            </Link>
+            {user && (
+              <Link
+                to="/create-hub"
+                className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-full text-sm font-bold transition-colors flex items-center gap-1"
+              >
+                CREATE +
+              </Link>
+            )}
             
           </>)}
           </div>
@@ -153,18 +160,38 @@ export const Navbar = () => {
         </div>
       </div>
 
+      {/* Movie Search Modal Integration */}
+      <MovieSearchModal 
+        isOpen={searchOpen} 
+        onClose={() => setSearchOpen(false)} 
+        onSelect={(movie) => {
+          setSearchOpen(false);
+          // Redirect to a specific movie view if needed
+          // navigate(`/movie/${movie.id}`); 
+        }}
+      />
+
       {/* Mobile Menu - updated icons */}
       {menuOpen && (
         <div className="md:hidden bg-[rgba(10,10,10,0.9)]">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {/* Always visible links */}
-            <Link
-              to="/"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
-              onClick={closeNav}
-            >
-              Home
-            </Link>
+            {user ? (
+              <Link
+                to="/search"
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
+                onClick={closeNav}
+              >
+                <div className="flex items-center gap-2">
+                  <Search className="w-5 h-5" />
+                  <span>Search Movies</span>
+                </div>
+                </Link>
+            ) : (
+              <Link to="/" className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700" onClick={closeNav}>
+                Home
+              </Link>
+            )}
             
             <Link
               to="/communities"
@@ -178,19 +205,11 @@ export const Navbar = () => {
             {user && (
               <>
                 <Link
-                  to="/create"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
+                  to="/create-hub"
+                  className="block px-3 py-2 rounded-md text-base font-bold text-purple-400 hover:text-white hover:bg-gray-700"
                   onClick={closeNav}
                 >
-                  Create Post
-                </Link>
-                
-                <Link
-                  to="/community/create"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
-                  onClick={closeNav}
-                >
-                  Create Community
+                  CREATE +
                 </Link>
               </>
             )}

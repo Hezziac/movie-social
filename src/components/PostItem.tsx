@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Post } from "./PostList";
 import { MovieTile } from "./MovieTile";
+import { Movie } from "../context/tmdb-client";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { useState, useRef, useEffect } from "react";
 import { useGesture } from "@use-gesture/react";
@@ -195,7 +196,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
       release_date: post.movie_release_date || 'N/A',
       // The Movie interface (from tmdb-client.ts) requires these, 
       // so we use placeholders since your SQL function doesn't return them.
-      overview: '', 
+      overview: post.movie?.overview ||'', 
       vote_average: 0, 
   } : null;
 

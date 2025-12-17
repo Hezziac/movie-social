@@ -9,13 +9,14 @@ interface Props {
 
 interface Community {
   id: number;
-  name: string;
+  title: string;
   description: string;
+  image_url?: string | null;
 }
 
 interface PostWithCommunity extends Post {
   communities: {
-    name: string;
+    title: string;
   };
 }
 
@@ -40,8 +41,9 @@ const fetchCommunityPosts = async (
 ): Promise<PostWithCommunity[]> => {
   const { data, error } = await supabase
     .from("posts")
-    .select("*, communities(name)")
-    .eq("community_id", id);
+    .select("*, communities(title), movie:movie_id (*)")
+    .eq("community_id", Number(id)) // CAST NUMBER TO MATCH DB TYPE
+    .order("created_at", { ascending: false });
   console.log("Joined DATA: ", data);
   if (error) throw error;
   return data || [];
@@ -74,11 +76,38 @@ export const CommunityDisplay = ({ communityId }: Props) => {
   if (error) return <div>Error loading data</div>;
 
   return (
-    <div>
-      <h2 className="text-6xl font-bold mb-6 text-center bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-        {community?.name || `Community ${communityId}`} Posts
-      </h2>
+    <div className="min-h-screen bg-black">
+    {/* Hero Banner Section */}
+    <div className="relative h-[300px] w-full flex items-center justify-center overflow-hidden mb-8">
+      {/* Background Image Layer */}
+      {community?.image_url ? (
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 hover:scale-105"
+          style={{ backgroundImage: `url(${community.image_url})` }}
+        />
+      ) : (
+        /* Fallback gradient if no image exists  */
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-900/20 to-black" />
+      )}
+      
+      {/* Dark Overlay for Readability */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
 
+      {/* Title Content Layer */}
+      <div className="relative z-10 text-center px-4">
+        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-2xl">
+          {community?.title || `Community ${communityId}`}
+        </h1>
+        {community?.description && (
+          <p className="text-gray-300 mt-4 max-w-2xl mx-auto text-lg md:text-xl">
+            {community.description}
+          </p>
+        )}
+      </div>
+    </div>
+
+    {/* Posts Section */}
+    <div className="max-w-7xl mx-auto px-4">
       {posts.length > 0 ? (
         <div className="flex flex-wrap gap-6 justify-center">
           {posts.map((post) => (
@@ -86,10 +115,11 @@ export const CommunityDisplay = ({ communityId }: Props) => {
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-400">
+        <p className="text-center text-gray-400 py-20 text-xl border border-white/5 rounded-xl bg-white/5">
           No posts in this community yet.
         </p>
       )}
     </div>
+  </div>
   );
 };

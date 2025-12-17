@@ -7,6 +7,7 @@ import { CreateCommunityPage } from "./pages/CreateCommunityPage";
 import { CommunitiesPage } from "./pages/CommunitiesPage";
 import { CommunityPage } from "./pages/CommunityPage";
 import MovieSearchPage from "./pages/MovieSearchPage";
+import { CreateHub } from "./pages/CreationHubPage";
 import { useAuth } from "./context/AuthContext";
 import { JSX, useEffect, useState } from "react";
 import { ProfileSetupPage } from "./pages/ProfileSetupPage";
@@ -74,6 +75,8 @@ const AppRoutes = () => {
       {/* Protected routes that only logged-in users can access */}
       <Route path="/create" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
       <Route path="/community/create" element={<ProtectedRoute><CreateCommunityPage /></ProtectedRoute>} />
+      <Route path="/create-hub" element={<ProtectedRoute><CreateHub /></ProtectedRoute>} />
+      <Route path="/search" element={<ProtectedRoute><MovieSearchPage /></ProtectedRoute>} />
 
       {/* This is a special route for new users. It is also protected. */}
       <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetupPage /></ProtectedRoute>} />

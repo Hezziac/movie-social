@@ -3,12 +3,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { supabase } from "../supabase-client"; 
 import { useAuth } from "../context/AuthContext"; 
+import { ImageUploader } from "./ImageUploader";
 
 interface CommunityInput {
   title: string; // Use 'title' to match DB column name
   description: string;
   creator_id: string; // Must include the creator's ID
   slug: string; // Add slug for unique URL path
+  type: 'public' | 'private'; // Specify type if needed
+  image_url?: string | null; // Optional image URL for community banner
 }
 
 // Function now requires the full payload
@@ -37,6 +40,8 @@ export const CreateCommunity = () => {
   const { user } = useAuth(); // Get the current user from context
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [type, setType] = useState<'public' | 'private'>('public'); // Default to public
+  const [bannerUrl, setBannerUrl] = useState<string | null>(null); // State for the image URL
 
   const { mutate, isPending, isError } = useMutation({
     mutationFn: createCommunity,
@@ -61,7 +66,9 @@ export const CreateCommunity = () => {
       title: name,
       description: description,
       creator_id: user.id, // CRITICAL: This satisfies the RLS policy
-      slug: slug // CRITICAL: Required for unique URL/database constraint
+      slug: slug, // CRITICAL: Required for unique URL/database constraint
+      type: type, // Default to 'public'; adjust as needed
+      image_url: bannerUrl, // Send the uploaded image URL to Supabase
     });
   };
   return (
@@ -69,6 +76,15 @@ export const CreateCommunity = () => {
       <h2 className="text-6xl font-bold mb-6 text-center bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
         Create New Community
       </h2>
+      
+      {/* Community Banner Uploader */}
+      <div className="space-y-2">
+        <label className="block font-medium text-gray-200">Community Banner</label>
+        <ImageUploader 
+          onImageChange={(_file, url) => setBannerUrl(url)} 
+        />
+      </div>
+
       <div>
         <label htmlFor="name" className="block mb-2 font-medium">
           Community Name
@@ -94,6 +110,35 @@ export const CreateCommunity = () => {
           rows={3}
         />
       </div>
+
+      {/* Privacy Selection */}
+      <div className="bg-gray-900/50 p-4 rounded-lg border border-white/10">
+        <label className="block mb-3 font-medium text-white">Privacy Setting</label>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => setType('public')}
+            className={`flex-1 py-2 rounded-md border transition-all ${type === 'public' ? 'bg-purple-600 border-purple-400 text-white' : 'bg-transparent border-white/10 text-gray-400'}`}
+          >
+            Public
+          </button>
+          <button
+            type="button"
+            onClick={() => setType('private')}
+            className={`flex-1 py-2 rounded-md border transition-all ${type === 'private' ? 'bg-red-600 border-red-400 text-white' : 'bg-transparent border-white/10 text-gray-400'}`}
+          >
+            Private
+          </button>
+        </div>
+
+        {/* Warning Message */}
+        {type === 'private' && (
+          <p className="mt-3 text-sm text-red-400 bg-red-900/20 p-2 rounded border border-red-900/50 animate-pulse">
+            ⚠️ <strong>Warning:</strong> Private communities and their posts will <strong>not</strong> be discoverable on the Explore page or in searches!
+          </p>
+        )}
+      </div>
+
       <button
         type="submit"
         className="bg-purple-500 text-white px-4 py-2 rounded cursor-pointer"

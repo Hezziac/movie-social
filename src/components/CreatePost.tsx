@@ -119,7 +119,7 @@ export const CreatePost = () => {
           {
             id: selectedMovie.id,
             title: selectedMovie.title,
-            release_date: selectedMovie.release_date,
+            release_date: selectedMovie.release_date || null,
             poster_path: selectedMovie.poster_path,
             overview: selectedMovie.overview || null,
           },

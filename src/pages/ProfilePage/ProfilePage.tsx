@@ -39,13 +39,7 @@ export function ProfilePage() {
           {/* Profile Picture */}
           {profile.avatar_url ? (
             <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0">
-              {profile.avatar_url && !profile.avatar_url.startsWith("blob:") ? (
-                <img src={profile.avatar_url} alt={`${profile.username}'s avatar`} className="w-full h-full rounded-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                  <span className="text-gray-400">👤</span>
-                </div>
-              )}
+            <img src={profile.avatar_url} alt={`${profile.username}'s avatar`} className="w-full h-full rounded-full object-cover" />
             </div>
           ) : (
             <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-800 border-2 border-purple-600 flex-shrink-0">
@@ -131,20 +125,21 @@ export function ProfilePage() {
               <Link to={`/post/${post.id}`} key={post.id} className="relative aspect-square bg-gray-800 group">
               {/* Post Image */}
                 {post.image_url ? (
-                  post.image_url.startsWith("blob:") ? (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-gray-500">Image unavailable</span>
-                    </div>
-                  ) : (
-                    <img 
-                      src={post.image_url} 
-                      alt={post.content} 
-                      className="w-full h-full object-cover"
+                  <img 
+                    src={post.image_url} 
+                    alt={post.content} 
+                    className="w-full h-full object-cover"
                     />
-                  )
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-gray-500">No Image</span>
+                  ) : (
+                  /* 2. Fallback: Display Title and Content only if no image */
+                  <div className="w-full h-full p-3 flex flex-col bg-gradient-to-b from-gray-800 to-black items-center justify-center">
+                    <h4 className="text-white text-xs md:text-sm font-bold line-clamp-2 mb-1">
+                      {post.title || "Untitled"}
+                    </h4>
+                    <p className="text-gray-400 text-[10px] md:text-xs line-clamp-9 leading-snug">
+                      {post.content}
+                    </p>
+                    <div className="mt-auto self-end opacity-30 text-xl">📄</div>
                   </div>
                 )}
 
