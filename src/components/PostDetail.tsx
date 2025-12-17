@@ -74,18 +74,20 @@ export const PostDetail = ({ postId }: Props) => {
                 Image unavailable
               </div>
             )}
-          
-          {/* Movie Tile (if exists) */}
-          {data.movie && (
-              <div className="absolute bottom-4 left-4 z-10">
-                <MovieTile movie={data.movie} />
-              </div>
-            )}
+          </div>
+        )}
+
+        {/* Movie Tile - ALWAYS SHOWS if movie exists (MOVED OUTSIDE image block) */}
+        {data.movie && (
+          <div className="flex justify-center mb-6 pt-4">
+            <div className="scale-125 shadow-lg shadow-purple-500/30rounded-xl p-3 bg-black/50 backdrop-blur-sm">
+              <MovieTile movie={data.movie} />
+            </div>
           </div>
         )}
 
         {/* Post Text Content */}
-        <div className="mt-4 text-gray-300 whitespace-pre-line">
+        <div className="flex justify-center text-gray-300 whitespace-pre-line">
           {data.content}
         </div>
       </div>

@@ -15,9 +15,15 @@ export interface Post {
   avatar_url?: string | null;
   like_count?: number;
   comment_count?: number;
-  movie_id?: number | null;
-  movie?: Movie;
   aspect_ratio?: string;
+  username: string;
+  // --- NEW MOVIE PROPERTIES FROM SQL FUNCTION ---
+  // Note: These should be nullable since posts without movies will have NULL here
+  movie_id: number | null;
+  movie_title: string | null;
+  movie_poster_path: string | null;
+  movie_release_date: string | null;
+  movie?: Movie;
 }
 
 export const fetchPosts = async (): Promise<(Post & { movie?: Movie })[]> => {

@@ -75,7 +75,7 @@ export const LikeButton = ({ postId }: Props) => {
   } = useQuery<Vote[], Error>({
     queryKey: ["votes", postId],
     queryFn: () => fetchVotes(postId),
-    refetchInterval: 50000, // could effect cost (every 5 sec it fetches likes( wothout refesh?))
+    refetchInterval: 600000, // could effect cost (every 5(currently 60 sec) sec it fetches likes( wothout refesh?))
   });
 
   const { mutate } = useMutation({

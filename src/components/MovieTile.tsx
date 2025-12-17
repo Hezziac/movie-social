@@ -12,7 +12,7 @@ export const MovieTile = ({ movie }: Props) => {
       <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg blur opacity-0 group-hover:opacity-75 transition-opacity duration-300 z-0"></div>
       
       {/* Main tile */}
-      <div className="relative w-full h-full bg-gray-900/90 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-700/50 shadow-lg transition-transform hover:scale-105 group-hover:border-purple-400/30 z-10">
+      <div className="relative w-full h-full bg-gray-900/90 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-700/50 shadow-lg transition-transform group-hover:border-purple-400/30">
         {movie.poster_path ? (
           <img
             src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}

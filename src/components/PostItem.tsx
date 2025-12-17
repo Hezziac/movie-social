@@ -5,6 +5,10 @@ import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { useState, useRef, useEffect } from "react";
 import { useGesture } from "@use-gesture/react";
 import { isMobile } from "../context/isMobile";
+// imports for likebutton functionality 
+import { useAuth } from "../context/AuthContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "../supabase-client";
 
 interface Props {
   post: Post;
@@ -146,6 +150,55 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
     };
   }, [isZooming, zoom]);
 
+  // HEART LIKE FUNCTION (copied from your LikeButton)
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const vote = async (voteValue: number) => {
+    if (!user) return;
+    
+    const { data: existingVote } = await supabase
+      .from("votes")
+      .select("*")
+      .eq("post_id", post.id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (existingVote) {
+      if (existingVote.vote === voteValue) {
+        await supabase.from("votes").delete().eq("id", existingVote.id);
+      } else {
+        await supabase.from("votes").update({ vote: voteValue }).eq("id", existingVote.id);
+      }
+    } else {
+      await supabase.from("votes").insert({ post_id: post.id, user_id: user.id, vote: voteValue });
+    }
+  };
+
+  const { mutate } = useMutation({
+    mutationFn: () => vote(1), // THUMBS UP ONLY
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] }); // Refresh ALL posts
+    },
+  });
+
+  // 1. Check if the post has the new movie fields returned by the SQL function
+  // We check for movie_id and movie_title to ensure we have something meaningful.
+  const hasMovieData = post.movie_id && post.movie_title;
+
+  // 2. Conditionally construct the Movie object structure that MovieTile expects.
+  // We use the new flat properties (e.g., post.movie_title) to build the nested object.
+  const movieForTile = hasMovieData ? {
+      id: post.movie_id!,
+      title: post.movie_title!,
+      poster_path: post.movie_poster_path,
+      release_date: post.movie_release_date || 'N/A',
+      // The Movie interface (from tmdb-client.ts) requires these, 
+      // so we use placeholders since your SQL function doesn't return them.
+      overview: '', 
+      vote_average: 0, 
+  } : null;
+
   return (
     <>
       <div
@@ -181,21 +234,31 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
             }`}
           >
             {/* Header */}
+            {/* 💡 1. Wrap the avatar and info with a Link to the profile using the username */}
             <div className="flex items-center gap-3 p-4 absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/70 to-transparent">
-              {post.avatar_url ? (
-                <img
-                  src={post.avatar_url}
-                  alt="User Avatar"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white/20"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tl from-purple-500 to-pink-500" />
-              )}
+              <Link to={`/${post.username}`} className="flex items-center gap-3">
+                {post.avatar_url ? (
+                  <img
+                    src={post.avatar_url}
+                    alt="User Avatar"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-white/20"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tl from-purple-500 to-pink-500" />
+                )}
+              </Link>
+              
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-white truncate">
-                  {post.title}
-                </h3>
+                {/* 💡 2. Wrap the title (and implicitly the post itself) with a Link to the post details */}
+                <Link to={`/post/${post.id}`}>
+                  <h3 className="font-semibold text-white truncate hover:underline">
+                    {post.title}
+                  </h3>
+                </Link>
+                {/* Assuming you display the username/author here, you can link it too */}
                 <p className="text-xs text-gray-300">
+                  {/* You could display and link the username here if you want */}
+                  {/* <Link to={`/profile/${post.username}`} className="hover:underline">@{post.username}</Link> - */}
                   {new Date(post.created_at).toLocaleDateString()}
                 </p>
               </div>
@@ -265,12 +328,19 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
             {/* Footer */}
             <div className="absolute bottom-4 left-4 right-4 z-20 flex justify-between items-end">
               <div className="flex-1">
-                {post.movie && <MovieTile movie={post.movie} />}
+                {movieForTile && <MovieTile movie={movieForTile} />}
               </div>
 
               <div className="flex flex-col items-center gap-4">
                 <div className="flex flex-col items-center">
-                  <button className="p-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition">
+                  {/* LIKE BUTTON FUNCTIONALITY */}
+                  <button 
+                    onClick={() => mutate()}
+                    disabled={!user}
+                    className="p-2 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                      hover:bg-white/20 bg-white/10"
+                    title={!user ? "Sign in to like" : "Like post"}
+                  >
                     ❤️
                   </button>
                   <span className="text-xs text-white mt-1">

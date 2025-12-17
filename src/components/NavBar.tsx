@@ -157,6 +157,7 @@ export const Navbar = () => {
       {menuOpen && (
         <div className="md:hidden bg-[rgba(10,10,10,0.9)]">
           <div className="px-2 pt-2 pb-3 space-y-1">
+            {/* Always visible links */}
             <Link
               to="/"
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
@@ -164,13 +165,7 @@ export const Navbar = () => {
             >
               Home
             </Link>
-            <Link
-              to="/create"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
-              onClick={closeNav}
-            >
-              Create Post
-            </Link>
+            
             <Link
               to="/communities"
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
@@ -178,57 +173,71 @@ export const Navbar = () => {
             >
               Communities
             </Link>
-            <Link
-              to="/community/create"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
-              onClick={closeNav}
-            >
-              Create Community
-            </Link>
+
+            {/* ONLY for logged-in users - same as desktop */}
+            {user && (
+              <>
+                <Link
+                  to="/create"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
+                  onClick={closeNav}
+                >
+                  Create Post
+                </Link>
+                
+                <Link
+                  to="/community/create"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
+                  onClick={closeNav}
+                >
+                  Create Community
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Auth Section */}
           <div className="px-4 py-2 border-t border-white/10">
-            {user ? (
-              <div className="flex items-center space-x-4">
-                {profile?.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt="User Avatar"
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <AccountCircle className="text-gray-300 text-2xl" />
-                )}
-                <span className="text-gray-300">{displayName}</span>
-                <button
-                  onClick={signOut}
-                  className="bg-red-500 px-3 py-1 rounded w-full mt-2 text-center text-white font-medium cursor-pointer"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <button
-                  onClick={signInWithGitHub}
-                  className="bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded w-full flex items-center justify-center"
-                >
-                  <GitHub className="w-4 h-4 mr-2" />
-                  Sign in with GitHub
-                </button>
-                <button
-                  onClick={signInWithGoogle}
-                  className="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded w-full flex items-center justify-center"
-                >
-                  <Google className="w-4 h-4 mr-2" />
-                  Sign in with Google
-                </button>
-              </div>
-            )}
-          </div>
+          {user ? (
+            <div className="flex items-center space-x-4">
+              {profile?.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt="User Avatar"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <AccountCircle className="text-gray-300 text-2xl" />
+              )}
+              <span className="text-gray-300">{displayName}</span>
+              <button
+                onClick={signOut}
+                className="bg-red-500 px-3 py-1 rounded w-full mt-2 text-center text-white font-medium cursor-pointer"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <button
+                onClick={signInWithGitHub}
+                className="bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded w-full flex items-center justify-center"
+              >
+                <GitHub className="w-4 h-4 mr-2" />
+                Sign in with GitHub
+              </button>
+              <button
+                onClick={signInWithGoogle}
+                className="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded w-full flex items-center justify-center"
+              >
+                <Google className="w-4 h-4 mr-2" />
+                Sign in with Google
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
+    )}
     </nav>
   );
 };

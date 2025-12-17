@@ -69,7 +69,7 @@ export const CreatePost = () => {
   }, [user]);
 
   // Fetch communities for the dropdown
-  // NOTE: Assuming CommunityList has been fixed to return { id: number, title: string }
+  // NOTE: Assuming CommunityList has been fixed to return { id: int8(number), title: string,description: string, created_at: uuid, type: string, slug: string }
   const { data: communities, isLoading: isLoadingCommunities, isError: isErrorCommunities } = useQuery<Community[], Error>({
     queryKey: ["communities"],
     queryFn: fetchCommunities,
