@@ -70,7 +70,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange }) =
         if (urlData?.publicUrl) {
           setPublicUrl(urlData.publicUrl); // Save the public URL
           // Use the public URL in the callback
-          onImageChange(file, urlData.publicUrl, "original"); // MARD CODED FOR MVP -selectedAspectRatio- Pass file, public URL, and aspect ratio to parent
+          onImageChange(file, urlData.publicUrl, selectedAspectRatio); // MARD CODED FOR MVP -selectedAspectRatio- Pass file, public URL, and aspect ratio to parent
         } else {
           throw new Error("Failed to get public URL for image.");
         }
