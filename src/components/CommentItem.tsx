@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Comment } from "./CommentSection";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../supabase-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   comment: Comment & {
@@ -41,6 +41,23 @@ export const CommentItem = ({ comment, postId }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  // 1. ADD THIS: Fetch the official username for the person REPLYING
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
   const { mutate, isPending, isError } = useMutation({
     mutationFn: (replyContent: string) =>
       createReply(
@@ -48,7 +65,7 @@ export const CommentItem = ({ comment, postId }: Props) => {
         postId,
         comment.id,
         user?.id,
-        user?.user_metadata?.user_name
+        profile?.username
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
