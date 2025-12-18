@@ -1,6 +1,7 @@
 // useProfileData.ts for fetching data on profile page 
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabase-client"; // Adjust path if your supabase-client is elsewhere
+import { useAuth } from "../../context/AuthContext";
 import { Post } from "../../components/PostList"; // Import the base Post interface
 
 // Define an interface for the extended post data returned by Supabase.
@@ -22,6 +23,8 @@ export const useProfileData = (username: string | undefined) => {
     followers: 0,
     following: 0,
     });
+    const [isFollowing, setIsFollowing] = useState(false);
+    const { user } = useAuth();
 
     useEffect(() => {
         if (username) {
@@ -73,6 +76,12 @@ export const useProfileData = (username: string | undefined) => {
         setUserPosts([]); // Clear posts if profile not found
         } else {
         setProfile(profileData);
+                // Check follow status for the current logged-in user, if available
+                if (user && profileData?.id) {
+                    checkFollowStatus(user.id, profileData.id).catch((err) => {
+                        console.warn("Failed to check follow status:", err);
+                    });
+                }
         
         // Now, fetch the posts for this specific user.
         const posts = await fetchUserPosts(profileData.id);
@@ -97,8 +106,44 @@ export const useProfileData = (username: string | undefined) => {
     }
     }, [username]); // Only re-run when the username in the URL changes
 
+        // Check if current user follows the profile target
+        const checkFollowStatus = async (currentUserId: string, targetUserId: string) => {
+            try {
+                const { data } = await supabase
+                    .from('follows')
+                    .select('*')
+                    .eq('follower_id', currentUserId)
+                    .eq('following_id', targetUserId)
+                    .maybeSingle();
+                setIsFollowing(!!data);
+            } catch (err) {
+                console.error('checkFollowStatus error', err);
+                setIsFollowing(false);
+            }
+        };
+
+        const toggleFollow = async (currentUserId: string | undefined, targetUserId: string) => {
+            if (!currentUserId) return;
+            try {
+                if (isFollowing) {
+                    await supabase.from('follows').delete()
+                        .eq('follower_id', currentUserId).eq('following_id', targetUserId);
+                } else {
+                    await supabase.from('follows').insert({
+                        follower_id: currentUserId,
+                        following_id: targetUserId
+                    });
+                }
+                setIsFollowing(prev => !prev);
+                // Refresh posts/stats after toggling
+                await loadProfileAndPosts();
+            } catch (err) {
+                console.error('toggleFollow error', err);
+            }
+        };
+
     // The hook returns all the data and state needed by the component.
-    return { profile, userPosts, stats, loading, loadProfileAndPosts };
+    return { profile, userPosts, stats, loading, loadProfileAndPosts, isFollowing, toggleFollow };
 };
 
 

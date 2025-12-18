@@ -68,13 +68,13 @@ const AppRoutes = () => {
       <Route path="/communities" element={<CommunitiesPage />} />
       <Route path="/community/:id" element={<CommunityPage />} />
       <Route path="/movies/search" element={<MovieSearchPage />} />
+      {/* Catch-all for Vite base path */}
+      <Route path="/movie-social" element={<Home />} />
+      <Route path="/movie-social/*" element={<Home />} />
 
       {/* This is the public-facing profile page. It is not wrapped. */}
       <Route path="/profile/:username" element={<ProfilePage />} />
 
-      {/* Catch-all for Vite base path */}
-      <Route path="/movie-social" element={<Home />} />
-      <Route path="/movie-social/*" element={<Home />} />
 
       {/* Protected routes that only logged-in users can access */}
       <Route path="/create-hub" element={<ProtectedRoute><CreateHub /></ProtectedRoute>} />

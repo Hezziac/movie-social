@@ -18,6 +18,8 @@ export function ProfilePage() {
     stats,
     loading,
     loadProfileAndPosts,
+    isFollowing,
+    toggleFollow,
 } = useProfileData(username);
 
   // This will only render the spinner if
@@ -52,12 +54,26 @@ export function ProfilePage() {
             {/* Username and Edit Button */}
             <div className="flex items-center gap-4 mb-4">
               <h1 className="text-xl font-bold text-white">{profile.username}</h1>
-              {user && user.id === profile.id && !isEditing && (
+
+              {user && user.id === profile.id ? (
+                !isEditing && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="bg-gray-800 text-white text-sm px-4 py-1.5 rounded-lg border border-gray-700 hover:bg-gray-700"
+                  >
+                    Edit Profile
+                  </button>
+                )
+              ) : (
                 <button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-gray-800 text-white text-sm px-4 py-1.5 rounded-lg border border-gray-700 hover:bg-gray-700"
+                  onClick={() => toggleFollow(user?.id, profile.id)}
+                  className={`px-6 py-1.5 rounded-lg font-medium transition ${
+                    isFollowing
+                      ? "bg-gray-800 text-white border border-gray-700 hover:bg-red-900/20 hover:text-red-500 hover:border-red-500"
+                      : "bg-purple-600 text-white hover:bg-purple-700"
+                  }`}
                 >
-                  Edit Profile
+                  {isFollowing ? "Unfollow" : "Follow"}
                 </button>
               )}
             </div>
