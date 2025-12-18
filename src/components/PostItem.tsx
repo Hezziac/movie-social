@@ -312,7 +312,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                 <div className="fixed inset-0 bg-black/70 z-40 pointer-events-none transition-opacity duration-200" />
               )}
 
-              {/* 🎨 1. FULL WIDTH GRADIENT SCRIM: Covers the entire bottom area */}
+              {/* FULL WIDTH GRADIENT SCRIM (only for images) */}
               {hasImage && !isZooming && (
                 <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/75 via-black/40 to-transparent z-10 pointer-events-none" />
               )}
@@ -322,27 +322,28 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                   hasImage ? "justify-end" : "items-center justify-center"
                 } p-6 gap-4 z-20`}
               >
-                {/* 🎬 MOVIE TILE MOVED HERE: Above the content */}
-                {movieForTile && (
-                  <div className="z-30 w-full max-w-[250px]">
-                    <MovieTile movie={movieForTile} />
-                  </div>
-                )}
+                {/* 🎬 CONTAINER: Handles Side-by-Side vs Stacked */}
+                <div className={`flex w-full gap-4 ${hasImage ? "flex-row items-end" : "flex-col items-center"}`}>
+                  {/* MOVIE TILE */}
+                  {movieForTile && (
+                    <div className={`z-30 w-full flex-shrink-0 ${hasImage ? "max-w-[140px]" : "max-w-[250px]"}`}>
+                      <MovieTile movie={movieForTile} />
+                    </div>
+                  )}
 
-                {/* 📝 POST CONTENT: Hidden if Image + Movie exists */}
-                {!shouldHideContent && (
-                  <div
-                    className={`whitespace-pre-line z-20 ${
-                      hasImage
-                        ? "text-white w-full text-sm md:text-base drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" 
-                        : "text-white text-xl md:text-2xl text-center"
-                    }`}
-                  >
-                    <p className={`line-clamp-4 ${!hasImage ? "px-4" : ""}`}>
-                      {post.content}
-                    </p>
-                  </div>
-                )}
+                  {/* 📝 POST CONTENT: Always visible, max 4 lines */}
+                  {post.content && (
+                    <div
+                      className={`whitespace-pre-line z-20 ${
+                        hasImage
+                          ? "text-white flex-1 text-sm md:text-base drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] pb-1"
+                          : "text-white text-xl md:text-2xl text-center px-4"
+                      }`}
+                    >
+                      <p className="line-clamp-4">{post.content}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
