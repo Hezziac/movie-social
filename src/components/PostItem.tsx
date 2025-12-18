@@ -314,7 +314,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
 
               {/* 🎨 1. FULL WIDTH GRADIENT SCRIM: Covers the entire bottom area */}
               {hasImage && !isZooming && (
-                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/100 via-black/60 to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/75 via-black/40 to-transparent z-10 pointer-events-none" />
               )}
 
               <div
@@ -338,7 +338,9 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                         : "text-white text-xl md:text-2xl text-center"
                     }`}
                   >
-                    {post.content}
+                    <p className={!hasImage ? "line-clamp-6 px-4" : "line-clamp-6"}>
+                      {post.content}
+                    </p>
                   </div>
                 )}
               </div>
