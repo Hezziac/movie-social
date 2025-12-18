@@ -9,10 +9,12 @@ import { AuthProvider } from "./context/AuthContext.tsx";
 
 const client = new QueryClient();
 
+const base = (import.meta.env.VITE_BASE_PATH as string | undefined) || undefined;
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={client}>
-      <Router>
+      <Router basename={base}>
         <AuthProvider>
           <App />
         </AuthProvider>
