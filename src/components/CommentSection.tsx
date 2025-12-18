@@ -171,7 +171,7 @@ export const CommentSection = ({ postId }: Props) => {
             {isPending ? "Posting..." : "Post Comment"}
           </button>
           {isError && (
-            <p className="text-red-500 mt-2">Error Posting comment.</p>
+            <p className="text-red-500 mt-2">Error Posting comment. {isError}</p>
           )}
         </form>
       ) : (
