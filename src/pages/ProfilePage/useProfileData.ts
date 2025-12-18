@@ -66,7 +66,7 @@ export const useProfileData = (username: string | undefined) => {
         setLoading(true); // Start loading
         const { data: profileData, error: profileError } = await supabase
         .from("profiles")
-        .select("id, username, bio, avatar_url, created_at, updated_at")
+        .select("id, username, bio, avatar_url, created_at, updated_at, followers_count, following_count")
         .eq("username", username)
         .single();
 
@@ -86,10 +86,11 @@ export const useProfileData = (username: string | undefined) => {
         // Now, fetch the posts for this specific user.
         const posts = await fetchUserPosts(profileData.id);
         setUserPosts(posts as PostWithRelations[]);
-        setStats(prevStats => ({
-            ...prevStats,
-            posts: posts.length
-        }));
+        setStats({
+            posts: posts.length,
+            followers: profileData.followers_count || 0,
+            following: profileData.following_count || 0
+        });
         }
     } catch (err) {
         console.error("Error loading profile or posts:", err);
