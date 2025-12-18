@@ -321,10 +321,10 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                 } p-6 gap-4 z-20`}
               >
                 {/* 🎬 CONTAINER: Handles Side-by-Side vs Stacked */}
-                <div className={`flex w-full gap-4 ${hasImage ? "flex-row items-end" : "flex-col items-center"}`}>
+                <div className={`flex w-full gap-3 ${hasImage ? "flex-row items-end" : "flex-col items-center"}`}>
                   {/* MOVIE TILE */}
                   {movieForTile && (
-                    <div className={`z-30 w-full flex-shrink-0 ${hasImage ? "max-w-[140px]" : "max-w-[250px]"}`}>
+                    <div className={`z-30 w-full flex-shrink-0 ${hasImage ? "w-24 md:w-32" : "w-full max-w-[250px]"}`}>
                       <MovieTile movie={movieForTile} />
                     </div>
                   )}
@@ -332,13 +332,13 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                   {/* 📝 POST CONTENT: Always visible, max 4 lines */}
                   {post.content && (
                     <div
-                      className={`whitespace-pre-line z-20 ${
+                      className={`whitespace-pre-line z-20 min-w-0 flex-1 ${
                         hasImage
                           ? "text-white flex-1 text-sm md:text-base drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] pb-1"
                           : "text-white text-xl md:text-2xl text-center px-4"
                       }`}
                     >
-                      <p className="line-clamp-4">{post.content}</p>
+                      <p className="line-clamp-4 leading-tight">{post.content}</p>
                     </div>
                   )}
                 </div>
