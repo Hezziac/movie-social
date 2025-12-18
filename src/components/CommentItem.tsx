@@ -100,7 +100,7 @@ export const CommentItem = ({ comment, postId }: Props) => {
     if (error) throw new Error(error.message);
   };
 
-  const { mutate: mutateDelete, isPending: isDeleting, isError: deleteError } = useMutation({
+  const { mutate: mutateDelete, isPending: isDeleting } = useMutation({
     mutationFn: () => deleteComment(comment.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
