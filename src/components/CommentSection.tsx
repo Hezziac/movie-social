@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { CommentItem } from "./CommentItem";
+
 interface Props {
   postId: number;
 }
@@ -59,6 +60,23 @@ export const CommentSection = ({ postId }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  // 1. Fetch the official username from your profiles table
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id, // Only run if a user is logged in
+  });
+
   const {
     data: comments,
     isLoading,
@@ -75,7 +93,7 @@ export const CommentSection = ({ postId }: Props) => {
         newComment,
         postId,
         user?.id,
-        user?.user_metadata?.user_name
+        profile?.username
       ),
 
       onSuccess: () => {
