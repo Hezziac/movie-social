@@ -200,8 +200,6 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
       vote_average: 0, 
   } : null;
 
-  // Hide content if there is an image AND movie data
-  const shouldHideContent = hasImage && hasMovieData;
   return (
     <>
       <div
