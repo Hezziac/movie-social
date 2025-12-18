@@ -36,15 +36,12 @@ export const useProfileData = (username: string | undefined) => {
     const { data, error } = await supabase
         .from("posts")
         .select(`
-        id,
-        title,
-        image_url,
-        content,
-        created_at,
-        movie_id,
-        movie_title,
-        movie_poster_path,
-        movie_release_date,
+        *,
+        movies (
+            title,
+            poster_path,
+            release_date
+        ),
         votes(count),
         comments(count),
         profiles(username, avatar_url)
