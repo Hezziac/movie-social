@@ -329,7 +329,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                   <div
                     className={`whitespace-pre-line z-20 ${
                       hasImage
-                        ? "text-white w-full text-sm md:text-base bg-black/40 p-2 rounded"
+                        ? "text-white w-full text-sm md:text-base pt-12 p-6 bg-gradient-to-t from-black/90 via-black/40 to-transparent"
                         : "text-white text-xl md:text-2xl text-center"
                     }`}
                   >
@@ -341,7 +341,6 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
 
             {/* Footer */}
             <div className="absolute bottom-4 left-4 right-4 z-20 flex justify-end items-end">
-              {/* MovieTile removed from here to prevent duplication */}
 
               <div className="flex flex-col items-center gap-4">
                 <div className="flex flex-col items-center">
