@@ -268,7 +268,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
             {/* Content area */}
             <div
               className={`flex-1 relative ${
-                isZooming ? "overflow-visible pb-0" : "overflow-hidden pb-16"
+                isZooming ? "overflow-visible pb-0" : "overflow-hidden"
               }`}
             >
               {hasImage && (
@@ -316,15 +316,15 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
               )}
 
               <div
-                className={`relative h-full flex flex-col ${
-                  hasImage ? "justify-end" : "items-center justify-center"
-                } p-6 gap-4 z-20`}
+                className={`absolute inset-0 flex flex-col ${
+                  hasImage ? "justify-end pb-20" : "items-center justify-center"
+                } p-6 gap-4 z-20 pointer-events-none`}
               >
                 {/* 🎬 CONTAINER: Handles Side-by-Side vs Stacked */}
-                <div className={`flex w-full gap-3 ${hasImage ? "flex-row items-end" : "flex-col items-center"}`}>
+                <div className={`flex w-full gap-3 pointer-events-auto ${hasImage ? "flex-row items-end" : "flex-col items-center"}`}>
                   {/* MOVIE TILE */}
                   {movieForTile && (
-                    <div className={`z-30 w-full flex-shrink-0 ${hasImage ? "w-24 md:w-32" : "w-full max-w-[250px]"}`}>
+                    <div className={`z-30 w-full flex-shrink-0 ${hasImage ? "w-24 md:w-32" : "w-full max-w-[200px]"}`}>
                       <MovieTile movie={movieForTile} />
                     </div>
                   )}
@@ -334,11 +334,11 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                     <div
                       className={`whitespace-pre-line z-20 min-w-0 flex-1 ${
                         hasImage
-                          ? "text-white flex-1 text-sm md:text-base drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] pb-1"
-                          : "text-white text-xl md:text-2xl text-center px-4"
+                          ? "text-white text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" 
+                          : "text-white text-xl text-center px-4"
                       }`}
                     >
-                      <p className="line-clamp-4 leading-tight">{post.content}</p>
+                      <p className="line-clamp-4 leading-tight font-medium">{post.content}</p>
                     </div>
                   )}
                 </div>
