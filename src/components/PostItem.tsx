@@ -321,10 +321,20 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                 } p-6 gap-4 z-20 pointer-events-none`}
               >
                 {/* 🎬 CONTAINER: Handles Side-by-Side vs Stacked */}
-                <div className={`flex w-full gap-3 pointer-events-auto ${hasImage ? "flex-row items-end" : "flex-col items-center"}`}>
+                <div 
+                  className={`flex w-full gap-4 pointer-events-auto 
+                    ${hasImage 
+                      ? "flex-col items-start md:flex-row md:items-end" // Stacked on mobile, side-by-side on desktop
+                      : "flex-col items-center justify-center text-center" // Centered for text-only
+                    }`}
+                >
                   {/* MOVIE TILE */}
                   {movieForTile && (
-                    <div className={`z-30 w-full flex-shrink-0 ${hasImage ? "w-24 md:w-32" : "w-full max-w-[200px]"}`}>
+                    <div className={`z-30 flex-shrink-0 ${
+                      hasImage 
+                        ? "w-20 md:w-32" // Smaller tile on mobile overlay
+                        : "w-full max-w-[180px] mb-4" // Centered tile for text-only
+                    }`}>
                       <MovieTile movie={movieForTile} />
                     </div>
                   )}
@@ -334,11 +344,13 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                     <div
                       className={`whitespace-pre-line z-20 min-w-0 flex-1 ${
                         hasImage
-                          ? "text-white text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" 
-                          : "text-white text-xl text-center px-4"
+                          ? "text-white text-sm md:text-base drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" 
+                          : "text-white text-xl md:text-2xl font-bold px-4 max-w-lg"
                       }`}
                     >
-                      <p className="line-clamp-4 leading-tight font-medium">{post.content}</p>
+                      <p className={`${hasImage ? "line-clamp-4" : ""} leading-tight font-medium`}>
+                        {post.content}
+                      </p>
                     </div>
                   )}
                 </div>
