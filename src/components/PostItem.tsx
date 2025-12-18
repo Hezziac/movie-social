@@ -200,6 +200,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
       vote_average: 0, 
   } : null;
 
+  // Hide content if there is an image AND movie data
+  const shouldHideContent = hasImage && hasMovieData;
   return (
     <>
       <div
@@ -309,28 +311,37 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
               {isZooming && (
                 <div className="fixed inset-0 bg-black/70 z-40 pointer-events-none transition-opacity duration-200" />
               )}
+
               <div
-                className={`relative h-full flex ${
-                  hasImage ? "items-end" : "items-center justify-center"
-                } p-6`}
+                className={`relative h-full flex flex-col ${
+                  hasImage ? "justify-end" : "items-center justify-center"
+                } p-6 gap-4`}
               >
-                <div
-                  className={`whitespace-pre-line ${
-                    hasImage
-                      ? "text-white w-full"
-                      : "text-white text-xl md:text-2xl text-center"
-                  }`}
-                >
-                  {post.content}
-                </div>
+                {/* 🎬 MOVIE TILE MOVED HERE: Above the content */}
+                {movieForTile && (
+                  <div className="z-30 w-full max-w-[250px]">
+                    <MovieTile movie={movieForTile} />
+                  </div>
+                )}
+
+                {/* 📝 POST CONTENT: Hidden if Image + Movie exists */}
+                {!shouldHideContent && (
+                  <div
+                    className={`whitespace-pre-line z-20 ${
+                      hasImage
+                        ? "text-white w-full text-sm md:text-base bg-black/40 p-2 rounded"
+                        : "text-white text-xl md:text-2xl text-center"
+                    }`}
+                  >
+                    {post.content}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="absolute bottom-4 left-4 right-4 z-20 flex justify-between items-end">
-              <div className="flex-1">
-                {movieForTile && <MovieTile movie={movieForTile} />}
-              </div>
+            <div className="absolute bottom-4 left-4 right-4 z-20 flex justify-end items-end">
+              {/* MovieTile removed from here to prevent duplication */}
 
               <div className="flex flex-col items-center gap-4">
                 <div className="flex flex-col items-center">

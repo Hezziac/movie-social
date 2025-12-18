@@ -134,7 +134,7 @@ export const CommentItem = ({ comment, postId }: Props) => {
           {(isAuthor || isPostOwner) && comment.author !== "[deleted]" && (
             <button
               onClick={() => {
-                if (confirm("Delete this comment? This will replace it with '[Deleted Comment]'.")) {
+                if (confirm("Delete this comment? CANNOT BE RESTORED!\nThis will replace it with '[Deleted Comment]'.")) {
                   mutateDelete();
                 }
               }}
