@@ -1,6 +1,6 @@
 # Social.Cine
-#### Video Demo:  <URL HERE>
-#### Live Application: [https://socialcine.vercel.app/](https://socialcine.vercel.app/)
+#### Video Demo: <URL HERE>
+#### Live Application: [Visit Social.Cine](https://socialcine.vercel.app/)
 
 #### Description:
 **Social.Cine** is a specialized social media platform built for movie enthusiasts. It combines the visual appeal of a modern photo-sharing app with the community-driven structure of a forum. The project was born from the idea that movie discussions deserve a dedicated space where film data—like posters, release dates, and director info—is integrated directly into the social experience.
@@ -15,6 +15,16 @@ The platform draws inspiration from the feed-based model of Instagram and the co
 * **Dynamic Movie Integration:** Using the TMDB API, users can tag specific films in their posts, which automatically pulls in high-quality posters and metadata.
 * **Communities:** Users can create and join genre-specific groups (e.g., "Horror Fanatics") to connect with people sharing niche interests.
 * **Responsive Media Grid:** An Instagram-inspired 3-column profile grid with hover effects for likes and comments, optimized specifically for mobile viewports.
+
+---
+
+## Sources & Inspiration
+This project was heavily influenced by the following educational resources, which provided the foundational architecture that I refactored and expanded upon to create Social.Cine:
+
+1. **PedroTech - Social Media App Tutorial**: Provided the initial framework for React routing and Supabase integration. 
+   - [Watch Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+2. **Tech With Tim - Learn React With This ONE Project**: Assisted in the logic for TMDB API integration and movie search functionality.
+   - [Watch Tutorial](https://www.youtube.com/watch?v=G6D9cBaLViA)
 
 ---
 

@@ -1,6 +1,6 @@
  /* [CommunityList.tsx]
  * 
- * Contains community list component and fetchCommunities functions.
+ * Contains community list component and fetchCommunities functions and display.
  * * * SOURCE ATTRIBUTION:
  * This entire file was originally provided by the following tutorial:
  * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { Link } from "react-router";
 
-// ID is bigint (number in JS) and columns are title/description
+// ID is bigint (number in JS) and columns are (id, title, description, created_at)
 export interface Community {
   id: number; 
   title: string; 
