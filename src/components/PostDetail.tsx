@@ -23,6 +23,7 @@ import { LikeButton } from "./LikeButton";
 import { CommentSection } from "./CommentSection";
 import { MovieTile } from "./MovieTile"; // New component we'll create
 import { Movie } from "../context/tmdb-client";
+import { Link } from "react-router";
 
 interface Props {
   postId: number;
@@ -30,12 +31,13 @@ interface Props {
 
 // Relational Join Logic: Refactored with AI assistance to fetch movie data 
 // alongside the post.
-const fetchPostById = async (id: number): Promise<Post & { movie?: Movie }> => {
+const fetchPostById = async (id: number): Promise<Post & { movie?: Movie; profile?: { username: string } }> => {
   const { data, error } = await supabase
     .from("posts")
     .select(`
       *,
-      movie:movie_id (*)
+      movie:movie_id (*),
+      profile:user_id (username)
     `)
     .eq("id", id)
     .single();
@@ -58,6 +60,8 @@ export const PostDetail = ({ postId }: Props) => {
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Post Header */}
       <div className="flex items-center gap-4 mb-6">
+        {/* User Avatar */}
+        <Link to={`/profile/${data.profile?.username}`} className="hover:underline">
         {data.avatar_url ? (
           <img
             src={data.avatar_url}
@@ -75,6 +79,7 @@ export const PostDetail = ({ postId }: Props) => {
             {new Date(data.created_at).toLocaleDateString()}
           </p>
         </div>
+        </Link>
       </div>
 
       {/* Post Content with Image */}
