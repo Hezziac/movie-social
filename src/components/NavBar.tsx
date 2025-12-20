@@ -14,6 +14,10 @@
  * rendering for Auth states (GitHub vs Google) and linking to custom user profiles.
  * - **UI/UX**: Used AI to improve visibility of navigation items and ensure 
  * the mobile toggle menu functioned correctly within the React state.
+ * - **Logo Integration**: AI helped refactor the brand section to include a 
+ * custom image logo alongside the text title. By using a flex container with 
+ * fixed dimensions, we ensured the 180px source image scales perfectly to 
+ * navbar height without distorting or breaking the responsive layout.
  */
 import { useState, useEffect } from "react";
 import { Link } from "react-router"; // Fixed import (use "react-router-dom" instead of "react-router")
@@ -70,9 +74,17 @@ export const Navbar = () => {
     <nav className="fixed top-0 w-full z-40 bg-[rgba(10,10,10,0.8)] backdrop-blur-lg border-b border-white/10 shadow-lg h-16">
       <div className="max-w-5xl mx-auto px-4 h-full">
         <div className="flex justify-between items-center h-full">
-          {/* Logo */}
-          <Link to="/" className="font-mono text-xl font-bold text-white">
-            Social<span className="text-purple-500">.Cine</span>
+          {/* Brand Logo Section: Refactored with AI to include image + text */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <img 
+              src="/logo.png" 
+              alt="Social.Cine Logo" 
+              /* h-8 (32px) is the sweet spot for a 64px (h-16) navbar */
+              className="h-8 w-auto object-contain transition-transform group-hover:scale-110" 
+            />
+            <span className="font-mono text-xl font-bold text-white tracking-tight">
+              Social<span className="text-purple-500">.Cine</span>
+            </span>
           </Link>
 
           {/* Desktop Links */}
