@@ -101,7 +101,7 @@ export default function MovieSearchPage() {
         {/* Fallback Logic: AI helped implement this check to handle cases 
                 where TMDB does not have an image available for a specific film. */}
         {movies.map((movie) => (
-          <div key={movie.id} className="bg-white rounded-lg shadow overflow-hidden">
+          <div key={movie.id} className="bg-gray-800 rounded-lg shadow overflow-hidden">
             {movie.poster_path ? (
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
