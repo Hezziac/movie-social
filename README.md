@@ -1,6 +1,6 @@
 # Social.Cine
 #### Video Demo: <URL HERE>
-#### Live Application: [Visit Social.Cine](https://socialcine.vercel.app/)
+#### Live Application: [https://socialcine.vercel.app/](https://socialcine.vercel.app/)
 
 #### Description:
 **Social.Cine** is a specialized social media platform built for movie enthusiasts. It combines the visual appeal of a modern photo-sharing app with the community-driven structure of a forum. The project was born from the idea that movie discussions deserve a dedicated space where film data—like posters, release dates, and director info—is integrated directly into the social experience.
