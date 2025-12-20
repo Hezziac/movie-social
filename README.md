@@ -1,28 +1,51 @@
-# Cine.Circle: A Social Hub for Movie Lovers
-
-#### Video Demo: Coming Soon!<URL HERE>
+# Social.Cine
+#### Video Demo:  <URL HERE>
+#### Live Application: [https://socialcine.vercel.app/](https://socialcine.vercel.app/)
 
 #### Description:
+**Social.Cine** is a specialized social media platform built for movie enthusiasts. It combines the visual appeal of a modern photo-sharing app with the community-driven structure of a forum. The project was born from the idea that movie discussions deserve a dedicated space where film data—like posters, release dates, and director info—is integrated directly into the social experience.
 
-Cine.Circle is a modern social media platform designed for movie lovers to connect, share their thoughts, and discover new films together. In a world saturated with generic social media, this project aims to create a specialized community where the conversation is centered around a shared passion. It’s a place where you can share your favorite movie scenes, review new releases, and plan virtual movie nights with friends. The platform draws inspiration from the feed-based model of Instagram and the community-driven structure of Reddit, but with every feature built specifically to enhance the movie-watching experience.
+This project represents a significant personal milestone. I have spent over **9 months** working on this application, iterating on the design and logic. While it is submitted here as my CS50 Final Project, it is a "living" project that I intend to continue building and updating as a long-term hobby.
 
-While a core feature like group streaming is a long-term goal, the current implementation focuses on the "social" aspect: creating a vibrant community where users can interact around movie content. This includes:
+The platform draws inspiration from the feed-based model of Instagram and the community-driven structure of Reddit, but with every feature built specifically to enhance the movie-watching experience.
 
-* **User Authentication & Profiles:** Users can sign up and create a personalized profile. This includes a username, avatar, and a feed of their posts.
-* **Dynamic Posts:** Posts are the heart of the platform. They can include text, images, and, most importantly, tagged movies. This allows users to share a review, a memorable quote, or a favorite movie meme while linking directly to the film they are discussing.
-* **Communities:** Users can create and join communities centered around specific genres, franchises, or directors (e.g., "Horror Fanatics" or "Christopher Nolan Lovers"). This allows for more focused discussions and a way to connect with people who share your niche interests.
-* **Friends & Following:** The platform supports a follower system, allowing users to build a network of friends and see their content on a personalized feed.
-* **In-app Search:** Search for movies and find information about them to include in your posts.
+### Key Features:
+* **User Authentication & Onboarding:** A custom-built flow ensures every user establishes a unique identity and username before entering the feed.
+* **The "Creation Hub":** A centralized UI portal that reduces navigation clutter by housing both Post and Community creation tools.
+* **Dynamic Movie Integration:** Using the TMDB API, users can tag specific films in their posts, which automatically pulls in high-quality posters and metadata.
+* **Communities:** Users can create and join genre-specific groups (e.g., "Horror Fanatics") to connect with people sharing niche interests.
+* **Responsive Media Grid:** An Instagram-inspired 3-column profile grid with hover effects for likes and comments, optimized specifically for mobile viewports.
 
 ---
 
-## Inspiration
+## File Breakdown and Functionality
 
-This project was heavily inspired by PedroTech's Social Media App tutorial on YouTube:
+To meet the requirements of a complex full-stack application, the following files were authored and refactored:
 
-[Social Media App Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+### Core & Configuration
+* **`App.tsx`**: The central traffic controller. It manages all routes and includes a "Profile Verification Gate" to ensure new users are funneled to onboarding.
+* **`main.tsx`**: The entry point that initializes the React DOM and configures the `BrowserRouter` with dynamic base-path logic for deployment.
+* **`supabase-client.ts`**: Handles the connection to the backend, including specialized error handling for Vercel environment variables.
+* **`index.css`**: Contains global styles and advanced mobile optimizations, such as Dynamic Viewport Height (`dvh`) and iOS safe-area inset management.
+* **`DATABASE SETUP.txt`**: A reference log of the SQL schema used to build the relational database, including Many-to-Many joining tables.
 
-I was looking to create a social media app that felt familiar to users but was built specifically for movie enthusiasts and their friends. While the tutorial provided a solid foundation, I'm building upon it to create my unique vision for a movie-focused social media experience.
+### Context & Logic
+* **`AuthContext.tsx`**: Manages the global authentication state. It handles the transition from Supabase's auth events to the application's internal user state.
+* **`tmdb-client.ts`**: A specialized API client that communicates with The Movie Database to fetch real-time film data.
+* **`useProfileData.ts`**: A custom hook that centralizes the heavy lifting of fetching profile stats, user posts, and social relationship statuses.
+
+### Pages & Views
+* **`Home.tsx`**: The landing page that renders the main social feed.
+* **`ProfilePage.tsx`**: A high-fidelity profile view featuring a 3-column media grid and conditional "Edit/Follow" logic.
+* **`ProfileSetupPage.tsx`**: The onboarding gate that handles initial username generation and profile creation.
+* **`MovieSearchPage.tsx`**: An interactive search interface for browsing the TMDB database.
+* **`CreationHubPage.tsx`**: A custom navigation portal designed to simplify the user experience.
+* **`CommunitiesPage.tsx` & `CommunityPage.tsx`**: Handle the display of genre-specific groups and their unique feeds.
+
+### Components
+* **`NavBar.tsx`**: A responsive navigation bar that adapts based on the user's authentication status.
+* **`PostList.tsx` & `PostDetail.tsx`**: The primary engines for rendering feed content and deep-dive post views.
+* **`ProfileEditForm.tsx`**: A dedicated interface for users to update their bios and avatars.
 
 ---
 
@@ -30,45 +53,34 @@ I was looking to create a social media app that felt familiar to users but was b
 
 The choice of technology for this project was deliberate, with the goal of building a modern, performant, and scalable application.
 
-* **React & TypeScript:** I chose React to build a dynamic, single-page application (SPA). This provides a seamless user experience without constant page reloads. TypeScript was used to add a layer of type safety, which is crucial for a project of this size. It helps catch common errors during development and makes the codebase easier to maintain and refactor.
-* **Vite:** As the build tool, Vite was selected for its incredibly fast development server and build times. This significantly improved my productivity and allowed for a faster development cycle compared to other alternatives like create-react-app.
-* **Supabase:** Rather than building a custom backend from scratch, I chose Supabase, a "Backend as a Service" (BaaS). This was a major design decision. Supabase provides a full suite of tools, including a PostgreSQL database, real-time data synchronization, and a robust authentication system. This allowed me to focus on building the front-end and core social features without getting bogged down in server-side logic and database management, which is a major advantage for a solo project.
-* **PostgreSQL:** The core database is PostgreSQL, which comes standard with Supabase. Its relational structure is ideal for a social media app, allowing for complex data relationships between users, posts, movies, and communities.
-* **Tailwind CSS:** For styling, I utilized Tailwind CSS. Its utility-first approach allowed me to rapidly build and customize the UI. It provides a consistent design system and makes responsive design much more efficient, which was a key consideration for ensuring the app looks great on both mobile and desktop.
+* **React & TypeScript:** I chose React to build a dynamic, single-page application (SPA). TypeScript was used to add a layer of type safety, which was crucial for a project of this size. It helped catch common errors during development and made the codebase easier to maintain.
+* **Supabase (PostgreSQL):** Rather than building a custom backend from scratch, I chose Supabase. This allowed me to focus on the "Instagram-look" and core social features without getting bogged down in server-side boilerplate. The relational structure of PostgreSQL is ideal for managing complex relationships between users, posts, and communities.
+* **Tailwind CSS:** For styling, I utilized Tailwind CSS. Its utility-first approach allowed me to rapidly build the UI. I spent considerable time refactoring the CSS to handle mobile "safe-area" insets and dynamic viewport heights to ensure the app feels like a native mobile application.
+* **AI Collaboration:** Throughout the 9-month development, I utilized GitHub Copilot and Perplexity AI as "pair programmers." They were instrumental in refactoring the `App.tsx` routing logic and debugging complex redirect loops during the onboarding phase.
 
 ---
 
 ## Database Structure
 
-The application's data is managed by a PostgreSQL database with the following key tables and their relationships:
-
-* `profiles`: Stores user data, including `id` (linked to Supabase Auth), `username`, and `avatar_url`. This table is essential for managing user-specific data outside of the authentication system.
-* `posts`: The primary table for all user posts. It includes columns for content, timestamps, and a `user_id` that links back to the `profiles` table.
-* `communities`: Stores information about each community, such as `name` and `description`. A `creator_id` links back to the `profiles` table.
-* `movies`: This table caches movie data from an external API (like TMDB) to avoid repeated API calls. It includes data such as `title`, `poster_url`, and `release_date`.
-* `comments`: This table holds user comments, with foreign keys linking back to both the `posts` and `profiles` tables.
-* `likes`: A simple table to track likes on posts, linking `user_id` and `post_id`.
-* `post_movies`: A join table to manage the many-to-many relationship between `posts` and `movies`, allowing a single post to tag multiple films.
-* `community_members`: A join table to track which users are members of which communities.
+* `profiles`: Stores user data linked to Supabase Auth.
+* `posts`: The primary table for all user content.
+* `communities`: Stores genre-specific group information.
+* `movies`: Caches data from the TMDB API to optimize performance.
+* `post_movies`: A join table managing the many-to-many relationship between posts and films.
 
 ---
 
-## Getting Started and Future Vision
+## Future Vision
 
-The project is still under active development, and I am committed to improving its features and performance. If you are interested in becoming a beta tester for the MVP or would like to contribute, please contact me at the email in this document. I'm learning TypeScript as I go, so any advice is welcome.
-
-Looking ahead, my vision for Cine.Circle includes:
-
-* **Group Watch:** Implementing real-time group streaming functionality using a service like WebRTC. This would allow friends to watch movies together in sync from anywhere.
-* **Enhanced User Profiles:** Allowing users to create "watched" and "want to watch" lists, and see which movies their friends have rated.
-* **Advanced Search & Discovery:** Creating a powerful search engine that allows users to find movies, friends, and communities based on various criteria.
-
-I am confident that Cine.Circle, built with these modern technologies, has the potential to become a truly useful and engaging platform for movie enthusiasts.
+Social.Cine is a project I am deeply passionate about. My future roadmap includes:
+* **Group Watch:** Implementing real-time group streaming functionality using WebRTC.
+* **Enhanced Lists:** Allowing users to create "Watched" and "Want to Watch" lists.
+* **Advanced Discovery:** A recommendation engine based on user following and liked genres.
 
 ---
 
 ## Important Note for CS50 Graders:
 
-This project is a personal reflection of my learning journey. It demonstrates the skills I have acquired in modern full-stack development. All the code, including the front-end components, API integrations, and database schema, was written from the ground up, with the Supabase backend providing the necessary tools to focus on the core functionality.
+This project is the culmination of my journey through CS50. It demonstrates a move from basic programming into professional full-stack architecture. By integrating third-party APIs with a custom-built relational database, I have created a platform that is both technically robust and visually polished. I am proud to share that after 9 months of hard work, the application is live and functional.
 
 Thank you for your consideration.

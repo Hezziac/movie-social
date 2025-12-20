@@ -1,3 +1,20 @@
+/* [tmdb-client.ts]
+ *
+ * This component is a client utility for interacting with The Movie Database (TMDB) API.
+ * Handles fetching popular movies, search queries, and movie details.
+ * * * * SOURCE ATTRIBUTION:
+ * This component's core structure and API logic were based on:
+ * [Tech With Tim - Learn React With This ONE Project](https://youtu.be/G6D9cBaLViA?si=1EzGXxDseUnhyomX)
+ * * * * Note on AI Usage: 
+ * - **API Learning & Documentation**: GitHub Copilot and Perplexity AI were used to 
+ * interpret the TMDB API documentation and understand the structure of the JSON responses.
+ * - **Performance & Caching**: AI helped implement a custom 'Global Request Cache' 
+ * and 'Active Requests' map. This ensures the app doesn't make duplicate API calls 
+ * for the same movie data, staying within rate limits and improving speed.
+ * - **Error Handling**: AI assisted in refactoring the 'makeRequest' wrapper to 
+ * provide consistent error catching and TypeScript return types across all API calls.
+ */
+
 // Movie Type
 export interface Movie {
     id: number;
@@ -12,9 +29,10 @@ export interface Movie {
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = import.meta.env.VITE_TMDB_BASE_URL;
 
-// Global request cache - Cache for basic rate limiting
+// Performance Optimization: Refactored with AI to implement request caching 
+// and "in-flight" request tracking. This prevents the app from firing 
+// multiple identical network requests simultaneously.
 const requestCache = new Map<string, { timestamp: number; data: any }>();
-
 const activeRequests = new Map<string, Promise<any>>();
 
 // Specialized cache for popular movies
@@ -100,7 +118,8 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
   }
 };
 
-// Optional: Get movie details
+// Fetch logic assisted by AI to ensure movie details are correctly cast 
+// to the TypeScript 'Movie' interface after being retrieved from the API.
 export const getMovieDetails = async (id: number): Promise<Movie | null> => {
   try {
     const data = await makeRequest(`movie/${id}`);

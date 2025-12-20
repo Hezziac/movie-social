@@ -1,4 +1,19 @@
-// components/MovieTile.tsx
+/* [MovieSearchModal.tsx]
+ *
+ ** A UI component for displaying movie posters with interactive hover effects.
+ * * * * SOURCE ATTRIBUTION:
+ * This component's functional logic (fetching/displaying TMDB data) was based on:
+ * [Tech With Tim - Learn React With This ONE Project](https://youtu.be/G6D9cBaLViA?si=1EzGXxDseUnhyomX)
+ * * * * Note on AI Usage: 
+ * - **Visual Design & UI**: While the logic follows the tutorial, the visual 
+ * implementation (Tailwind CSS) was refactored with GitHub Copilot and Perplexity AI. 
+ * - **Styling Features**: AI was specifically used to implement the custom 
+ * "Glow Effect" (gradient blur), the backdrop-blur glassmorphism, and the 
+ * responsive sizing (w-24 vs w-32) to fit my social feed's aesthetic.
+ * - **Refactoring**: AI assisted in making the component resilient to missing 
+ * poster images by generating the fallback gradient and emoji layout.
+ */
+ 
 import { Movie } from "../context/tmdb-client";
 
 interface Props {
@@ -8,7 +23,8 @@ interface Props {
 export const MovieTile = ({ movie }: Props) => {
   return (
     <div className="relative group w-24 h-32 md:w-32 md:h-44">
-      {/* Glow effect - constrained to tile size */}
+      {/* Custom UI: Glow effect and hover transitions pinpointed and 
+          implemented with AI to match the project's purple/pink theme. */}
       <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg blur opacity-0 group-hover:opacity-75 transition-opacity duration-300 z-0"></div>
       
       {/* Main tile */}

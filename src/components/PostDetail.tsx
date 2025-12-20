@@ -1,4 +1,21 @@
-// PostDetail.tsx
+ /* [PostDetail.tsx]
+ * 
+ * Contains the detailed view of a post, including the post's title, content, image, and associated movie.
+ * It also includes the like/dislike button and comment section components.
+ * * * SOURCE ATTRIBUTION:
+ * This file was originally provided by the following tutorial:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ * Adapted significantly to handle custom Movie associations and database schema changes.
+ * * * Note on AI Usage: 
+ * - **Assistant Teaching**: Used AI as an assistant teacher to understand the 
+ * fundamentals of creating and integrating reusable components (like MovieTile) for later use.
+ * - **UI/UX Design**: AI assisted in refactoring the visual layout, specifically 
+ * for the positioning of the movie tile, implementing the backdrop-blur effects, 
+ * and using Tailwind CSS to create the purple-pink gradient aesthetic.
+ * - **Database & Types**: GitHub Copilot and Perplexity assisted in modifying 
+ * the 'fetchPostById' query to correctly perform a relational join with the 
+ * 'movies' table in Supabase.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { Post } from "./PostList";
@@ -11,6 +28,8 @@ interface Props {
   postId: number;
 }
 
+// Relational Join Logic: Refactored with AI assistance to fetch movie data 
+// alongside the post.
 const fetchPostById = async (id: number): Promise<Post & { movie?: Movie }> => {
   const { data, error } = await supabase
     .from("posts")
@@ -77,6 +96,9 @@ export const PostDetail = ({ postId }: Props) => {
           </div>
         )}
 
+        {/* UI Adaptation: Movie Tile positioning and backdrop-blur styling 
+            refactored with AI assistance to ensure visibility regardless of 
+            the post background. */}
         {/* Movie Tile - ALWAYS SHOWS if movie exists (MOVED OUTSIDE image block) */}
         {data.movie && (
           <div className="flex justify-center mb-6 pt-4">

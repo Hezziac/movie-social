@@ -1,3 +1,19 @@
+ /* [LikeButton.tsx]
+ * 
+ * Contains the LikeButton component for a post, allowing users to like or dislike posts.
+ * * * SOURCE ATTRIBUTION:
+ * This file was originally provided by the following tutorial:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ * I have adapted the code specifically to match my project's Supabase data structure 
+ * and TypeScript requirements.
+ * * * Note on AI Usage: 
+ * - **Code Explanation & Learning**: GitHub Copilot and Perplexity AI were used after the 
+ * tutorial to provide detailed comments and assist in my fundamental understanding 
+ * of how the mutation and vote-checking logic work in TypeScript.
+ * - **Refactoring**: AI assisted in ensuring the types for the 'Vote' interface 
+ * and 'mutate' function correctly matched my Supabase schema.
+ */
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../context/AuthContext";

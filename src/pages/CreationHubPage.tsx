@@ -1,3 +1,18 @@
+/** [CreateHub.tsx]
+ * 
+ * * A custom navigation portal created to consolidate "Create" actions into 
+ * a single view. This improves the UI by reducing Navbar clutter and 
+ * providing a dedicated space for users to choose between creating content 
+ * or communities.
+ * * * * Note on AI Usage: 
+ * - **Design & Layout**: GitHub Copilot and Perplexity AI assisted in the 
+ * visual refactoring of this page. AI helped implement the responsive 
+ * two-column grid and the interactive hover effects (scale-ups and border 
+ * color transitions) using Tailwind CSS.
+ * - **Iconography**: AI assisted in selecting and styling the appropriate 
+ * Material UI icons (PostAdd and GroupAdd) to match the project's aesthetic.
+ */
+
 import { Link } from "react-router";
 import { PostAdd, GroupAdd } from "@mui/icons-material";
 
@@ -5,6 +20,9 @@ export const CreateHub = () => {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="max-w-2xl w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Visual Refactoring: AI assisted in implementing these interactive 
+            cards with conditional hover states (border-purple vs border-pink) 
+            to differentiate between 'Post' and 'Community' actions. */}
         {/* Create Post Button */}
         <Link
           to="/create"

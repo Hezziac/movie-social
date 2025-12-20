@@ -1,4 +1,11 @@
-// CreatePostPage.tsx
+/**
+ * [CreatePostPage.tsx]
+ * * A page-level component that serves as the container for the 
+ * 'CreatePost' form logic. 
+ * * * * SOURCE ATTRIBUTION:
+ * This component's structure was implemented based on:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ */
 import { CreatePost } from "../components/CreatePost";
 
 export const CreatePostPage = () => {

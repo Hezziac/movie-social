@@ -1,3 +1,22 @@
+/* [index.css]
+ * 
+ * * Central stylesheet for global animations, layout utilities, and mobile optimizations.
+ * Includes custom keyframes and safety resets for modern web browsers.
+ * * * * Note on AI Usage: 
+ * - **Mobile UX Optimization**: I used GitHub Copilot and Perplexity AI to refactor 
+ * the CSS for a "native app" feel. AI helped implement 'safe-area-inset' variables 
+ * and 'dvh' (Dynamic Viewport Height) units to solve issues with the iOS Safari 
+ * address bar covering UI elements.
+ * - **Touch Gesture Support**: AI assisted in writing the utility classes for 
+ * 'touch-action: none' and the 'image-zoom-wrapper' to support custom pinch-to-zoom 
+ * logic without triggering browser-default scrolling.
+ * - **Animations**: AI helped refine the 'blink' and 'loading-bar' keyframes used 
+ * for skeleton screens and interaction feedback.
+ * - **Scroll Prevention**: I worked with AI to implement 'overscroll-behavior: none' 
+ * and 'touch-action: manipulation' to prevent accidental page zooming or "pull-to-refresh" 
+ * triggers on mobile.
+ */
+
 @import "tailwindcss";
 
 @layer utilities {
@@ -45,6 +64,9 @@
   position: relative;
 }
 
+/* Gesture Optimization: AI helped define 'will-change' and 'touch-action' 
+   to ensure that the custom pinch-to-zoom logic is GPU-accelerated 
+   and doesn't conflict with native browser gestures. */
 .zoomable-image {
   transition: transform 0.15s ease-out;
   will-change: transform;
@@ -96,6 +118,9 @@ body {
   min-height: calc(100vh - var(--sat) - var(--sab));
 }
 
+/* Technical Solution: Refactored with AI to use Dynamic Viewport Height (dvh). 
+   This prevents the UI from jumping or being hidden when the mobile browser 
+   address bar expands or collapses. */
 @supports (height: 100dvh) {
   .full-viewport {
     height: 100dvh;

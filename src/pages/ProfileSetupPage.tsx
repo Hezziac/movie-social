@@ -1,11 +1,29 @@
-// src/pages/ProfileSetupPage.tsx
+/** [ProfileSetupPage.tsx]
+ * 
+ * * A custom-built onboarding page designed to force new users to establish a 
+ * unique username and bio before accessing the main feed.
+ * * * * Note on AI Usage: 
+ * - **Onboarding Architecture**: I conceptualized this "onboarding gate" to 
+ * improve user identity. AI helped me structure the logic that redirects 
+ * existing users away from this page if their profile is already complete.
+ * - **Debugging Redirect Loops**: GitHub Copilot and Perplexity AI were 
+ * instrumental in fixing a bug where this page wouldn't load or would loop 
+ * infinitely. AI helped me implement the 'initialLoad' state and the 
+ * '.single()' query to check for existing profiles correctly.
+ * - **Username Implementation**: I came up with the idea to auto-generate a 
+ * random placeholder username to reduce signup friction. I used AI to help 
+ * write the specific JavaScript logic for 'generateDefaultUsername' and to 
+ * ensure the 'upsert' command worked correctly with Supabase.
+ * - **Validation**: AI assisted in the regex implementation to ensure 
+ * usernames meet database requirements and prevent SQL-level errors.
+ */
+
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../supabase-client";
 import { useNavigate } from "react-router";
 
 export function ProfileSetupPage() {
-  console.log("Rendering: ProfileSetupPage"); // <-- DEBUG RENDERING PAGE
   const { user } = useAuth();
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
@@ -14,6 +32,9 @@ export function ProfileSetupPage() {
   const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
+    // UX Logic: I decided to implement an automatic username generator to 
+    // help users get started faster. I used AI to help me write this function 
+    // and integrate it with the component's state.
     const generateDefaultUsername = () => {
       return `MovieFan${Math.floor(1000 + Math.random() * 9000)}`;
     };
@@ -22,7 +43,9 @@ export function ProfileSetupPage() {
       setUsername(generateDefaultUsername());
       setInitialLoad(false);
 
-      // Now we re-enable this check to redirect users who already have a profile.
+      // Security/Navigation Logic: Refactored with AI to prevent a redirect loop. 
+      // This check ensures that if a user already has a profile, they are 
+      // automatically sent to their dashboard instead of seeing the setup form again.
       supabase
         .from("profiles")
         .select("username") // We need the username to redirect to a dynamic URL
@@ -48,10 +71,7 @@ export function ProfileSetupPage() {
     
     if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
       setError(
-        "Username must be 3-20 characters (letters, numbers, underscores)"
-      );
-      console.log(
-        "Username must be 3-20 characters (letters, numbers, underscores)"
+        "Username must be 3-20 characters (ONLY letters, numbers, and underscores '-' & '_')"
       );
       return;
     }
@@ -61,8 +81,6 @@ export function ProfileSetupPage() {
       .from("profiles")
       .select("*", { count: "exact" })
       .eq("username", username);
-
-      console.log("Count: ", count);
 
       if (count && count > 0) {
         setError("Username is already taken");

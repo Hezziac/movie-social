@@ -1,4 +1,19 @@
-// src/pages/ProfilePage.tsx
+/** [ProfilePage.tsx]
+ * 
+ * * * A custom-built profile view that serves as the user's home base. It features 
+ * a professional "Instagram-inspired" layout including profile stats, 
+ * bio management, and a responsive media grid.
+ * * * * Note on AI Usage: 
+ * - **UI/UX Design**: GitHub Copilot and Perplexity AI were instrumental in 
+ * achieving the specific "Instagram look." AI assisted in implementing the 
+ * CSS-grid logic for the 3-column post layout and the hover-overlay effects 
+ * showing like/comment counts.
+ * - **State Orchestration**: AI helped refactor this page to use a custom hook 
+ * (`useProfileData`) to separate the data-fetching logic from the presentation layer.
+ * - **Refactoring**: AI assisted in implementing the conditional logic for the 
+ * "Edit Profile" vs "Follow" button based on the logged-in user's relationship 
+ * to the profile being viewed.
+ */
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useParams } from "react-router";
@@ -51,6 +66,9 @@ export function ProfilePage() {
           
           {/* Profile Info */}
           <div className="flex-1">
+            {/* Relationship Logic: Refactored with AI to dynamically toggle 
+                between 'Edit Profile' (for the owner) and 'Follow/Unfollow' 
+                (for visitors), ensuring a secure and personalized experience. */}
             {/* Username and Edit Button */}
             <div className="flex items-center gap-4 mb-4">
               <h1 className="text-xl font-bold text-white">{profile.username}</h1>
@@ -124,7 +142,9 @@ export function ProfilePage() {
           </div>
         </div>
 
-        {/* Posts Grid */}
+        {/* Posts Grid: Implemented with AI assistance to achieve a 
+            responsive 3-column layout. It includes a fallback render for 
+            text-only posts and a hover-state overlay for engagement metrics. */}
         {userPosts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mb-4 text-2xl">

@@ -1,4 +1,22 @@
-// src/pages/MovieSearchPage.tsx
+/** [MovieSearchPage.tsx]
+ * 
+ * * A dedicated page allowing users to browse popular movies or search for 
+ * specific titles using the TMDB API.
+ * * * * SOURCE ATTRIBUTION:
+ * This component's core search and display logic were based on:
+ * [Tech With Tim - Learn React With This ONE Project](https://youtu.be/G6D9cBaLViA?si=1EzGXxDseUnhyomX)
+ * * * * Note on AI Usage: 
+ * - **State Integration**: AI assisted in adapting the TMDB client methods 
+ * into this functional component, ensuring proper TypeScript typing for the 
+ * movie results.
+ * - **Memory Leak Prevention**: GitHub Copilot helped implement the 'isMounted' 
+ * cleanup pattern within the 'useEffect' hook. This prevents the app from 
+ * trying to update state on a component that has already been unmounted, 
+ * which is a common source of React errors.
+ * - **UI Polish**: AI helped refactor the movie grid to be responsive and 
+ * provided the logic for the "No Image" fallback placeholder.
+ */
+
 import { useState, useEffect } from 'react';
 import { getPopularMovies, searchMovies, Movie} from '../context/tmdb-client';
 
@@ -8,16 +26,19 @@ export default function MovieSearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Lifecycle Management: AI assisted in implementing the 'isMounted' pattern 
+  // to ensure that asynchronous API responses don't trigger state updates 
+  // if the user navigates away from the page before the fetch finishes.
   // Load popular movies on first render
-useEffect(() => {
-  let isMounted = true;
-  
-  const loadPopular = async () => {
-    setLoading(true);
-    try {
-      const popular = await getPopularMovies();
-      if (isMounted) setMovies(popular);
-    } catch (err) {
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPopular = async () => {
+      setLoading(true);
+      try {
+        const popular = await getPopularMovies();
+        if (isMounted) setMovies(popular);
+      } catch (err) {
       if (isMounted) setError(err instanceof Error ? err.message : 'Failed to load movies');
     } finally {
       if (isMounted) setLoading(false);
@@ -77,6 +98,8 @@ useEffect(() => {
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {/* Fallback Logic: AI helped implement this check to handle cases 
+                where TMDB does not have an image available for a specific film. */}
         {movies.map((movie) => (
           <div key={movie.id} className="bg-white rounded-lg shadow overflow-hidden">
             {movie.poster_path ? (

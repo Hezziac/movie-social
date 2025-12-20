@@ -1,8 +1,29 @@
-// src/context/AuthContext.tsx
+ /* [AuthContext.tsx]
+ * 
+ * Contains the AuthContext and AuthProvider components for managing user authentication.
+ * The context provides methods for signing in with GitHub or Google, and signing out.
+ * It also manages the user state and loading state.
+ * * * SOURCE ATTRIBUTION:
+ * This file was originally based on:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ * * * Note on AI Usage: 
+ * - **Redirection Debugging**: GitHub Copilot and Perplexity AI were instrumental 
+ * in troubleshooting redirection bugs. AI helped me understand that 
+ * navigation should happen at the component level rather than inside the 
+ * AuthContext, leading to the removal of 'useNavigate' for a cleaner architecture.
+ * - **Google Integration**: AI assisted in refactoring the 'handleOAuthLogin' 
+ * function to support multiple providers (GitHub and Google) beyond the 
+ * tutorial's original scope.
+ * - **State Management**: Used AI to ensure the 'onAuthStateChange' listener was 
+ * correctly handling session cleanups to prevent memory leaks.
+ */
 import { User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../supabase-client";
-// We no longer import useNavigate here because redirects should not happen in the context.
+// Architectural Decision: Refactored with AI assistance to remove 
+// 'useNavigate' from the Context. AI taught me that context should 
+// manage state, while components handle navigation, resolving 
+// several circular dependency bugs that were breaking my redirection.
 
 interface AuthContextType {
   user: User | null;

@@ -1,3 +1,16 @@
+/** [CommunitiesPage.tsx]
+ *
+ * * A top-level page component that displays the 'Top Picks' communities.
+ * * * * SOURCE ATTRIBUTION:
+ * This component's layout and the integration of the 'CommunityList' were 
+ * based on the following tutorial:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ * * * * CUSTOMIZATION:
+ * I customized the visual presentation, including the specific Tailwind CSS 
+ * typography and the "Social.Cine" branding colors (purple-to-pink gradient) 
+ * to align with my project's movie-centric theme.
+ */
+
 import { CommunityList } from "../components/CommunityList";
 
 export const CommunitiesPage = () => {

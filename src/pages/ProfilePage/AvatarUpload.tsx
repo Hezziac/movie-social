@@ -1,5 +1,23 @@
+/** [AvatarUpload.tsx]
+ * 
+ * * A custom addon component created to enhance user profiles by allowing 
+ * users to upload and update their personal avatars.
+ * Handles the interaction with Supabase Storage buckets and provides real-time 
+ * preview updates.
+ * * * * Note on AI Usage: 
+ * - **TypeScript & Refactoring**: GitHub Copilot and Perplexity AI were used to 
+ * ensure strict type safety for the 'AvatarUploadProps' and to refactor the 
+ * asynchronous upload logic for better error handling.
+ * - **Supabase Storage Integration**: AI assisted in implementing the 'upsert' 
+ * logic and the unique file path generation (`${uid}/${Date.now()}`) to prevent 
+ * naming collisions in the storage bucket.
+ * - **Debugging**: AI was used to resolve issues with the 'publicUrl' retrieval 
+ * and to ensure the 'onUpload' callback correctly synchronized state with the 
+ * parent Profile component.
+ */
+
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../supabase-client'; // Adjust path as needed
+import { supabase } from '../../supabase-client';
 import { AccountCircle } from '@mui/icons-material'; // For the default avatar icon
 
 interface AvatarUploadProps {
@@ -25,6 +43,9 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ uid, url, onUpload }
         throw new Error('You must select an image to upload.');
       }
 
+      // Security/Collision Logic: Implemented with AI assistance to ensure every 
+      // upload has a unique path using the user's ID and a timestamp, 
+      // preventing users from accidentally overwriting other people's data.
       const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
       // Generate a unique file path using user ID and a timestamp
@@ -50,6 +71,9 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ uid, url, onUpload }
 
       if (publicUrlData?.publicUrl) {
         setAvatarUrl(publicUrlData.publicUrl);
+        // State Synchronization: AI helped refactor this callback to ensure the 
+        // parent 'Profile' component receives the new public URL immediately 
+        // after a successful database update.
         // Call the onUpload callback to inform the parent component
         onUpload(event, publicUrlData.publicUrl);
       } else {

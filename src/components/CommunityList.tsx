@@ -1,9 +1,20 @@
-// CommunityList.tsx
+ /* [CommunityList.tsx]
+ * 
+ * Contains community list component and fetchCommunities functions.
+ * * * SOURCE ATTRIBUTION:
+ * This entire file was originally provided by the following tutorial:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ * I have adapted the code specifically to match my project's Supabase data structure
+ * and TypeScript requirements.
+ * * * Note on AI Usage: 
+ * GitHub Copilot and Perplexity AI were used only to assist in refactoring the 
+ * code to fit my database schema and to ensure TypeScript compatibility.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { Link } from "react-router";
 
-// FIX: ID is bigint (number in JS) and columns are title/description
+// ID is bigint (number in JS) and columns are title/description
 export interface Community {
   id: number; 
   title: string; 
@@ -14,7 +25,7 @@ export interface Community {
 export const fetchCommunities = async (): Promise<Community[]> => {
   const { data, error } = await supabase
     .from("communities")
-    // FIX: Select the correct column names (title, description)
+    // Select the correct column names (title, description)
     .select("id, title, description, created_at") 
     // CRITICAL: Filter by type='public' to satisfy RLS for public display
     .eq('type', 'public') 
@@ -60,10 +71,10 @@ export const CommunityList = () => {
                 to={`/community/${community.id}`}
                 className="text-2xl font-bold text-purple-500 hover:underline"
               >
-                {/* FIX: Use community.title */}
+                {/* Community Title */}
                 {community.title}
               </Link>
-              {/* FIX: Use community.description */}
+              {/* Community Description */}
               <p className="text-gray-400 mt-2">{community.description}</p>
             </div>
           </div>

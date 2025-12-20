@@ -1,3 +1,19 @@
+/* [MovieSearchModal.tsx]
+ *
+ * This component is a modal that allows users to search for movies and select one from the results.
+ * It serves as the bridge between the social feed and the movie database (TMDB).
+ * * * * SOURCE ATTRIBUTION:
+ * This component's logic and structure were primarily supplied by:
+ * [Tech With Tim - Learn React With This ONE Project](https://youtu.be/G6D9cBaLViA?si=1EzGXxDseUnhyomX)
+ * I have adapted and integrated this logic into my social media platform.
+ * * * * Note on AI Usage: 
+ * - **Integration & Refactoring**: GitHub Copilot and Perplexity AI were used to refactor 
+ * the tutorial code to ensure it worked within my existing project architecture 
+ * (more specifically, ensuring it worked alongside my Supabase/PedroTech context).
+ * - **TypeScript & Debugging**: AI assisted in implementing proper TypeScript 
+ * interfaces and resolving debounced search bugs during the adaptation.
+ */
+
 import { useState, useEffect, useRef } from 'react';
 import { searchMovies, getPopularMovies, Movie } from '../context/tmdb-client';
 
@@ -39,7 +55,8 @@ export const MovieSearchModal = ({ isOpen, onClose, onSelect }: MovieSearchModal
     };
   }, [isOpen]);
 
-  // Debounced search
+  // Debounced search logic: Refactored with AI assistance to ensure search 
+  // requests only fire after the user stops typing, reducing unnecessary API calls.
   useEffect(() => {
     if (!isOpen || query.trim() === '') return;
 

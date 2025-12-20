@@ -1,4 +1,22 @@
-// PostList.tsx
+ /* [PostList.tsx]
+ * 
+ * Renders a vertically-snapping list of posts. Implements custom scroll 
+ * mechanics, touch gestures, and keyboard navigation for a "feed" experience.
+ * * * SOURCE ATTRIBUTION:
+ * - Originally based on [PedroTech Social Media Tutorial] for the base 
+ * React Query setup and Post mapping.
+ * - Heavily adapted to include custom database properties (username, movie info) 
+ * returned by the 'get_posts_with_counts' SQL function.
+ * * * Note on AI Usage: 
+ * - **Scroll & Navigation**: GitHub Copilot and Perplexity AI assisted in 
+ * implementing the advanced event listeners for 'wheel', 'touchstart', and 
+ * 'keydown' to create a smooth, snapping scroll experience.
+ * - **UI Design**: AI helped implement the CSS logic to hide scrollbars across 
+ * different browsers while maintaining full scrolling functionality.
+ * - **SQL Integration**: AI helped refactor the 'Post' interface to correctly 
+ * handle the relational movie data joined via the Supabase RPC call.
+ * 
+ */
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { PostItem } from "./PostItem";
@@ -51,7 +69,9 @@ export const PostList = () => {
     let isScrolling = false;
     let startY: number;
 
-    // Mouse wheel handler
+    // Custom Navigation Logic: Refactored with AI to intercept standard 
+    // scroll behavior and replace it with a smooth, page-by-page snapping 
+    // mechanism using the 'scrollBy' API.
     const handleWheel = (e: WheelEvent) => {
       if (isScrolling) return;
       isScrolling = true;
@@ -139,6 +159,9 @@ export const PostList = () => {
   }
 
   return (
+    /* Visual Design Refinement: Assisted by AI to apply cross-browser 
+       styles to hide the scrollbar (Tailwind + Webkit style tag) 
+       to achieve a cleaner "mobile-app" aesthetic on desktop. */
     <div
       ref={containerRef}
       className="w-full overflow-y-auto snap-y snap-mandatory no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none]"

@@ -1,3 +1,19 @@
+/**
+ * [CommentSection.tsx]
+ * 
+ * * Contains the main comment section component. Handles displaying comments,
+ * nested replies, and real-time updates via React Query.
+ * * * SOURCE ATTRIBUTION:
+ * This entire file was originally provided by the following tutorial:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ * I have adapted the code specifically to match my project's Supabase data structure
+ * and TypeScript requirements.
+ * * * Note on AI Usage: 
+ * GitHub Copilot and Perplexity AI were used only to assist in refactoring the 
+ * inherited logic to match my specific database schema and to resolve 
+ * TypeScript syntax errors encountered during the adaptation.
+ */
+
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -113,11 +129,11 @@ export const CommentSection = ({ postId }: Props) => {
 
   /* Each comment will have the Id as the key and the list (of comments) as its child
   Roots: holds top comment with no replies
-  Map of comments - organize Replies - return tree */
+  Map of comments - organize Replies - return tree - PedroTech*/
   const buildCommentTree = (
     flatComments: Comment[]
   ): (Comment & { children?: Comment[] })[] => {
-    // Map
+    // Map to hold comment references
     const map = new Map<number, Comment & { children?: Comment[] }>();
     const roots: (Comment & { children?: Comment[] })[] = [];
 

@@ -1,4 +1,20 @@
-//NavBar.tsx
+/** [NavBar.tsx]
+ * 
+ * Component for the application's navigation bar. Handles responsive layouts,
+ * authentication state, and integration with the movie search functionality.
+ * * * * SOURCE ATTRIBUTION:
+ * Originally based on [PedroTech Social Media Tutorial]. 
+ * Extensively modified to include custom routing, profile fetching, and 
+ * integration with the Tech With Tim-inspired movie search system.
+ * * * * Note on AI Usage: 
+ * - **Responsive Design**: GitHub Copilot and Perplexity AI assisted in 
+ * differentiating the Desktop and Mobile menus and improving the Tailwind CSS 
+ * for glassmorphism effects (backdrop-blur).
+ * - **Logic Refactoring**: AI helped refactor the layout to support conditional 
+ * rendering for Auth states (GitHub vs Google) and linking to custom user profiles.
+ * - **UI/UX**: Used AI to improve visibility of navigation items and ensure 
+ * the mobile toggle menu functioned correctly within the React state.
+ */
 import { useState, useEffect } from "react";
 import { Link } from "react-router"; // Fixed import (use "react-router-dom" instead of "react-router")
 import { useAuth } from "../context/AuthContext";
@@ -24,6 +40,8 @@ export const Navbar = () => {
     setMenuOpen(false);
   };
 
+  // Custom Profile logic: Refactored with AI to bridge the Auth context 
+  // with the Supabase 'profiles' table to display custom usernames.
   // Fetch profile from Supabase if user is logged in
   useEffect(() => {
     const fetchProfile = async (userId: string) => {
@@ -143,7 +161,8 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button - updated */}
+          {/* Mobile Menu: Implementation assisted by AI to ensure 
+          proper overlay visibility and background blur effects. */}
           <div className="md:hidden">
             <button
               onClick={() => setMenuOpen((prev) => !prev)}

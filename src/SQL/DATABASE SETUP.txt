@@ -1,3 +1,15 @@
+/* [DATABASE SETUP.txt]
+ * * This document serves as a reference log for the essential SQL commands 
+ * used to initialize the Supabase database. It tracks the schema for 
+ * genres, tags, and relational joining tables.
+ * * * * * * Note on AI Usage: 
+ * - **Schema Design**: I designed the relationship structure to match the 
+ * TMDB API's genre IDs. AI assisted in writing the specific PostgreSQL 
+ * syntax (upsert logic and optimized indexes) to ensure the data 
+ * structure was robust.
+ * - **Data Automation**: I used AI to generate the bulk INSERT statements 
+ * for TMDB genre IDs to ensure 100% accuracy with the external API data.
+ */
 
 -- SQL to generate IDs and Genres based off TMDB
 -- must have 2 tables (genres, movie_genres) created before joining table and adding id and key
@@ -6,12 +18,6 @@
 CREATE TABLE genres (
   id INT8 PRIMARY KEY,
   name TEXT NOT NULL
-);
-
-CREATE TABLE movie_genres (
-  movie_id INT8 NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
-  genre_id INT8 NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
-  PRIMARY KEY (movie_id, genre_id)
 );
 
 -- Create a Joining table

@@ -1,7 +1,24 @@
+/** [ProfileEditForm.tsx]
+ * 
+ * * A custom form component created to allow users to update their profile information,
+ * including username, bio, and avatar. 
+ * Handles real-time validation and ensures changes are correctly reflected in the 
+ * Supabase 'profiles' table.
+ * * * * Note on AI Usage: 
+ * - **Validation Logic**: GitHub Copilot and Perplexity AI assisted in implementing 
+ * the regex for username validation and the logic to check for username uniqueness 
+ * before allowing a database update.
+ * - **State Management**: AI helped refactor the 'formData' state to handle multiple 
+ * inputs simultaneously and synchronized the 'AvatarUpload' callback with the 
+ * final save operation.
+ * - **Error Handling**: AI assisted in creating the try/catch flow to provide 
+ * user-friendly error messages for database conflicts or network issues.
+ */
+
 import React, { useState } from 'react';
 import { supabase } from '../../supabase-client';
 import { User } from "@supabase/supabase-js";
-import { AvatarUpload } from './AvatarUpload'; // Import the new AvatarUpload component
+import { AvatarUpload } from './AvatarUpload'; 
 
 interface ProfileEditFormProps {
   profile: {
@@ -34,12 +51,17 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, user,
       return;
     }
 
+    // Security & Validation: Implemented with AI assistance to ensure usernames 
+    // follow specific patterns (3-20 chars, alphanumeric) to prevent database errors 
+    // or injection attempts.
     if (!/^[a-zA-Z0-9_]{3,20}$/.test(formData.username)) {
       setError("Username must be 3-20 characters (letters, numbers, underscores).");
       setIsSaving(false);
       return;
     }
 
+    // Database Sync: Refactored with AI to include the new 'avatar_url' in 
+    // the profile update, ensuring the user's new image persists across sessions.
     try {
       if (formData.username !== profile.username) {
         const { count } = await supabase

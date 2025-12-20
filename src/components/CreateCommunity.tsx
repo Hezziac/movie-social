@@ -1,3 +1,16 @@
+ /* [CreateCommunity.tsx]
+ * 
+ * Contains the CreateCommunity component and the createCommunity function.
+ * * * SOURCE ATTRIBUTION:
+ * This entire file was originally provided by the following tutorial:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ * I have adapted the code specifically to match my project's Supabase data structure
+ * and TypeScript requirements.
+ * * * Note on AI Usage: 
+ * GitHub Copilot and Perplexity AI were used only to assist in refactoring the 
+ * code to fit my database schema and to ensure TypeScript compatibility.
+ */
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";

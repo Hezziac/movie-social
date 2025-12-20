@@ -1,3 +1,16 @@
+/**
+ * [CommentItem.tsx]
+ * 
+ * Component for displaying individual comments and their replies.
+ * Supports replying to comments, deleting comments (soft delete), and collapsing/expanding replies.
+ * Originally developed following [Tutorial: https://www.youtube.com/watch?v=_sSTzz13tVY. By PedroTech] and customized for this project.
+ * * Note on AI Usage: 
+ * This file contains TypeScript syntax and logic refactored with the assistance 
+ * of GitHub Copilot and Perplexity AI to ensure type safety and resolve bugs.
+ * Specific logic for [Soft Delete] was implemented following
+ * architectural patterns suggested by [Github Co-Pilot].
+ */
+
 import { useState } from "react";
 import { Comment } from "./CommentSection";
 import { useAuth } from "../context/AuthContext";
@@ -41,6 +54,7 @@ export const CommentItem = ({ comment, postId }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  // Structure suggestion by GitHub Co-Pilot for fetching replier's username
   // 1. ADD THIS: Fetch the official username for the person REPLYING
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
@@ -91,6 +105,7 @@ export const CommentItem = ({ comment, postId }: Props) => {
 
   const postOwnerId: string | undefined = postOwnerData?.user_id;
 
+  // Soft-delete logic suggested by GitHub Co-Pilot
   // Soft-delete: replace content & author but keep the comment row
   const deleteComment = async (commentId: number) => {
     const { error } = await supabase
@@ -130,7 +145,7 @@ export const CommentItem = ({ comment, postId }: Props) => {
             </span>
           </div>
 
-          {/* Delete button (comment author or post owner) */}
+          {/* Delete button (comment author or post owner) Structure by Github Co-Pilot */}
           {(isAuthor || isPostOwner) && comment.author !== "[deleted]" && (
             <button
               onClick={() => {

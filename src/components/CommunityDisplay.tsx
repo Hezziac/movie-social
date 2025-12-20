@@ -1,3 +1,19 @@
+ /* [CommunityDisplay.tsx]
+ * 
+ * Contains communitydisplay component, which fetches and displays a community's
+ * information and posts. It uses React Query for data fetching and Supabase for
+ * database interactions.
+ * * * SOURCE ATTRIBUTION:
+ * This entire file was originally provided by the following tutorial:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ * I have adapted the code specifically to match my project's Supabase data structure
+ * and TypeScript requirements.
+ * * * Note on AI Usage: 
+ * GitHub Copilot and Perplexity AI were used only to assist in refactoring the 
+ * inherited logic to match my specific database schema and to resolve 
+ * TypeScript syntax errors encountered during the adaptation and design.
+ */
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { PostItem } from "./PostItem";
@@ -77,7 +93,9 @@ export const CommunityDisplay = ({ communityId }: Props) => {
 
   return (
     <div className="min-h-screen bg-black">
-    {/* Hero Banner Section */}
+    {/* Hero Banner Section: Custom UI design implemented with 
+        Tailwind CSS, utilizing AI to assist with the 
+        background overlay and blur effects. */}
     <div className="relative h-[300px] w-full flex items-center justify-center overflow-hidden mb-8">
       {/* Background Image Layer */}
       {community?.image_url ? (

@@ -1,3 +1,21 @@
+/**
+ * [PostItem.tsx]
+ *
+ * Renders an individual post item within the PostList.
+ * Originally developed following [Tutorial: https://www.youtube.com/watch?v=_sSTzz13tVY. By PedroTech].
+ * Adapted and customized significantly to integrate with a unique database schema and custom features.
+ * * * Note on AI Usage: 
+ * - This file contains TypeScript syntax and logic refactored with the assistance 
+ * of GitHub Copilot and Perplexity AI to ensure type safety and resolve bugs.
+ * - **Gestures & Zooming**: The complex pinch-to-zoom logic and mobile gesture handling 
+ * were implemented using a mix of Perplexity and GitHub Copilot to refine the 
+ * interaction behavior.
+ * - **Design & Layout**: AI assisted in pinpointing and implementing specific 
+ * CSS/Tailwind design features to achieve the desired look and feel.
+ * - **Like Shortcut**: The implementation of the heart button as a shortcut for 
+ * the mutation function was developed with AI assistance.
+ */
+
 import { Link } from "react-router";
 import { Post } from "./PostList";
 import { MovieTile } from "./MovieTile";
@@ -34,7 +52,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
   const positionRef = useRef({ x: 0, y: 0 });
   const lastOffsetRef = useRef({ x: 0, y: 0 });
 
-  // Gesture handling
+  // Mobile Zoom & Gesture handling: Core logic developed using a combination 
+  // of Perplexity AI and GitHub Copilot to handle pinch-to-zoom mechanics.
   const bind = useGesture(
     {
       onPinchStart: ({ origin: [ox, oy], event }) => {
@@ -176,6 +195,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
     }
   };
 
+  // Heart "Quick-Like" implementation: Assisted by AI to create a shortcut 
+  // that triggers the vote(1) mutation without navigating away from the feed.
   const { mutate } = useMutation({
     mutationFn: () => vote(1), // THUMBS UP ONLY
     onSuccess: () => {
@@ -183,6 +204,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
     },
   });
 
+  // Manual object construction to bridge flat SQL data to MovieTile interface.
+  // Pattern refined with Perplexity AI to ensure all required Movie fields are present.
   // 1. Check if the post has the new movie fields returned by the SQL function
   // We check for movie_id and movie_title to ensure we have something meaningful.
   const hasMovieData = post.movie_id && post.movie_title;
@@ -234,7 +257,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
               hasImage ? "bg-black" : ""
             }`}
           >
-            {/* Header */}
+            {/* Header -- Restructured by Perplexity AI */}
             {/* 💡 1. Wrap the avatar and info with a Link to the profile using the username */}
             <div className="flex items-center gap-3 p-4 absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/70 to-transparent">
               <Link to={`/profile/${post.username}`} className="flex items-center gap-3">
@@ -265,7 +288,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
               </div>
             </div>
 
-            {/* Content area */}
+            {/* Content area: Layout refactored with GitHub Copilot to pinpoint 
+                the specific side-by-side (desktop) vs stacked (mobile) design. */}
             <div
               className={`flex-1 relative ${
                 isZooming ? "overflow-visible pb-0" : "overflow-hidden"
@@ -320,7 +344,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                   hasImage ? "justify-end pb-20" : "items-center justify-center"
                 } p-6 gap-4 z-20 pointer-events-none`}
               >
-                {/* 🎬 CONTAINER: Handles Side-by-Side vs Stacked */}
+                {/* 🎬 CONTAINER: Handles Side-by-Side vs Stacked -- Refactored by GitHub Co-Pilot for the design I would like*/}
                 <div 
                   className={`flex w-full gap-4 pointer-events-auto 
                     ${hasImage 
@@ -339,7 +363,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                     </div>
                   )}
 
-                  {/* 📝 POST CONTENT: Always visible, max 4 lines */}
+                  {/* 📝 POST CONTENT: Always visible -- Refactored by GitHub Co-Pilot for the design I would like*/}
                   {post.content && (
                     <div
                       className={`whitespace-pre-line z-20 min-w-0 flex-1 ${

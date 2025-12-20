@@ -1,4 +1,22 @@
-// CreatePost.tsx
+ /* [CreatePost.tsx]
+ * 
+ * Contains the CreatePost component and the createPost functions.
+ * Component is used to create a new post with optional image, community, and movie associations.
+ * Handles form submission, image uploads, community selection, and movie associations.
+ * Uses React Query for fetching communities and handling mutations.
+ * Includes a movie search modal for associating movies with posts.
+ * * * SOURCE ATTRIBUTION:
+ * This file was originally provided by the following tutorial:
+ * [PedroTech Social Media Tutorial](https://www.youtube.com/watch?v=_sSTzz13tVY)
+ * Adapted significantly to handle custom Movie associations and Tagging features.
+ * * * Note on AI Usage: 
+ * - **Tagging System**: GitHub Copilot and Perplexity AI assisted in implementing 
+ * the regex-based tag highlighting and the 'upsert' logic for the tags database.
+ * - **Movie Data Persistence**: AI helped implement the 'upsert' pattern for TMDB 
+ * movies to ensure movie data exists in my local database as a backup for the API.
+ * - **Refactoring**: Used AI to bridge my data structure with the tutorial's 
+ * base logic and ensured TypeScript type safety.
+ */
 import { useState, useRef, useEffect } from "react";
 import { ImageUploader } from "../components/ImageUploader";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -69,6 +87,7 @@ export const CreatePost = () => {
 
   // Fetch communities for the dropdown
   // NOTE: Assuming CommunityList has been fixed to return { id: int8(number), title: string,description: string, created_at: uuid, type: string, slug: string }
+  // TODO: Add image_url to Community type
   const { data: communities, isLoading: isLoadingCommunities, isError: isErrorCommunities } = useQuery<Community[], Error>({
     queryKey: ["communities"],
     queryFn: fetchCommunities,
@@ -80,7 +99,8 @@ export const CreatePost = () => {
     setShowMovieSearch(false);
   };
 
-  // Tag highlighting
+  // Tag highlighting logic: Refactored with Perplexity AI to use regex 
+  // for identifying #tags and styling them differently than plain text.
   const highlightTags = (text: string) => {
     return text.split(/(#[a-zA-Z0-9_]+)/g).map((part, i) =>
       part.startsWith("#") ? (
@@ -111,7 +131,9 @@ export const CreatePost = () => {
           ?.map((tag) => tag.slice(1).toLowerCase())
           .filter(Boolean) || [];
 
-      // Handle TMDB movie insertion if selected
+      // Movie persistence logic: Assisted by AI to implement an 'upsert' pattern.
+      // This ensures that even if the TMDB API is unavailable, the movie details
+      // are cached in our own 'movies' table once a user has referenced them.
       let movieId: number | null = null;
       if (selectedMovie) {
         const { error: movieError } = await supabase.from("movies").upsert(

@@ -1,0 +1,14 @@
+# [env_example.txt]
+# This is a template file for the environment variables required to run Social.Cine.
+# To use: Copy these keys into a new file named '.env' and provide your own API keys.
+
+# --- SUPABASE CONFIGURATION ---
+VITE_SUPABASE_URL=your_supabase_project_url_here
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+
+# --- TMDB (The Movie Database) CONFIGURATION ---
+VITE_TMDB_READ_ACCESS_TOKEN=your_tmdb_bearer_token_here
+
+# --- DEPLOYMENT CONFIGURATION ---
+# Use '/' for local development or your sub-path for hosting (e.g., /movie-social)
+VITE_BASE_PATH=/

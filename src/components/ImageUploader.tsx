@@ -1,3 +1,20 @@
+/** [ImageUploader.tsx]
+ * 
+ * * A reusable component for handling image selection, instant Supabase storage uploads,
+ * and local preview rendering. 
+ * * * * SOURCE ATTRIBUTION:
+ * This logic was originally part of my 'CreatePost.tsx' (derived from PedroTech's tutorial).
+ * I extracted it into a standalone component to improve code readability and maintainability.
+ * * * * Note on AI Usage: 
+ * - **Refactoring**: GitHub Copilot and Perplexity AI assisted in the modularization 
+ * of this code from the parent component.
+ * - **Memory Management (Blob URLs)**: AI specifically helped implement the 'useEffect' 
+ * logic for creating and revoking Object URLs (URL.createObjectURL). This was crucial 
+ * for fixing "blob leakage" and ensuring images render correctly without memory leaks.
+ * - **Async Upload Flow**: AI assisted in structuring the try/catch block for 
+ * immediate background uploading to Supabase.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase-client'; // Adjust path as needed
 import { AspectRatio } from '../context/AspectRatios'; // Import AspectRatio type
@@ -17,7 +34,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange }) =
   // NEW: State to hold the temporary Blob URL for image preview
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // NEW: Effect to create and clean up the temporary Blob URL
+  // NEW: Effect implemented with AI assistance to handle temporary Blob URLs.
+  // This ensures that local previews are shown instantly, and the memory is 
+  // cleaned up (revoked) as soon as the file changes or the component unmounts.
   useEffect(() => {
     // If no file is selected, or if the component is unmounting, clean up
     if (!selectedFile) {

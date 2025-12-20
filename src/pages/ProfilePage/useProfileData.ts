@@ -1,6 +1,21 @@
-// useProfileData.ts for fetching data on profile page 
+/** [useProfileData.ts]
+ * 
+ * * A custom React hook designed to centralize all data-fetching logic for the 
+ * Profile Page. It manages state for user profiles, posts, stats, and 
+ * follower relationships.
+ * * * * Note on AI Usage: 
+ * - **Architectural Refactoring**: GitHub Copilot and Perplexity AI assisted in 
+ * extracting this logic from the 'ProfilePage' component into a standalone hook 
+ * to improve code reusability and maintainability.
+ * - **Relational Queries**: AI helped structure the complex Supabase '.select()' 
+ * strings to perform nested joins across the 'posts', 'movies', 'votes', 
+ * and 'comments' tables in a single network request.
+ * - **Social Logic**: AI assisted in implementing the 'toggleFollow' and 
+ * 'checkFollowStatus' logic, ensuring the UI correctly reflects the 
+ * relationship between the logged-in user and the target profile.
+ */
 import { useEffect, useState } from "react";
-import { supabase } from "../../supabase-client"; // Adjust path if your supabase-client is elsewhere
+import { supabase } from "../../supabase-client";
 import { useAuth } from "../../context/AuthContext";
 import { Post } from "../../components/PostList"; // Import the base Post interface
 
@@ -34,6 +49,9 @@ export const useProfileData = (username: string | undefined) => {
 
     
 
+    // Relational Fetching: AI helped refactor this query to use nested 
+    // selections. This allows the app to fetch a post's metadata, movie info, 
+    // and vote/comment counts in one go, rather than making separate calls.
     // This function fetches all posts for a given user ID.
     const fetchUserPosts = async (userId: string) => {
     const { data, error } = await supabase
@@ -123,6 +141,9 @@ export const useProfileData = (username: string | undefined) => {
             }
         };
 
+        // Social Relationship Logic: Implemented with AI assistance to handle 
+        // the asynchronous 'insert' and 'delete' operations on the 'follows' 
+        // table, while triggering a re-fetch of stats to keep the UI in sync.
         const toggleFollow = async (currentUserId: string | undefined, targetUserId: string) => {
             if (!currentUserId) return;
             try {
@@ -146,20 +167,3 @@ export const useProfileData = (username: string | undefined) => {
     // The hook returns all the data and state needed by the component.
     return { profile, userPosts, stats, loading, loadProfileAndPosts, isFollowing, toggleFollow };
 };
-
-
-  // NO LONGEr NEEDED AS fetchUserPosts does this
-  // const fetchUserStats = async () => {
-  //   // Get post count
-  //   const { count: postCount } = await supabase
-  //     .from("posts")
-  //     .select("*", { count: "exact", head: true })
-  //     .eq("user_id", user?.id);
-
-  //   // Placeholder for followers/following - adapt to your schema
-  //   setStats({
-  //     posts: postCount || 0,
-  //     followers: 2_000_000, // Replace with actual count when implemented DEBUG - remove/edit
-  //     following: 2  // Replace with actual count when implemented DEBUG - remove edit
-  //   });
-  // };
