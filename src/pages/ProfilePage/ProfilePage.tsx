@@ -22,7 +22,6 @@ import { ProfileEditForm } from "./ProfileEditForm";
 
 
 export function ProfilePage() {
-  console.log("Rendering: ProfilePage"); // <-- DEBUG RENDERING PAGE
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
 
