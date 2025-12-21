@@ -69,7 +69,9 @@ export const EditCommunityModal = ({ isOpen, onClose, community, onSave }: Props
 
             {/* Image Uploader for NEW Banner */}
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Upload New Banner</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">
+                <Image sx={{ fontSize: 14 }} />
+                Upload New Banner</label>
               <ImageUploader 
                 bucketName="banners" // Tells the uploader to save to your new folder
                 onImageChange={(_, url) => setImageUrl(url || "")} 
