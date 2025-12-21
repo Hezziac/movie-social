@@ -344,12 +344,12 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                   hasImage ? "justify-end pb-20" : "items-center justify-center"
                 } p-6 gap-4 z-20 pointer-events-none`}
               >
-                {/* 🎬 CONTAINER: Handles Side-by-Side vs Stacked -- Refactored by GitHub Co-Pilot for the design I would like*/}
+                {/* 🎬 CONTAINER: Handles Side-by-Side vs Stacked vs Centered -- Refactored by GitHub Co-Pilot for the design I would like*/}
                 <div 
                   className={`flex w-full gap-4 pointer-events-auto 
                     ${hasImage 
-                      ? "flex-col items-center md:flex-row md:items-end" // Stacked on mobile, side-by-side on desktop
-                      : "flex-col items-center justify-center text-center" // Centered for text-only
+                      ? "flex-col items-start md:flex-row md:items-end" // Bottom-left stacked for BG images
+                      : "flex-col items-center justify-center text-center" // Centered for Content Only or Content + Movie
                     }`}
                 >
                   {/* MOVIE TILE */}
@@ -357,7 +357,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                     <div className={`z-30 flex-shrink-0 ${
                       hasImage 
                         ? "w-20 md:w-32" // Smaller tile on mobile overlay
-                        : "w-full max-w-[180px] mb-4" // Centered tile for text-only
+                        : "w-full max-w-[180px] mb-4 mx-auto" // Centered tile for text-only
                     }`}>
                       <MovieTile movie={movieForTile} />
                     </div>
@@ -368,8 +368,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                     <div
                       className={`whitespace-pre-line z-20 min-w-0 flex-1 ${
                         hasImage
-                          ? "text-white text-sm md:text-base drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" 
-                          : "text-white text-xl md:text-2xl font-bold px-4 max-w-lg"
+                          ? "text-white text-sm md:text-base drop-shadow-[0_2px_4px_rgba(0,0,0,1)] text-left" 
+                          : "text-white text-xl md:text-2xl font-bold px-4 max-w-lg text-center"
                       }`}
                     >
                       <p className={`${hasImage ? "line-clamp-4" : ""} leading-tight font-medium`}>
