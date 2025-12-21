@@ -125,7 +125,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
     <ConfirmModal 
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
-        onConfirm={handleDelete}
+        onConfirm={handleDelete} // This calls the database function directly
         title="Delete Post?"
         message="This action cannot be undone. All likes and comments on this movie post will be permanently removed."
       />

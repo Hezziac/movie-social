@@ -22,9 +22,10 @@ import { AspectRatio } from '../context/AspectRatios'; // Import AspectRatio typ
 interface ImageUploaderProps {
   // Callback to inform parent about image selection/upload and aspect ratio
   onImageChange: (file: File | null, url: string | null, aspectRatio: AspectRatio) => void;
+  bucketName?: string; // Optional: specify a different bucket if needed
 }
 
-export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange }) => {
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange, bucketName = "post-images" }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [publicUrl, setPublicUrl] = useState<string | null>(null); 
   // const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>("original");
@@ -71,10 +72,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange }) =
       try {
         const fileExt = file.name.split('.').pop();
         // Generate a unique file path (you might need user ID here if not public bucket)
-        const filePath = `post-images/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9-_.]/g, "")}.${fileExt}`;
+        const filePath = `${bucketName}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9-_.]/g, "")}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("post-images") // Your bucket name
+          .from(bucketName) // Your bucket name
           .upload(filePath, file, {
             cacheControl: '3600',
             upsert: true,
@@ -83,7 +84,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange }) =
         if (uploadError) throw uploadError;
 
         const { data: urlData } = supabase.storage
-          .from("post-images")
+          .from(bucketName)
           .getPublicUrl(filePath);
 
         if (urlData?.publicUrl) {

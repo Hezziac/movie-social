@@ -20,13 +20,14 @@ export interface Community {
   title: string; 
   description: string; 
   created_at: string;
+  image_url?: string | null;
 }
 
 export const fetchCommunities = async (): Promise<Community[]> => {
   const { data, error } = await supabase
     .from("communities")
-    // Select the correct column names (title, description)
-    .select("id, title, description, created_at") 
+    // Select the correct column names (title, description etc.)
+    .select("id, title, description, created_at, image_url") 
     // CRITICAL: Filter by type='public' to satisfy RLS for public display
     .eq('type', 'public') 
     .order("created_at", { ascending: false });
@@ -61,22 +62,35 @@ export const CommunityList = () => {
             key={community.id}
             className="border border-white/10 rounded-lg hover:-translate-y-1 transition-transform overflow-hidden bg-gray-900/70 backdrop-blur-sm"
           >
-            {/* Placeholder image */}
-            <div className="h-48 bg-gradient-to-br from-gray-800 to-gray-700 flex items-center justify-center">
-              <span className="text-xl text-white/50">Genre Image</span>
+            {/* Community image */}
+          <Link
+            to={`/community/${community.id}`}
+            className="text-2xl font-bold text-purple-500 hover:lift-1 group transition-transform duration-500"
+          >
+            <div className="h-48 relative overflow-hidden">
+              {community.image_url ? (
+                <img 
+                  src={community.image_url} 
+                  alt={community.title} 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              ) : (
+                /* Fallback if no image exists */
+                <div className="w-full h-full bg-gradient-to-br from-purple-900/40 to-black flex items-center justify-center">
+                  <span className="text-white/30 text-4xl">🎬</span>
+                </div>
+              )}
+              {/* Dark Gradient Overlay for professional look */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
             
             <div className="p-4">
-              <Link
-                to={`/community/${community.id}`}
-                className="text-2xl font-bold text-purple-500 hover:underline"
-              >
                 {/* Community Title */}
                 {community.title}
-              </Link>
               {/* Community Description */}
               <p className="text-gray-400 mt-2">{community.description}</p>
             </div>
+          </Link>
           </div>
         ))}
       </div>

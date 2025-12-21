@@ -18,6 +18,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { PostItem } from "./PostItem";
 import { Post } from "./PostList";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { EditCommunityModal } from "./EditCommunityModal";
+import { Settings } from "@mui/icons-material";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   communityId: number;
@@ -28,6 +33,7 @@ interface Community {
   title: string;
   description: string;
   image_url?: string | null;
+  creator_id: string;
 }
 
 interface PostWithCommunity extends Post {
@@ -66,6 +72,10 @@ const fetchCommunityPosts = async (
 };
 
 export const CommunityDisplay = ({ communityId }: Props) => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   // 2. Parallel fetch using Promise.all
   const { data, isLoading, error } = useQuery({
     queryKey: ["communityData", communityId],
@@ -81,6 +91,8 @@ export const CommunityDisplay = ({ communityId }: Props) => {
   // 3. Destructure the parallel results
   const [community, posts] = data || [null, []];
 
+  // community ownership
+  const isOwner = user && community && user.id === community.creator_id;
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -111,13 +123,24 @@ export const CommunityDisplay = ({ communityId }: Props) => {
       {/* Dark Overlay for Readability */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
 
+      {/* Edit Community Button (Only visible to owner) */}
+        {isOwner && (
+          <button 
+            onClick={() => setIsEditModalOpen(true)}
+            className="absolute top-6 right-6 z-20 bg-black/40 hover:bg-purple-600 text-white p-2 rounded-full backdrop-blur-md border border-white/10 transition-all"
+            title="Community Settings"
+          >
+            <Settings />
+          </button>
+        )}
+
       {/* Title Content Layer */}
       <div className="relative z-10 text-center px-4">
-        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-2xl">
+        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-2xl leading-tight py-2">
           {community?.title || `Community ${communityId}`}
         </h1>
         {community?.description && (
-          <p className="text-gray-300 mt-4 max-w-2xl mx-auto text-lg md:text-xl">
+          <p className="text-gray-300 mt-8 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed">
             {community.description}
           </p>
         )}
@@ -138,6 +161,14 @@ export const CommunityDisplay = ({ communityId }: Props) => {
         </p>
       )}
     </div>
+    {community && (
+        <EditCommunityModal 
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          community={community}
+          onSave={() => queryClient.invalidateQueries({ queryKey: ["communityData", communityId] })}
+        />
+      )}
   </div>
   );
 };
