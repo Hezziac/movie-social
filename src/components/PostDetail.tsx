@@ -28,6 +28,7 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { EditPostModal } from "./EditPostModal";
 import { Edit } from "@mui/icons-material";
+import { MovieDetailModal } from "./MovieDetailModal";
 
 interface Props {
   postId: number;
@@ -53,7 +54,8 @@ const fetchPostById = async (id: number): Promise<Post & { movie?: Movie; profil
 export const PostDetail = ({ postId }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for edit modal visibility
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null); // State for movie detail visibility
 
   const { data, error, isLoading } = useQuery({
     queryKey: ["post", postId],
@@ -128,9 +130,11 @@ export const PostDetail = ({ postId }: Props) => {
         {/* Movie Tile - ALWAYS SHOWS if movie exists (MOVED OUTSIDE image block) */}
         {data.movie && (
           <div className="flex justify-center mb-6 pt-4">
-            <div className="scale-125 shadow-lg shadow-purple-500/30rounded-xl p-3 bg-black/50 backdrop-blur-sm">
+            <button 
+              onClick={() => setSelectedMovie(data.movie || null)}
+              className="scale-125 shadow-lg shadow-purple-500/30rounded-xl p-3 bg-black/50 backdrop-blur-sm transition-transform">
               <MovieTile movie={data.movie} />
-            </div>
+            </button>
           </div>
         )}
 
@@ -160,6 +164,13 @@ export const PostDetail = ({ postId }: Props) => {
         initialTitle={data.title}
         initialContent={data.content}
         onSave={() => queryClient.invalidateQueries({ queryKey: ["post", postId] })}
+      />
+
+      {/* Movie Detail Modal */}
+      <MovieDetailModal 
+        movie={selectedMovie}
+        isOpen={!!selectedMovie}
+        onClose={() => setSelectedMovie(null)}
       />
     </div>
   );
