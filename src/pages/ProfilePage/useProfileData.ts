@@ -1,7 +1,7 @@
 /** [useProfileData.ts]
  * 
  * * A custom React hook designed to centralize all data-fetching logic for the 
- * Profile Page. It manages state for user profiles, posts, stats, and 
+ * Profile Page. It manages state for user profiles, posts, stats, favorite movies and 
  * follower relationships.
  * * * * Note on AI Usage: 
  * - **Architectural Refactoring**: GitHub Copilot and Perplexity AI assisted in 
@@ -40,6 +40,7 @@ export const useProfileData = (username: string | undefined) => {
     });
     const [isFollowing, setIsFollowing] = useState(false);
     const { user } = useAuth();
+    const [favoriteMovies, setFavoriteMovies] = useState<any[]>([]);
     
 
     useEffect(() => {
@@ -49,6 +50,24 @@ export const useProfileData = (username: string | undefined) => {
     }, [username]);
 
     
+    // Helper: Fetch movies from the junction table
+    const fetchFavoriteMovies = async (userId: string) => {
+        const { data, error } = await supabase
+            .from("user_movies")
+            .select(`
+                status,
+                movie:movies (*)
+            `)
+            .eq("user_id", userId)
+            .eq("status", "favorite");
+
+        if (error) {
+            console.error("Error fetching favorites:", error);
+            return [];
+        }
+        //Transform the nested join into a clean movie array
+        return data.map((item: any) => item.movie).filter(Boolean);
+    };
 
     // Relational Fetching: AI helped refactor this query to use nested 
     // selections. This allows the app to fetch a post's metadata, movie info, 
@@ -124,9 +143,13 @@ export const useProfileData = (username: string | undefined) => {
                 });
             }
         
-        // Now, fetch the posts for this specific user.
-        const posts = await fetchUserPosts(profileData.id);
+        // Fetch posts AND favorite movies for the user we are LOOKING AT
+        const [posts, favorites] = await Promise.all([
+            fetchUserPosts(profileData.id),
+            fetchFavoriteMovies(profileData.id)
+        ]);
         setUserPosts(posts as PostWithRelations[]);
+        setFavoriteMovies(favorites);
         setStats({
             posts: posts.length,
             followers: profileData.followers_count || 0,
@@ -188,5 +211,5 @@ export const useProfileData = (username: string | undefined) => {
         };
 
     // The hook returns all the data and state needed by the component.
-    return { profile, userPosts, stats, loading, loadProfileAndPosts, isFollowing, toggleFollow, };
+    return { profile, userPosts, stats, loading, loadProfileAndPosts, isFollowing, toggleFollow, favoriteMovies};
 };

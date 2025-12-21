@@ -19,12 +19,14 @@
 
 import { useState, useEffect } from 'react';
 import { getPopularMovies, searchMovies, Movie} from '../context/tmdb-client';
+import { MovieDetailModal } from '../components/MovieDetailModal';
 
 export default function MovieSearchPage() {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   // Lifecycle Management: AI assisted in implementing the 'isMounted' pattern 
   // to ensure that asynchronous API responses don't trigger state updates 
@@ -101,7 +103,7 @@ export default function MovieSearchPage() {
         {/* Fallback Logic: AI helped implement this check to handle cases 
                 where TMDB does not have an image available for a specific film. */}
         {movies.map((movie) => (
-          <div key={movie.id} className="bg-gray-800 rounded-lg shadow overflow-hidden">
+          <div key={movie.id} onClick={() => setSelectedMovie(movie)} className="bg-gray-800 rounded-lg shadow cursor-pointer transition-transform overflow-hidden">
             {movie.poster_path ? (
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -126,6 +128,12 @@ export default function MovieSearchPage() {
       {movies.length === 0 && !loading && (
         <p className="text-center text-gray-500">No movies found</p>
       )}
+
+      <MovieDetailModal 
+        movie={selectedMovie}
+        isOpen={!!selectedMovie}
+        onClose={() => setSelectedMovie(null)}
+      />
     </div>
   );
 }
