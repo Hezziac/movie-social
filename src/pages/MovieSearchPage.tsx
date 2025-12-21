@@ -111,7 +111,7 @@ export default function MovieSearchPage() {
                 className="w-full h-auto"
               />
             ) : (
-              <div className="bg-gray-200 h-64 flex items-center justify-center">
+              <div className="bg-gray-600 h-64 flex items-center justify-center">
                 No Image
               </div>
             )}
