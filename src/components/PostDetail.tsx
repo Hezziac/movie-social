@@ -16,7 +16,7 @@
  * the 'fetchPostById' query to correctly perform a relational join with the 
  * 'movies' table in Supabase.
  */
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { Post } from "./PostList";
 import { LikeButton } from "./LikeButton";
@@ -24,6 +24,10 @@ import { CommentSection } from "./CommentSection";
 import { MovieTile } from "./MovieTile"; // New component we'll create
 import { Movie } from "../context/tmdb-client";
 import { Link } from "react-router";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { EditPostModal } from "./EditPostModal";
+import { Edit } from "@mui/icons-material";
 
 interface Props {
   postId: number;
@@ -31,7 +35,7 @@ interface Props {
 
 // Relational Join Logic: Refactored with AI assistance to fetch movie data 
 // alongside the post.
-const fetchPostById = async (id: number): Promise<Post & { movie?: Movie; profile?: { username: string } }> => {
+const fetchPostById = async (id: number): Promise<Post & { movie?: Movie; profile?: { username: string }; user_id: string }> => {
   const { data, error } = await supabase
     .from("posts")
     .select(`
@@ -47,6 +51,10 @@ const fetchPostById = async (id: number): Promise<Post & { movie?: Movie; profil
 };
 
 export const PostDetail = ({ postId }: Props) => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const { data, error, isLoading } = useQuery({
     queryKey: ["post", postId],
     queryFn: () => fetchPostById(postId),
@@ -55,6 +63,9 @@ export const PostDetail = ({ postId }: Props) => {
   if (isLoading) return <div className="text-center py-10">Loading...</div>;
   if (error) return <div className="text-red-500">Error: {error.message}</div>;
   if (!data) return <div>Post not found</div>;
+
+  // Determine if user owns the post
+  const isOwner = user?.id === data.user_id;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -80,7 +91,17 @@ export const PostDetail = ({ postId }: Props) => {
           </p>
         </div>
         </Link>
+        {isOwner && (
+          <button 
+            onClick={() => setIsEditModalOpen(true)}
+            className="p-2 text-gray-500 hover:text-purple-500 hover:bg-white/5 rounded-full transition"
+          >
+            <Edit fontSize="small" />
+          </button>
+        )}
       </div>
+      
+      
 
       {/* Post Content with Image */}
       <div className="relative mb-6">
