@@ -96,7 +96,7 @@ export const PostDetail = ({ postId }: Props) => {
             onClick={() => setIsEditModalOpen(true)}
             className="p-2 text-gray-500 hover:text-purple-500 hover:bg-white/5 rounded-full transition"
           >
-            <Edit fontSize="small" />
+            <Edit fontSize="small" /> Edit
           </button>
         )}
       </div>
