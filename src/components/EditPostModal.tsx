@@ -50,9 +50,6 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm("Are you sure you want to permanently delete this post?");
-    if (!confirmDelete) return;
-
     setIsSaving(true);
     try {
       const { error } = await supabase
