@@ -10,6 +10,7 @@ import { useState } from "react";
 import { supabase } from "../supabase-client";
 import { Close, Save, DeleteForever } from "@mui/icons-material";
 import { useNavigate } from "react-router";
+import { ConfirmModal } from "./ConfirmModal";
 
 interface Props {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
   const [content, setContent] = useState(initialContent);
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
+  const [showConfirm, setShowConfirm] = useState(false);
 
   if (!isOpen) return null;
 
@@ -105,12 +107,10 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
         {/* Footer with Delete and Save */}
         <div className="p-4 bg-black/20 border-t border-white/5 flex justify-between items-center">
           <button
-            onClick={handleDelete}
-            disabled={isSaving}
-            className="text-red-500 hover:text-red-400 hover:bg-red-500/10 px-3 py-2 rounded-lg transition flex items-center gap-1 text-sm font-bold"
+            onClick={() => setShowConfirm(true)} // Open Warning Modal
+            className="text-red-500 hover:text-red-400 flex items-center gap-1 font-bold"
           >
-            <DeleteForever fontSize="small" />
-            Delete Post
+            <DeleteForever fontSize="small" /> Delete
           </button>
           <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white font-medium">
             Cancel
@@ -125,6 +125,13 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
           </button>
         </div>
       </div>
+    <ConfirmModal 
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete Post?"
+        message="This action cannot be undone. All likes and comments on this movie post will be permanently removed."
+      />
     </div>
   );
 };
