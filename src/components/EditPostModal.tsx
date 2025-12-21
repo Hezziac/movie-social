@@ -8,7 +8,8 @@
  */
 import { useState } from "react";
 import { supabase } from "../supabase-client";
-import { Close, Save } from "@mui/icons-material";
+import { Close, Save, DeleteForever } from "@mui/icons-material";
+import { useNavigate } from "react-router";
 
 interface Props {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
   const [isSaving, setIsSaving] = useState(false);
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -40,6 +42,29 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
     } catch (err) {
       console.error("Update failed:", err);
       alert("Error updating post.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to permanently delete this post?");
+    if (!confirmDelete) return;
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("posts")
+        .delete()
+        .eq("id", postId);
+
+      if (error) throw error;
+
+      onClose();
+      navigate("/"); // Send user back to feed after successful deletion
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Could not delete post.");
     } finally {
       setIsSaving(false);
     }
@@ -77,7 +102,16 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
           </div>
         </div>
 
-        <div className="p-4 bg-black/20 border-t border-white/5 flex justify-end gap-3">
+        {/* Footer with Delete and Save */}
+        <div className="p-4 bg-black/20 border-t border-white/5 flex justify-between items-center">
+          <button
+            onClick={handleDelete}
+            disabled={isSaving}
+            className="text-red-500 hover:text-red-400 hover:bg-red-500/10 px-3 py-2 rounded-lg transition flex items-center gap-1 text-sm font-bold"
+          >
+            <DeleteForever fontSize="small" />
+            Delete Post
+          </button>
           <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white font-medium">
             Cancel
           </button>
