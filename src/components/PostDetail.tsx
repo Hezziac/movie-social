@@ -151,6 +151,16 @@ export const PostDetail = ({ postId }: Props) => {
 
       {/* Comments Section */}
       <CommentSection postId={postId} />
+      
+      {/* Modal - Kept separate for a small file size */}
+      <EditPostModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        postId={postId}
+        initialTitle={data.title}
+        initialContent={data.content}
+        onSave={() => queryClient.invalidateQueries({ queryKey: ["post", postId] })}
+      />
     </div>
   );
 };
