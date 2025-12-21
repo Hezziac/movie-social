@@ -40,6 +40,7 @@ export const useProfileData = (username: string | undefined) => {
     });
     const [isFollowing, setIsFollowing] = useState(false);
     const { user } = useAuth();
+    
 
     useEffect(() => {
         if (username) {
@@ -82,9 +83,22 @@ export const useProfileData = (username: string | undefined) => {
     const loadProfileAndPosts = async () => {
     try {
         setLoading(true); // Start loading
+
+        // Relational Fetching: Refactored query to fetch not just counts, 
+        // but the actual profile data (username, avatar) for the followers 
+        // and following lists via the 'follows' table.
         const { data: profileData, error: profileError } = await supabase
         .from("profiles")
-        .select("id, username, bio, avatar_url, created_at, updated_at, followers_count, following_count")
+        .select(`
+                id, username, bio, avatar_url, created_at, updated_at, 
+                followers_count, following_count,
+                followers:follows!following_id (
+                    follower:profiles!follower_id (id, username, avatar_url)
+                ),
+                following:follows!follower_id (
+                    following:profiles!following_id (id, username, avatar_url)
+                )
+            `)
         .eq("username", username)
         .single();
 
@@ -93,13 +107,22 @@ export const useProfileData = (username: string | undefined) => {
         setProfile(null);
         setUserPosts([]); // Clear posts if profile not found
         } else {
-        setProfile(profileData);
-                // Check follow status for the current logged-in user, if available
-                if (user && profileData?.id) {
-                    checkFollowStatus(user.id, profileData.id).catch((err) => {
-                        console.warn("Failed to check follow status:", err);
-                    });
-                }
+            setProfile(profileData);
+            // Flatten the nested data so the Modal can read it easily
+            const followers_data = profileData.followers?.map((f: any) => f.follower) || [];
+            const following_data = profileData.following?.map((f: any) => f.following) || [];
+
+            setProfile({
+                ...profileData,
+                followers_data,
+                following_data
+            });
+            // Check follow status for the current logged-in user, if available
+            if (user && profileData?.id) {
+                checkFollowStatus(user.id, profileData.id).catch((err) => {
+                    console.warn("Failed to check follow status:", err);
+                });
+            }
         
         // Now, fetch the posts for this specific user.
         const posts = await fetchUserPosts(profileData.id);
@@ -165,5 +188,5 @@ export const useProfileData = (username: string | undefined) => {
         };
 
     // The hook returns all the data and state needed by the component.
-    return { profile, userPosts, stats, loading, loadProfileAndPosts, isFollowing, toggleFollow };
+    return { profile, userPosts, stats, loading, loadProfileAndPosts, isFollowing, toggleFollow, };
 };

@@ -19,6 +19,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Link, useParams } from "react-router";
 import { useProfileData } from "./useProfileData";
 import { ProfileEditForm } from "./ProfileEditForm";
+import { FollowModal } from "./FollowersModal";
 
 
 export function ProfilePage() {
@@ -35,6 +36,11 @@ export function ProfilePage() {
     isFollowing,
     toggleFollow,
 } = useProfileData(username);
+const [followModal, setFollowModal] = useState<{ open: boolean; title: string; users: any[] }>({
+  open: false,
+  title: "",
+  users: [],
+});
 
   // This will only render the spinner if
   // `loading` is true OR `profile` is null. The changes above ensure that
@@ -102,12 +108,24 @@ export function ProfilePage() {
                 <span className="text-gray-400">posts</span>
               </div>
               <div>
-                <span className="text-white font-bold">{stats.followers}</span>{" "}
-                <span className="text-gray-400">followers</span>
+                {/* Followers Button */}
+                <button 
+                  onClick={() => setFollowModal({ open: true, title: "Followers", users: profile.followers_data || [] })}
+                  className="hover:opacity-70 transition"
+                >
+                  <span className="text-white font-bold">{stats.followers}</span>{" "}
+                  <span className="text-gray-400">followers</span>
+                </button>
               </div>
               <div>
-                <span className="text-white font-bold">{stats.following}</span>{" "}
-                <span className="text-gray-400">following</span>
+                {/* Following Button */}
+                <button 
+                  onClick={() => setFollowModal({ open: true, title: "Following", users: profile.following_data || [] })}
+                  className="hover:opacity-70 transition"
+                >
+                  <span className="text-white font-bold">{stats.following}</span>{" "}
+                  <span className="text-gray-400">following</span>
+                </button>
               </div>
             </div>
             
@@ -203,6 +221,12 @@ export function ProfilePage() {
           </div>
         )}
       </div>
+      <FollowModal 
+        isOpen={followModal.open}
+        onClose={() => setFollowModal({ ...followModal, open: false })}
+        title={followModal.title}
+        users={followModal.users}
+      />
     </div>
   );
 }
