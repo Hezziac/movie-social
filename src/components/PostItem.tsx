@@ -357,7 +357,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                     <div className={`z-30 flex-shrink-0 ${
                       hasImage 
                         ? "w-20 md:w-32" // Smaller tile on mobile overlay
-                        : "w-full max-w-[180px] mb-4" // Centered tile for text-only
+                        : "w-full flex justify-center max-w-[180px] mb-4" // Centered tile for text-only
                     }`}>
                       <MovieTile movie={movieForTile} />
                     </div>
