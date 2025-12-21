@@ -372,7 +372,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                           : "text-white text-xl md:text-2xl font-bold px-4 max-w-lg"
                       }`}
                     >
-                      <p className={`${hasImage ? "line-clamp-4" : ""} leading-tight font-medium`}>
+                      {/* Post content (text) */}
+                      <p className={`${hasImage ? "line-clamp-2" : "line-clamp-4"} leading-tight font-medium`}>
                         {post.content}
                       </p>
                     </div>
