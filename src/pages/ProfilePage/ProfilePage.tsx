@@ -35,12 +35,14 @@ export function ProfilePage() {
     loadProfileAndPosts,
     isFollowing,
     toggleFollow,
+    favoriteMovies,
 } = useProfileData(username);
-const [followModal, setFollowModal] = useState<{ open: boolean; title: string; users: any[] }>({
-  open: false,
-  title: "",
-  users: [],
-});
+  const [followModal, setFollowModal] = useState<{ open: boolean; title: string; users: any[] }>({
+    open: false,
+    title: "",
+    users: [],
+  });
+  const [activeTab, setActiveTab] = useState<"posts" | "movies">("posts");
 
   // This will only render the spinner if
   // `loading` is true OR `profile` is null. The changes above ensure that
@@ -147,13 +149,27 @@ const [followModal, setFollowModal] = useState<{ open: boolean; title: string; u
             />
         ) : null}
 
-        {/* Content Tabs */}
+        {/* Content Tabs Refactored */}
         <div className="border-t border-gray-800 mt-4">
           <div className="flex">
-            <button className="flex-1 py-3 text-center border-t-2 border-purple-600 text-purple-600 font-medium">
+            <button 
+              onClick={() => setActiveTab("posts")}
+              className={`flex-1 py-3 text-center font-medium transition-colors ${
+                activeTab === "posts" 
+                ? "border-t-2 border-purple-600 text-purple-600" 
+                : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
               POSTS
             </button>
-            <button className="flex-1 py-3 text-center text-gray-500 font-medium">
+            <button 
+              onClick={() => setActiveTab("movies")}
+              className={`flex-1 py-3 text-center font-medium transition-colors ${
+                activeTab === "movies" 
+                ? "border-t-2 border-purple-600 text-purple-600" 
+                : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
               MOVIES
             </button>
           </div>
@@ -162,6 +178,8 @@ const [followModal, setFollowModal] = useState<{ open: boolean; title: string; u
         {/* Posts Grid: Implemented with AI assistance to achieve a 
             responsive 3-column layout. It includes a fallback render for 
             text-only posts and a hover-state overlay for engagement metrics. */}
+        {activeTab === "posts" ? (
+          <>
         {userPosts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mb-4 text-2xl">
@@ -218,6 +236,35 @@ const [followModal, setFollowModal] = useState<{ open: boolean; title: string; u
                 )}
               </Link>
             ))}
+          </div>
+        )}
+        </>
+        ) : ( 
+          <div className="mt-4">
+            {favoriteMovies.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mb-4 text-2xl">
+                  🎬
+                </div>
+                <h3 className="text-lg font-medium text-white mb-2">No Favorites Yet</h3>
+                <p className="text-gray-400">Movies you favorite will appear here.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                {favoriteMovies.map((movie) => (
+                  <div key={movie.id} className="relative aspect-[2/3] bg-gray-900 rounded-lg overflow-hidden border border-white/5 group shadow-lg">
+                    <img 
+                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+                      alt={movie.title}
+                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+                      <p className="text-white text-[10px] md:text-xs font-bold truncate">{movie.title}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
