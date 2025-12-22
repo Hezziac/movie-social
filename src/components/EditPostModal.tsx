@@ -67,7 +67,8 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
         content
           .match(/#[a-zA-Z0-9_]+/g)
           ?.map((tag) => tag.slice(1).toLowerCase())
-          .filter(Boolean) || [];
+          /* SAFETY CHECK: Filter out tags that are empty OR longer than 50 chars */
+          .filter((tag) => tag && tag.length > 0 && tag.length <= 50) || [];
 
       // 3. Sync Tags (Delete old relations and build new ones)
       // First, remove all existing relations for this post

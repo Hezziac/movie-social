@@ -103,7 +103,6 @@ export const CreatePost = () => {
   const handleScroll = () => {
     if (textareaRef.current && highlightRef.current) {
       highlightRef.current.scrollTop = textareaRef.current.scrollTop;
-      highlightRef.current.scrollLeft = textareaRef.current.scrollLeft;
     }
   };
 
@@ -113,7 +112,7 @@ export const CreatePost = () => {
     if (!text) return " ";
     return text.split(/(#[a-zA-Z0-9_]+)/g).map((part, i) =>
       part.startsWith("#") ? (
-        <span key={i} className="text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.5)] font-bold">
+        <span key={i} className="text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.5)]">
           {part}
         </span>
       ) : (
@@ -138,7 +137,8 @@ export const CreatePost = () => {
         data.post.content
           .match(/#[a-zA-Z0-9_]+/g)
           ?.map((tag) => tag.slice(1).toLowerCase())
-          .filter(Boolean) || [];
+          /* SAFETY CHECK: Filter out tags that are empty OR longer than 50 chars */
+          .filter((tag) => tag && tag.length > 0 && tag.length <= 50) || [];
 
       // Movie persistence logic: Assisted by AI to implement an 'upsert' pattern.
       // This ensures that even if the TMDB API is unavailable, the movie details
@@ -269,9 +269,9 @@ export const CreatePost = () => {
         </label>
 
         {/* WRAPPER: This holds the background color and the fixed height */}
-        <div className="relative h-48 md:h-64 bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+        <div className="relative h-48 md:h-64 w-full bg-gray-900 break-all">
 
-            {/* LAYER 1: THE HIGHLIGHTING LAYER (z-10) */}
+            {/* LAYER 1: THE HIGHLIGHTING LAYER (THE DIV z-10) */}
             <div 
               ref={highlightRef}
               /* CRITICAL FIXES:
@@ -279,17 +279,16 @@ export const CreatePost = () => {
                 - m-0: Removes any browser-default margins
                 - leading-6: Hard-coded line height
               */
-              className="absolute inset-0 p-3 font-sans text-base leading-6 whitespace-pre-wrap pointer-events-none overflow-hidden text-gray-300 z-10 m-0 border-2 border-transparent"
-              style={{ boxSizing: 'border-box',
-                       msOverflowStyle: 'none',  /* IE and Edge */
-                       scrollbarWidth: 'none'    /* Firefox */
-               }}
+              className="absolute inset-0 p-3 font-sans text-sm md:text-base leading-normal whitespace-pre-wrap pointer-events-none overflow-hidden text-gray-300 z-10 border border-transparent"
             >
-              {highlightTags(content)}
-              <br />
+              {content === "" ? (
+                <span className="text-gray-500">Share your thoughts... Use #tags</span>
+              ) : (
+                highlightTags(content)
+              )}
             </div>
 
-            {/* LAYER 2: THE INTERACTIVE TEXTAREA (z-20) */}
+            {/* LAYER 2: THE INTERACTIVE TEXTAREA (THE TEXTAREAz-20) */}
             <textarea
               ref={textareaRef}
               id="content"
@@ -302,9 +301,8 @@ export const CreatePost = () => {
                   but keep a transparent one here so the text doesn't shift 2px left.
                 - bg-transparent: To see the layer below.
               */
-              className="absolute inset-0 w-full h-full bg-transparent p-3 text-transparent caret-white focus:outline-none transition overflow-y-auto z-20 font-sans text-base leading-6 resize-none m-0 border-2 border-transparent"
-              style={{ boxSizing: 'border-box' }}
-              placeholder="Share your thoughts... Use #tags to categorize your post"
+              className="absolute inset-0 w-full h-full bg-transparent p-3 text-transparent caret-white focus:outline-none transition overflow-y-auto z-20 font-sans text-sm md:text-base leading-normal resize-none border border-transparent"
+              placeholder=""
             />
           </div>
           <p className="text-sm text-gray-400 mt-1">

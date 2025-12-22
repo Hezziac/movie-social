@@ -99,7 +99,7 @@ const AppRoutes = () => {
 
       {/* Protected routes that only logged-in users can access */}
       <Route path="/create-hub" element={<ProtectedRoute><CreateHub /></ProtectedRoute>} />
-      <Route path="/create" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
+      <Route path="/create" element={<><CreatePostPage /></>} />
       <Route path="/community/create" element={<ProtectedRoute><CreateCommunityPage /></ProtectedRoute>} />
       <Route path="/search" element={<ProtectedRoute><MovieSearchPage /></ProtectedRoute>} />
 
