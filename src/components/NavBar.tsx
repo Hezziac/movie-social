@@ -250,6 +250,11 @@ export const Navbar = () => {
           <div className="px-4 py-2 border-t border-white/10">
           {user ? (
             <div className="flex items-center space-x-4">
+              <Link
+                to={profile?.username ? `/profile/${profile.username}` : "/profile"}
+                onClick={closeNav} // Important: close the menu when navigating
+                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
+              >
               {profile?.avatar_url ? (
                 <img
                   src={profile.avatar_url}
@@ -266,6 +271,7 @@ export const Navbar = () => {
               >
                 Sign Out
               </button>
+            </Link> 
             </div>
           ) : (
             <div className="space-y-2">
