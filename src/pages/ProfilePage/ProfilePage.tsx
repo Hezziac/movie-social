@@ -20,6 +20,7 @@ import { Link, useParams } from "react-router";
 import { useProfileData } from "./useProfileData";
 import { ProfileEditForm } from "./ProfileEditForm";
 import { FollowModal } from "./FollowersModal";
+import { MovieDetailModal } from "../../components/MovieDetailModal";
 
 
 export function ProfilePage() {
@@ -43,6 +44,7 @@ export function ProfilePage() {
     users: [],
   });
   const [activeTab, setActiveTab] = useState<"posts" | "movies">("posts");
+  const [selectedMovie, setSelectedMovie] = useState<any | null>(null);
 
   // This will only render the spinner if
   // `loading` is true OR `profile` is null. The changes above ensure that
@@ -253,13 +255,19 @@ export function ProfilePage() {
               <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
                 {favoriteMovies.map((movie) => (
                   <div key={movie.id} className="relative aspect-[2/3] bg-gray-900 rounded-lg overflow-hidden border border-white/5 group shadow-lg">
-                    <img 
-                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
-                      alt={movie.title}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
-                      <p className="text-white text-[10px] md:text-xs font-bold truncate">{movie.title}</p>
+                    <div 
+                      key={movie.id} 
+                      onClick={() => setSelectedMovie(movie)} // Triggers popup
+                      className="relative aspect-[2/3] bg-gray-900 rounded-lg overflow-hidden border border-white/5 group shadow-lg cursor-pointer transition-transform hover:scale-[1.02] active:scale-95"
+                    >
+                      <img 
+                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+                        alt={movie.title}
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+                        <p className="text-white text-[10px] md:text-xs font-bold truncate">{movie.title}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -268,6 +276,12 @@ export function ProfilePage() {
           </div>
         )}
       </div>
+      <MovieDetailModal 
+        movie={selectedMovie}
+        isOpen={!!selectedMovie}
+        onClose={() => setSelectedMovie(null)}
+      />
+      
       <FollowModal 
         isOpen={followModal.open}
         onClose={() => setFollowModal({ ...followModal, open: false })}
