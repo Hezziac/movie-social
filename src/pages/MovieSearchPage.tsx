@@ -86,7 +86,7 @@ export default function MovieSearchPage() {
           <button 
             type="submit" 
             disabled={loading}
-            className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+            className="bg-purple-500 text-white px-4 py-2 rounded disabled:opacity-50"
           >
             {loading ? 'Searching...' : 'Search'}
           </button>

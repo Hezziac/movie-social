@@ -164,7 +164,7 @@ export const Navbar = () => {
                 </button>
                 <button
                   onClick={signInWithGoogle}
-                  className="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded flex items-center"
+                  className="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded flex items-center"
                 >
                   <Google className="w-4 h-4 mr-2" />
                   Google
@@ -284,7 +284,7 @@ export const Navbar = () => {
               </button>
               <button
                 onClick={signInWithGoogle}
-                className="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded w-full flex items-center justify-center"
+                className="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded w-full flex items-center justify-center"
               >
                 <Google className="w-4 h-4 mr-2" />
                 Sign in with Google
