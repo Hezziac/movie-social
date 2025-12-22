@@ -96,9 +96,14 @@ export const PostDetail = ({ postId }: Props) => {
         {isOwner && (
           <button 
             onClick={() => setIsEditModalOpen(true)}
-            className="p-2 text-gray-500 hover:text-purple-500 hover:bg-white/5 rounded-full transition"
+            className="group flex items-center justify-center gap-0 hover:gap-2 p-2 text-gray-500 hover:text-purple-500 hover:bg-white/5 rounded-full transition-all duration-300 ease-in-out"
           >
-            <Edit fontSize="small" /> Edit
+            <Edit fontSize="small" />
+            
+            {/* Text is hidden by default, shown on group-hover */}
+            <span className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap text-sm font-bold">
+              Edit
+            </span>
           </button>
         )}
       </div>
