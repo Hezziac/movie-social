@@ -61,6 +61,7 @@ export const CreatePost = () => {
   
   // Refs and hooks
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const highlightRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const [profile, setProfile] = useState<any | null>(null);
 
@@ -99,12 +100,19 @@ export const CreatePost = () => {
     setShowMovieSearch(false);
   };
 
+  const handleScroll = () => {
+    if (textareaRef.current && highlightRef.current) {
+      highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  };
+
   // Tag highlighting logic: Refactored with Perplexity AI to use regex 
   // for identifying #tags and styling them differently than plain text.
   const highlightTags = (text: string) => {
+    if (!text) return " ";
     return text.split(/(#[a-zA-Z0-9_]+)/g).map((part, i) =>
       part.startsWith("#") ? (
-        <span key={i} className="text-blue-400">
+        <span key={i} className="text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.5)] font-bold">
           {part}
         </span>
       ) : (
@@ -252,30 +260,56 @@ export const CreatePost = () => {
         />
       </div>
 
-      {/* Content Textarea with Tag Highlighting */}
+      {/* 5. Refactored Content Textarea Section */}
       <div>
-        <label htmlFor="content" className="block mb-2 font-medium text-gray-200">
+        <label htmlFor="content" 
+        className="block mb-2 font-medium text-gray-200">
           Content
         </label>
-        <div className="relative">
-          <div className="absolute inset-0 p-3 whitespace-pre-wrap pointer-events-none overflow-hidden">
-            {highlightTags(content)}
+
+        {/* WRAPPER: This holds the background color and the fixed height */}
+        <div className="relative h-48 md:h-64 bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+
+            {/* LAYER 1: THE HIGHLIGHTING LAYER (z-10) */}
+            <div 
+              ref={highlightRef}
+              /* CRITICAL FIXES:
+                - border-2 border-transparent: Matches the textarea's border width
+                - m-0: Removes any browser-default margins
+                - leading-6: Hard-coded line height
+              */
+              className="absolute inset-0 p-3 font-sans text-base leading-6 whitespace-pre-wrap pointer-events-none overflow-hidden text-gray-300 z-10 m-0 border-2 border-transparent"
+              style={{ boxSizing: 'border-box',
+                       msOverflowStyle: 'none',  /* IE and Edge */
+                       scrollbarWidth: 'none'    /* Firefox */
+               }}
+            >
+              {highlightTags(content)}
+              <br />
+            </div>
+
+            {/* LAYER 2: THE INTERACTIVE TEXTAREA (z-20) */}
+            <textarea
+              ref={textareaRef}
+              id="content"
+              required
+              value={content}
+              onScroll={handleScroll} // SYNC SCROLL HERE
+              onChange={(e) => setContent(e.target.value)}
+              /* CRITICAL FIXES:
+                - border-2 border-transparent: We use the parent's border for the visual, 
+                  but keep a transparent one here so the text doesn't shift 2px left.
+                - bg-transparent: To see the layer below.
+              */
+              className="absolute inset-0 w-full h-full bg-transparent p-3 text-transparent caret-white focus:outline-none transition overflow-y-auto z-20 font-sans text-base leading-6 resize-none m-0 border-2 border-transparent"
+              style={{ boxSizing: 'border-box' }}
+              placeholder="Share your thoughts... Use #tags to categorize your post"
+            />
           </div>
-          <textarea
-            ref={textareaRef}
-            id="content"
-            required
-            rows={5}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full border border-gray-700 bg-gray-900 p-3 rounded-lg text-transparent caret-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            placeholder="Share your thoughts... Use #tags to categorize your post"
-          />
+          <p className="text-sm text-gray-400 mt-1">
+            Pro tip: Posts with images get 2.5x more engagement!
+          </p>
         </div>
-        <p className="text-sm text-gray-400 mt-1">
-          Pro tip: Posts with images get 2.5x more engagement!
-        </p>
-      </div>
 
       {/* Community Select */}
       <div>
