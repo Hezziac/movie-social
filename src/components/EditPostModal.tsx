@@ -4,9 +4,10 @@
  * - **State Sync**: AI helped implement the initial state synchronization so 
  * the modal always opens with the most current post data.
  * - **Database Logic**: Refactored with AI to handle the Supabase '.update()' 
- * operation and provide immediate feedback via the onSave callback.
+ * operation, provide immediate feedback via the onSave callback and Updated to 
+ * handle Tag Highlighting and Relational Tag Synchronization.
  */
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "../supabase-client";
 import { Close, Save, DeleteForever } from "@mui/icons-material";
 import { useNavigate } from "react-router";
@@ -26,19 +27,89 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
   const [content, setContent] = useState(initialContent);
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const highlightRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen) return null;
+
+  const handleScroll = () => {
+  if (textareaRef.current && highlightRef.current) {
+      highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  };
+
+  // Tag highlighting logic (same as CreatePost)
+  const highlightTags = (text: string) => {
+    return text.split(/(#[a-zA-Z0-9_]+)/g).map((part, i) =>
+      part.startsWith("#") ? (
+        <span key={i} className="text-blue-400 drop-shadow-[0_0_5px_rgba(96,165,250,0.5)]">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
 
   const handleUpdate = async () => {
     setIsSaving(true);
     try {
-      const { error } = await supabase
+      const { error: postUpdateError } = await supabase
         .from("posts")
         .update({ title, content })
         .eq("id", postId);
 
-      if (error) throw error;
+      if (postUpdateError) throw postUpdateError;
+
+      // 2. Extract tags from the new content
+      const tagNames =
+        content
+          .match(/#[a-zA-Z0-9_]+/g)
+          ?.map((tag) => tag.slice(1).toLowerCase())
+          .filter(Boolean) || [];
+
+      // 3. Sync Tags (Delete old relations and build new ones)
+      // First, remove all existing relations for this post
+      const { error: deleteRelError } = await supabase
+        .from("post_tags")
+        .delete()
+        .eq("post_id", postId);
+      
+      if (deleteRelError) throw deleteRelError;
+
+      if (tagNames.length > 0) {
+        // Upsert tags into the main 'tags' table
+        const { error: tagUpsertError } = await supabase.from("tags").upsert(
+          tagNames.map((name) => ({
+            name,
+            slug: name, // simplify slug for MVP
+          })),
+          { onConflict: "name" }
+        );
+        if (tagUpsertError) throw tagUpsertError;
+
+        // Fetch IDs for these tags
+        const { data: tagData, error: fetchTagsError } = await supabase
+          .from("tags")
+          .select("id")
+          .in("name", tagNames);
+        if (fetchTagsError) throw fetchTagsError;
+
+        // Re-insert new relations
+        if (tagData && tagData.length > 0) {
+          const { error: insertRelError } = await supabase
+            .from("post_tags")
+            .insert(
+              tagData.map((tag) => ({
+                post_id: postId,
+                tag_id: tag.id,
+              }))
+            );
+          if (insertRelError) throw insertRelError;
+        }
+      }
+      
       onSave();
       onClose();
     } catch (err) {
@@ -90,14 +161,28 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
             />
           </div>
 
+          {/* Content */}
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Content</label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={5}
-              className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 outline-none transition resize-none"
-            />
+            <div className="relative h-48 md:h-64 w-full">
+              {/* 1. The Highlighting Overlay (Behind the text) */}
+              <div 
+                ref={highlightRef}
+                className="absolute inset-0 p-3 font-sans text-sm md:text-base whitespace-pre-wrap pointer-events-none overflow-hidden text-gray-300 z-10 border border-transparent"
+              >
+                {highlightTags(content)}
+              </div>
+              {/* Tag Highlighting Overlay */}
+              <textarea
+                ref={textareaRef}
+                rows={8}
+                value={content}
+                onScroll={handleScroll} // SYNC SCROLL HERE
+                onChange={(e) => setContent(e.target.value)}
+                className="absolute inset-0 w-full h-full bg-transparent border border-gray-700 p-3 rounded-lg text-transparent caret-white focus:ring-2 focus:ring-purple-500 outline-none transition overflow-y-auto z-20 font-sans text-sm md:text-base leading-normal resize-none"
+                placeholder="Share your thoughts..."
+              />
+            </div>
           </div>
         </div>
 
