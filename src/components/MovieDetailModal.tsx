@@ -9,7 +9,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../context/AuthContext";
-import { Favorite, FavoriteBorder, Close, CalendarMonth } from "@mui/icons-material";
+import { Favorite, FavoriteBorder, Close, CalendarMonth, ExpandMore, ExpandLess} from "@mui/icons-material";
 import { Movie } from "../context/tmdb-client";
 
 interface Props {
@@ -22,6 +22,7 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
   const { user } = useAuth();
   const [isFavorited, setIsFavorited] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Check if this movie is already favorited by the user
   useEffect(() => {
@@ -81,15 +82,24 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
     }
   };
 
+  const shouldShowReadMore = movie.overview && movie.overview.length > 200;
+  const displayedOverview = isExpanded ? movie.overview : movie.overview?.slice(0, 200) + (shouldShowReadMore ? "..." : "");
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-      <div className="relative bg-gray-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
-        <button onClick={onClose} className="absolute top-4 right-4 z-10 text-white/50 hover:text-white bg-black/20 rounded-full p-1">
+      {/* Backdrop Click to Close */}
+      <div className="absolute inset-0" onClick={onClose} />
+      <div className="relative bg-gray-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-y-auto max-h-[90vh] shadow-2xl flex flex-col md:flex-row scrollbar-hide">
+        {/* Fixed Close Button (Top Right) */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 z-20 text-white/70 hover:text-white bg-black/40 backdrop-blur-md rounded-full p-1 border border-white/10"
+        >
           <Close />
         </button>
 
-        {/* Poster Section */}
-        <div className="w-full md:w-2/5 aspect-[2/3] bg-gray-800">
+        {/* Poster Section: Shrinks on mobile */}
+        <div className="w-full md:w-2/5 aspect-[2/3] bg-gray-800 flex-shrink-0">
           <img 
             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
             className="w-full h-full object-cover" 
@@ -106,9 +116,20 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
             <span>{new Date(movie.release_date).getFullYear()}</span>
           </div>
 
-          <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-6 line-clamp-6">
-            {movie.overview || "No overview available for this title."}
-          </p>
+          {/* Overview Section with Read More */}
+          <div className="mb-6">
+            <p className="text-gray-300 text-sm md:text-base leading-relaxed whitespace-pre-line">
+              {displayedOverview || "No overview available."}
+            </p>
+            {shouldShowReadMore && (
+              <button 
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-purple-400 text-sm font-bold mt-2 flex items-center gap-1 hover:text-purple-300"
+              >
+                {isExpanded ? <><ExpandLess fontSize="small"/> Show Less</> : <><ExpandMore fontSize="small"/> Read More</>}
+              </button>
+            )}
+          </div>
 
           <div className="mt-auto flex justify-end">
             <button
