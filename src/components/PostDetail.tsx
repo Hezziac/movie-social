@@ -75,36 +75,42 @@ export const PostDetail = ({ postId }: Props) => {
       <div className="flex items-center gap-4 mb-6">
         {/* User Avatar */}
         <Link to={`/profile/${data.profile?.username}`} className="hover:underline">
-        {data.avatar_url ? (
-          <img
-            src={data.avatar_url}
-            alt="User avatar"
-            className="w-12 h-12 rounded-full object-cover"
-          />
-        ) : (
-          <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500" />
-        )}
-        <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-            {data.title}
-          </h1>
-          <p className="text-gray-400 text-sm">
-            {new Date(data.created_at).toLocaleDateString()}
-          </p>
-        </div>
+          {data.avatar_url ? (
+            <img
+              src={data.avatar_url}
+              alt="User avatar"
+              className="w-12 h-12 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500" />
+          )}
+
+          {/* Title and Date Info */}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent truncate">
+              {data.title}
+            </h1>
+            <p className="text-gray-400 text-sm">
+              {new Date(data.created_at).toLocaleDateString()}
+            </p>
+          </div>
         </Link>
+
+        {/* Edit Button - isOwner check */}
         {isOwner && (
-          <button 
-            onClick={() => setIsEditModalOpen(true)}
-            className="group flex items-center justify-center gap-0 hover:gap-2 p-2 text-gray-500 hover:text-purple-500 hover:bg-white/5 rounded-full transition-all duration-300 ease-in-out"
-          >
-            <Edit fontSize="small" />
-            
-            {/* Text is hidden by default, shown on group-hover */}
-            <span className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap text-sm font-bold">
-              Edit
-            </span>
-          </button>
+          <div className="flex items-center justify-center">
+            <button 
+              onClick={() => setIsEditModalOpen(true)}
+              className="group flex items-center justify-center gap-0 hover:gap-2 p-2 text-gray-500 hover:text-purple-500 hover:bg-white/5 rounded-full transition-all duration-300 ease-in-out"
+            >
+              <Edit fontSize="small" />
+              
+              {/* Text is hidden by default, shown on group-hover */}
+              <span className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap text-sm font-bold">
+                Edit
+              </span>
+            </button>
+          </div>
         )}
       </div>
       
