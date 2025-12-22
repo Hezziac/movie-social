@@ -277,9 +277,9 @@ export const CreatePost = () => {
               /* CRITICAL FIXES:
                 - border-2 border-transparent: Matches the textarea's border width
                 - m-0: Removes any browser-default margins
-                - leading-6: Hard-coded line height
+                - leading: Hard-coded line height
               */
-              className="absolute inset-0 p-3 font-sans text-sm md:text-base leading-6 whitespace-pre-wrap pointer-events-none overflow-hidden text-gray-300 z-10 border border-transparent"
+              className="absolute inset-0 p-3 font-sans text-sm md:text-base leading-[1.5rem] whitespace-pre-wrap pointer-events-none overflow-hidden text-gray-300 z-10 border border-transparent"
               style={{ boxSizing: 'border-box' }}
             >
               {content === "" ? (
@@ -302,7 +302,7 @@ export const CreatePost = () => {
                   but keep a transparent one here so the text doesn't shift 2px left.
                 - bg-transparent: To see the layer below.
               */
-              className="absolute inset-0 w-full h-full bg-transparent p-3 text-transparent caret-white focus:outline-none transition overflow-y-auto z-20 font-sans text-sm md:text-base leading-6 resize-none border border-transparent"
+              className="absolute inset-0 w-full h-full bg-transparent p-3 text-transparent caret-white focus:outline-none transition overflow-y-auto z-20 font-sans text-sm md:text-base leading-[1.5rem] resize-none border border-transparent"
               style={{ boxSizing: 'border-box' }}
               placeholder=""
             />
