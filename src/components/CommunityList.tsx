@@ -88,7 +88,7 @@ export const CommunityList = () => {
                 {/* Community Title */}
                 {community.title}
               {/* Community Description */}
-              <p className="text-gray-400 mt-2">{community.description}</p>
+              <p className="text-gray-400 mt-2 text-sm line-clamp-2 h-10">{community.description || `${community.title} Community`}</p>
             </div>
           </Link>
           </div>
