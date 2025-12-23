@@ -73,39 +73,55 @@ export const PostDetail = ({ postId }: Props) => {
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Post Header */}
       <div className="flex items-center gap-4 mb-6">
-        {/* User Avatar */}
-        <Link to={`/profile/${data.profile?.username}`} className="hover:underline">
+        {/* 1. Avatar Link (Separate from Title Gradient) */}
+        <Link to={`/profile/${data.profile?.username}`} className="flex-shrink-0">
           {data.avatar_url ? (
             <img
               src={data.avatar_url}
               alt="User avatar"
-              className="w-12 h-12 rounded-full object-cover"
+              className="w-12 h-12 rounded-full object-cover border border-white/10"
             />
           ) : (
             <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500" />
           )}
-
-          {/* Title and Date Info */}
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent truncate">
-              {data.title}
-            </h1>
-            <p className="text-gray-400 text-sm">
-              {new Date(data.created_at).toLocaleDateString()}
-            </p>
-          </div>
         </Link>
 
-        {/* Edit Button - isOwner check */}
+        {/* 2. Title and Info Link */}
+        <Link to={`/profile/${data.profile?.username}`} className="flex-1 min-w-0 group">
+          <h1 className="text-2xl font-bold truncate flex items-center gap-2">
+            {/* This logic splits the title by emojis. 
+              Text parts get the gradient. 
+              Emoji parts are rendered as normal spans to preserve color.
+            */}
+            {data.title.split(/(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu).map((part, index) => {
+              const isEmoji = /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu.test(part);
+              return isEmoji ? (
+                <span key={index} className="inline-block">
+                  {part}
+                </span>
+              ) : (
+                <span 
+                  key={index} 
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent [-webkit-background-clip:text]"
+                >
+                  {part}
+                </span>
+              );
+            })}
+          </h1>
+          <p className="text-gray-400 text-sm group-hover:underline">
+            @{data.profile?.username} • {new Date(data.created_at).toLocaleDateString()}
+          </p>
+        </Link>
+
+        {/* Edit Button Section */}
         {isOwner && (
           <div className="flex items-center justify-center">
             <button 
               onClick={() => setIsEditModalOpen(true)}
               className="group flex items-center justify-center gap-0 hover:gap-2 p-2 text-gray-500 hover:text-purple-500 hover:bg-white/5 rounded-full transition-all duration-300 ease-in-out"
             >
-              <Edit fontSize="small" />
-              
-              {/* Text is hidden by default, shown on group-hover */}
+              <Edit fontSize="small" /> 
               <span className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap text-sm font-bold">
                 Edit
               </span>
@@ -113,7 +129,6 @@ export const PostDetail = ({ postId }: Props) => {
           </div>
         )}
       </div>
-      
       
 
       {/* Post Content with Image */}
