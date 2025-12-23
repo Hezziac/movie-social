@@ -348,8 +348,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                 <div 
                   className={`flex w-full gap-4 pointer-events-auto 
                     ${hasImage 
-                      ? "flex-col items-start md:flex-row md:items-end" // Stacked on mobile, side-by-side on desktop
-                      : "flex-col items-center justify-center text-center" // Centered for text-only
+                      ? "flex-col items-start max-w-[calc(100%-40px)] md:flex-row md:items-end md:max-w-[calc(100%-60px)]" // Stacked on mobile, side-by-side on desktop
+                      : "flex-col items-center justify-center text-center mx-auto" // Centered for text-only
                     }`}
                 >
                   {/* MOVIE TILE */}
