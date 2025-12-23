@@ -99,12 +99,15 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
         </button>
 
         {/* Poster Section: Shrinks on mobile */}
-        <div className="w-full md:w-2/5 aspect-[2/3] bg-gray-800 flex-shrink-0">
-          <img 
-            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
-            className="w-full h-full object-cover" 
-            alt={movie.title} 
-          />
+        <div className="w-full md:w-2/5 aspect-[2/3] bg-gray-800 flex-shrink-0 relative overflow-hidden">
+          <div className="md:absolute md:inset-0">
+            
+            <img 
+              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+              className="w-full h-full object-cover" 
+              alt={movie.title} 
+              />
+          </div>
         </div>
 
         {/* Details Section */}
