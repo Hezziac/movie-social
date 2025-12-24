@@ -1,11 +1,12 @@
 # Social.Cine
-#### Video Demo: <URL HERE>
+#### Video Demo: [https://youtu.be/DibPb-H-B-c](https://youtu.be/DibPb-H-B-c)
 #### Live Application: [https://socialcine.vercel.app/](https://socialcine.vercel.app/)
 
 #### Description:
 **Social.Cine** is a specialized social media platform built for movie enthusiasts. It combines the visual appeal of a modern photo-sharing app with the community-driven structure of a forum. The project was born from the idea that movie discussions deserve a dedicated space where film data—like posters, release dates, and director info—is integrated directly into the social experience.
 
-This project represents a significant personal milestone. I have spent over **9 months** working on this application, iterating on the design and logic. While it is submitted here as my CS50 Final Project, it is a "living" project that I intend to continue building and updating as a long-term hobby.
+### A Personal Note on the Journey
+This project was developed over the course of **9 months**. During this time, I transitioned into a brick-and-mortar college, which made my schedule significantly more cluttered than I initially anticipated. Balancing full-time studies with the complexity of building a full-stack social network was a major challenge, but it pushed me to master professional tools like React Query and TypeScript. I am proud to submit this as a fully functional, live application that I intend to maintain as a long-term hobby.
 
 The platform draws inspiration from the feed-based model of Instagram and the community-driven structure of Reddit, but with every feature built specifically to enhance the movie-watching experience.
 
@@ -56,6 +57,9 @@ To meet the requirements of a complex full-stack application, the following file
 * **`NavBar.tsx`**: A responsive navigation bar that adapts based on the user's authentication status.
 * **`PostList.tsx` & `PostDetail.tsx`**: The primary engines for rendering feed content and deep-dive post views.
 * **`ProfileEditForm.tsx`**: A dedicated interface for users to update their bios and avatars.
+* **`ImageUploader.tsx`**: Handles image selection, cropping, and Supabase Storage bucket uploads with aspect-ratio management.
+* **`CreatePost.tsx`**: Features a custom-built, real-time hashtag syntax highlighter using a layered-textarea approach and TMDB API integration.
+* **`MovieDetailModal.tsx`**: A high-fidelity modal providing deep-dive movie info, utilizing relational joins to track user favorites.
 
 ---
 
@@ -64,9 +68,12 @@ To meet the requirements of a complex full-stack application, the following file
 The choice of technology for this project was deliberate, with the goal of building a modern, performant, and scalable application.
 
 * **React & TypeScript:** I chose React to build a dynamic, single-page application (SPA). TypeScript was used to add a layer of type safety, which was crucial for a project of this size. It helped catch common errors during development and made the codebase easier to maintain.
+* **Complex Mobile UI:** One of the most challenging parts of this project was the "Mobile Zoom" feature. Using `@use-gesture/react`, I implemented a custom pinch-to-zoom and drag system for the feed, allowing mobile users to interact with high-resolution posters in a native-app fashion.
+* **Real-time Highlighting:** To enhance the "Creation Post," I developed a custom hashtag highlighter. Because standard HTML textareas do not support inline styling, I used a layered-component approach where a transparent input sits perfectly atop a formatted `div`, synchronizing scroll and line-heights to provide real-time visual feedback.
+* **Relational Database Design:** Unlike a simple NoSQL setup, I utilized PostgreSQL's relational power. I authored specialized 'Join Tables' (`post_tags` and `user_movies`) to manage the complex many-to-many relationships that power the discovery and tagging features.
 * **Supabase (PostgreSQL):** Rather than building a custom backend from scratch, I chose Supabase. This allowed me to focus on the "Instagram-look" and core social features without getting bogged down in server-side boilerplate. The relational structure of PostgreSQL is ideal for managing complex relationships between users, posts, and communities.
 * **Tailwind CSS:** For styling, I utilized Tailwind CSS. Its utility-first approach allowed me to rapidly build the UI. I spent considerable time refactoring the CSS to handle mobile "safe-area" insets and dynamic viewport heights to ensure the app feels like a native mobile application.
-* **AI Collaboration:** Throughout the 9-month development, I utilized GitHub Copilot and Perplexity AI as "pair programmers." They were instrumental in refactoring the `App.tsx` routing logic and debugging complex redirect loops during the onboarding phase.
+* **AI Collaboration:** Throughout the 9-month development, I utilized GitHub Copilot and Perplexity AI as "pair programmers." They were instrumental in refactoring the `App.tsx` routing logic and debugging complex redirect loops during the onboarding phase as well as helping debug issues I didn't understand.
 
 ---
 
