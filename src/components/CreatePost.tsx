@@ -22,7 +22,6 @@ import { ImageUploader } from "../components/ImageUploader";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../context/AuthContext";
-import { Community, fetchCommunities } from "../components/CommunityList"; // Assuming components are here
 import { MovieSearchModal } from "../components/MovieSearchModal";
 import { Movie } from "../context/tmdb-client";
 import { useNavigate } from "react-router";
@@ -89,9 +88,28 @@ export const CreatePost = () => {
   // Fetch communities for the dropdown
   // NOTE: Assuming CommunityList has been fixed to return { id: int8(number), title: string,description: string, created_at: uuid, type: string, slug: string }
   // TODO: Add image_url to Community type
-  const { data: communities, isLoading: isLoadingCommunities, isError: isErrorCommunities } = useQuery<Community[], Error>({
-    queryKey: ["communities"],
-    queryFn: fetchCommunities,
+  const { data: joinedCommunities, isLoading: isLoadingCommunities, isError: isErrorCommunities } = useQuery({
+    queryKey: ["joinedCommunities", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      
+      const { data, error } = await supabase
+        .from("community_members")
+        .select(`
+          community_id,
+          communities (
+            id,
+            title
+          )
+        `)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      // Map the Supabase join structure to a flat array of community objects
+      return data.map((membership: any) => membership.communities);
+    },
+    enabled: !!user,
   });
 
   // Movie selection handler
@@ -314,9 +332,10 @@ export const CreatePost = () => {
 
       {/* Community Select */}
       <div>
-        <label className="block mb-2 text-gray-200">Select Community</label>
+        <label className="block mb-2 text-gray-200">Select Community (Optional)</label>
         <select
           id="community"
+          value={communityId || ""} // sync with state
           onChange={(e) =>
             setCommunityId(e.target.value ? Number(e.target.value) : null)
           }
@@ -324,16 +343,12 @@ export const CreatePost = () => {
           disabled={isLoadingCommunities || isErrorCommunities}
         >
           <option value="">
-            {isLoadingCommunities
-              ? "Loading Communities..."
-              : isErrorCommunities
-              ? "Error loading communities"
-              : "-- Choose a Community --"}
+            {isLoadingCommunities ? "Loading joined groups..." : "-- No Joined Communites Yet --"}
           </option>
-          {communities?.map((community) => (
-            <option key={community.id} value={community.id}>
-              {community.title}
-            </option>
+          {joinedCommunities?.map((community: any) => (
+          <option key={community.id} value={community.id}>
+            {community.title}
+          </option>
           ))}
         </select>
         {isErrorCommunities && <p className="text-red-500 mt-2">Error loading communities. Check your console for details.</p>}
