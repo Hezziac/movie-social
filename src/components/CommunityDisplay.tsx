@@ -71,6 +71,20 @@ const fetchCommunityPosts = async (
   return data || [];
 };
 
+// FETCH membership status 
+const fetchMembershipStatus = async (communityId: number, userId: string | undefined) => {
+  if (!userId) return null;
+  const { data, error } = await supabase
+    .from("community_members")
+    .select("*")
+    .eq("community_id", communityId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  
+  if (error) return null;
+  return data;
+};
+
 export const CommunityDisplay = ({ communityId }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -78,18 +92,37 @@ export const CommunityDisplay = ({ communityId }: Props) => {
 
   // 2. Parallel fetch using Promise.all
   const { data, isLoading, error } = useQuery({
-    queryKey: ["communityData", communityId],
+    queryKey: ["communityData", communityId, user?.id], // Add user?.id to key so it refetches on login/logout
     queryFn: () =>
       Promise.all([
         fetchCommunity(communityId),
         fetchCommunityPosts(communityId),
+        fetchMembershipStatus(communityId, user?.id), // New fetch
       ]),
     // Optional: Set stale time to prevent unnecessary refetches
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // 3. Destructure the parallel results
-  const [community, posts] = data || [null, []];
+  // 3. Destructure the THREE results
+  const [community, posts, membership] = data || [null, [], null];
+
+  // Mutation for Joining/Leaving
+  const toggleJoin = async () => {
+    if (!user) return alert("Please log in to join communities!");
+
+    if (membership) {
+      // Already a member -> Leave
+      await supabase.from("community_members").delete().eq("id", membership.id);
+    } else {
+      // Not a member -> Join
+      await supabase.from("community_members").insert({
+        user_id: user.id,
+        community_id: communityId,
+      });
+    }
+    // Tell React Query to refresh the data
+    queryClient.invalidateQueries({ queryKey: ["communityData", communityId] });
+  };
 
   // community ownership
   const isOwner = user && community && user.id === community.creator_id;
@@ -139,6 +172,21 @@ export const CommunityDisplay = ({ communityId }: Props) => {
         <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-2xl leading-tight py-2">
           {community?.title || `Community ${communityId}`}
         </h1>
+
+        {/* JOIN BUTTON ADDED HERE */}
+        <div className="mt-6">
+          <button
+            onClick={toggleJoin}
+            className={`px-8 py-2 rounded-full font-bold transition-all duration-300 transform hover:scale-105 border-2 ${
+              membership
+                ? "bg-transparent border-gray-500 text-gray-400 hover:border-red-500 hover:text-red-500"
+                : "bg-purple-600 border-purple-600 text-white hover:bg-purple-700"
+            }`}
+          >
+            {membership ? "Leave Community" : "Join Community"}
+          </button>
+        </div>
+
         {community?.description && (
           <p className="text-gray-300 mt-8 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed">
             {community.description}
