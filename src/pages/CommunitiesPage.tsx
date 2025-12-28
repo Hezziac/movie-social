@@ -1,6 +1,6 @@
 /** [CommunitiesPage.tsx]
  *
- * * A top-level page component that displays the 'Top Picks' communities.
+ * * A top-level page component that displays the 'Community Groups'.
  * * * * SOURCE ATTRIBUTION:
  * This component's layout and the integration of the 'CommunityList' were 
  * based on the following tutorial:
