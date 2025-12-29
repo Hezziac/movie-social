@@ -343,7 +343,7 @@ export const CreatePost = () => {
           disabled={isLoadingCommunities || isErrorCommunities}
         >
           <option value="">
-            {isLoadingCommunities ? "Loading joined groups..." : "-- No Joined Communites Yet --"}
+            {isLoadingCommunities ? "Loading joined groups..." : "-- No Communites Selected --"}
           </option>
           {joinedCommunities?.map((community: any) => (
           <option key={community.id} value={community.id}>
