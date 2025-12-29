@@ -48,8 +48,16 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ uid, url, onUpload }
       // preventing users from accidentally overwriting other people's data.
       const file = event.target.files[0];
       const fileExt = file.name.split('.').pop();
-      // Generate a unique file path using user ID and a timestamp
-      const filePath = `${uid}/${Date.now()}.${fileExt}`;
+
+      // 1. GENERATE A SAFE FILENAME
+      // This removes spaces and anything not a letter, number, or dot
+      const safeName = file.name
+        .replace(/\s+/g, '_') // Replace spaces with underscores
+        .replace(/[^a-zA-Z0-9._]/g, ''); // Remove special characters
+
+      // 2. CREATE THE FINAL PATH
+      // Including a timestamp is still smart to prevent caching issues
+      const filePath = `${uid}/${Date.now()}-${safeName}`;
 
       // Upload the file to Supabase Storage
       const { error: uploadError } = await supabase.storage
