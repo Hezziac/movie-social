@@ -28,6 +28,7 @@ import { isMobile } from "../context/isMobile";
 import { useAuth } from "../context/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
+import { AuthModal } from "./SignInModal";
 
 interface Props {
   post: Post;
@@ -39,6 +40,17 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
   const hasImage = !!post.image_url;
   const isTextOnly = !hasImage;
 
+  // Sign in modal state
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  
+  // 1. Create the handler
+  const handleLikeClick = () => {
+    if (!user) {
+      setIsAuthModalOpen(true); // Open modal if guest
+    } else {
+      mutate(); // Trigger like if logged in
+    }
+  };
   // Zoom state
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -396,10 +408,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                 <div className="flex flex-col items-center">
                   {/* LIKE BUTTON FUNCTIONALITY */}
                   <button 
-                    onClick={() => mutate()}
-                    disabled={!user}
-                    className="p-2 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed
-                      hover:bg-white/20 bg-white/10"
+                    onClick={handleLikeClick}
+                    className="p-2 rounded-full transition-all hover:bg-white/20 bg-white/10"
                     title={!user ? "Sign in to like" : "Like post"}
                   >
                     ❤️
@@ -427,6 +437,12 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
       </div>
 
       {isLast && <div className="h-16 w-full"></div>}
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        actionName="like posts"
+      />
     </>
   );
 };
