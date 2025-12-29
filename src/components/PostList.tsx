@@ -77,47 +77,32 @@ export const PostList = () => {
     }
   }, [isLoading, data]);
 
-  // SAVE SCROLL POSITION
+  
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
-    const handleSavePos = () => {
-      sessionStorage.setItem("feedScrollPos", container.scrollTop.toString());
-    };
-
-    container.addEventListener("scroll", handleSavePos);
-
-    return () => {
-      container.removeEventListener("scroll", handleSavePos);
-    };
-  }, []);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
+    
     // Scroll debouncing
     let isScrolling = false;
     let startY: number;
-
+    
     // Custom Navigation Logic: Refactored with AI to intercept standard 
     // scroll behavior and replace it with a smooth, page-by-page snapping 
     // mechanism using the 'scrollBy' API.
     const handleWheel = (e: WheelEvent) => {
       if (isScrolling) return;
       isScrolling = true;
-
+      
       const direction = e.deltaY > 0 ? 1 : -1;
       container.scrollBy({
         top: window.innerHeight * direction,
         behavior: "smooth",
       });
-
+      
       setTimeout(() => (isScrolling = false), 800); // SET SCROLL SPEED
       e.preventDefault();
     };
-
+    
     // Touch handlers
     const handleTouchStart = (e: TouchEvent) => {
       const target = e.target as HTMLElement;
@@ -126,7 +111,7 @@ export const PostList = () => {
         startY = e.touches[0].clientY;
       }
     };
-
+    
     const handleTouchEnd = (e: TouchEvent) => {
       const target = e.target as HTMLElement;
       // Only handle touch if not on an image zoom container
@@ -164,7 +149,7 @@ export const PostList = () => {
     container.addEventListener("touchstart", handleTouchStart);
     container.addEventListener("touchend", handleTouchEnd);
     window.addEventListener("keydown", handleKeyDown);
-
+    
     // Cleanup
     return () => {
       container.removeEventListener("wheel", handleWheel);
@@ -173,7 +158,42 @@ export const PostList = () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+  
+  // SAVE SCROLL POSITION
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
 
+    const handleSavePos = () => {
+      sessionStorage.setItem("feedScrollPos", container.scrollTop.toString());
+    };
+
+    container.addEventListener("scroll", handleSavePos);
+
+    return () => {
+      container.removeEventListener("scroll", handleSavePos);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleReset = () => {
+      if (containerRef.current) {
+        containerRef.current.scrollTo({
+          top: 0,
+          behavior: "instant" // Use instant here so it feels like a fresh reload
+        });
+      }
+    };
+
+    // Listen for the custom event from the Navbar
+    window.addEventListener("resetHomeScroll", handleReset);
+
+    return () => {
+      window.removeEventListener("resetHomeScroll", handleReset);
+    };
+  }, []);
+
+  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -181,7 +201,7 @@ export const PostList = () => {
       </div>
     );
   }
-
+  
   if (error) {
     return (
       <div className="text-red-500 text-center py-10">
@@ -189,7 +209,7 @@ export const PostList = () => {
       </div>
     );
   }
-
+  
   return (
     /* Visual Design Refinement: Assisted by AI to apply cross-browser 
        styles to hide the scrollbar (Tailwind + Webkit style tag) 

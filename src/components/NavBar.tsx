@@ -39,6 +39,13 @@ export const Navbar = () => {
   const [profile, setProfile] = useState<any | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   // const navigate = useNavigate();
+  const handleHomeClick = () => {
+    sessionStorage.removeItem("feedScrollPos"); // Clear scroll memory
+    setMenuOpen(false); // Close mobile nav
+    // Create and dispatch a custom event to tell PostList to reset
+    const resetEvent = new CustomEvent("resetHomeScroll");
+    window.dispatchEvent(resetEvent);
+  };
 
   const closeNav = () => {
     setMenuOpen(false);
@@ -75,7 +82,7 @@ export const Navbar = () => {
       <div className="max-w-5xl mx-auto px-4 h-full">
         <div className="flex justify-between items-center h-full">
           {/* Brand Logo Section: Refactored with AI to include image + text */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" onClick={handleHomeClick} className="flex items-center gap-3 group">
             <img 
               src="/logo.png" 
               alt="Social.Cine Logo" 
@@ -98,7 +105,7 @@ export const Navbar = () => {
                 <span>Search</span>
               </Link>
             ) : (
-              <Link to="/" className="text-gray-300 hover:text-white transition-colors">
+              <Link to="/" onClick={handleHomeClick} className="text-gray-300 hover:text-white transition-colors">
                 Home
               </Link>
             )}
@@ -219,7 +226,7 @@ export const Navbar = () => {
                 </div>
                 </Link>
             ) : (
-              <Link to="/" className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700" onClick={closeNav}>
+              <Link to="/" onClick={handleHomeClick} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">
                 Home
               </Link>
             )}
