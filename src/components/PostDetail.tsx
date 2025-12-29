@@ -97,7 +97,7 @@ export const PostDetail = ({ postId }: Props) => {
 
         {/* 2. Title and Info Link */}
         <Link to={`/profile/${data.profile?.username}`} className="flex-1 min-w-0 group">
-          <h1 className="text-2xl font-bold truncate flex items-center gap-2">
+          <h1 className="text-2xl font-bold flex flex-wrap items-center gap-2 break-words whitespace-normal leading-tight">
             {/* This logic splits the title by emojis. 
               Text parts get the gradient. 
               Emoji parts are rendered as normal spans to preserve color.
