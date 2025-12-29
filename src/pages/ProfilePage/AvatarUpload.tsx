@@ -47,7 +47,6 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ uid, url, onUpload }
       // upload has a unique path using the user's ID and a timestamp, 
       // preventing users from accidentally overwriting other people's data.
       const file = event.target.files[0];
-      const fileExt = file.name.split('.').pop();
 
       // 1. GENERATE A SAFE FILENAME
       // This removes spaces and anything not a letter, number, or dot
