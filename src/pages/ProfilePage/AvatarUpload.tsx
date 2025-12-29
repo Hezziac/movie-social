@@ -68,6 +68,8 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ uid, url, onUpload }
 
       if (uploadError) {
         console.error("Supabase Storage Upload Error:", uploadError); // Add this
+        // THIS WILL PRINT THE EXACT CLOUD ERROR MESSAGE
+        console.error("FULL ERROR OBJECT:", JSON.stringify(uploadError, null, 2));
         throw uploadError;
       }
 
