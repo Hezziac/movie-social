@@ -23,11 +23,11 @@ import { LikeButton } from "./LikeButton";
 import { CommentSection } from "./CommentSection";
 import { MovieTile } from "./MovieTile"; // New component we'll create
 import { Movie } from "../context/tmdb-client";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { EditPostModal } from "./EditPostModal";
-import { Edit } from "@mui/icons-material";
+import { Edit, ArrowBack } from "@mui/icons-material";
 import { MovieDetailModal } from "./MovieDetailModal";
 
 interface Props {
@@ -54,6 +54,7 @@ const fetchPostById = async (id: number): Promise<Post & { movie?: Movie; profil
 export const PostDetail = ({ postId }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate(); // Initialize navigate
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for edit modal visibility
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null); // State for movie detail visibility
 
@@ -71,6 +72,14 @@ export const PostDetail = ({ postId }: Props) => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Back Button */}
+      <button 
+        onClick={() => navigate(-1)}
+        className="mb-6 flex items-center gap-2 text-gray-400 hover:text-purple-400 transition-colors group"
+      >
+        <ArrowBack className="group-hover:-translate-x-1 transition-transform" />
+        <span className="font-medium">Back to Feed</span>
+      </button>
       {/* Post Header */}
       <div className="flex items-center gap-4 mb-6">
         {/* 1. Avatar Link (Separate from Title Gradient) */}

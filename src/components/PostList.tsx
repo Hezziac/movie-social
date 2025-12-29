@@ -61,6 +61,38 @@ export const PostList = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // RESTORE SCROLL POSITION
+  useEffect(() => {
+    if (!isLoading && data && containerRef.current) {
+      const savedScrollPos = sessionStorage.getItem("feedScrollPos");
+      if (savedScrollPos) {
+        // Small timeout to ensure the DOM has rendered the posts
+        setTimeout(() => {
+          containerRef.current?.scrollTo({
+            top: parseInt(savedScrollPos, 10) || 0,
+            behavior: "auto", // instant-like behavior without flicker
+          });
+        }, 100);
+      }
+    }
+  }, [isLoading, data]);
+
+  // SAVE SCROLL POSITION
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleSavePos = () => {
+      sessionStorage.setItem("feedScrollPos", container.scrollTop.toString());
+    };
+
+    container.addEventListener("scroll", handleSavePos);
+
+    return () => {
+      container.removeEventListener("scroll", handleSavePos);
+    };
+  }, []);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
