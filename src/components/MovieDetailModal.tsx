@@ -11,6 +11,7 @@ import { supabase } from "../supabase-client";
 import { useAuth } from "../context/AuthContext";
 import { Favorite, FavoriteBorder, Close, CalendarMonth, ExpandMore, ExpandLess} from "@mui/icons-material";
 import { Movie } from "../context/tmdb-client";
+import { SignInModal } from "./SignInModal";
 
 interface Props {
   movie: Movie | null;
@@ -23,6 +24,7 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showSignInModal, setShowSignInModal] = useState(false);
 
   // Check if this movie is already favorited by the user
   useEffect(() => {
@@ -43,7 +45,10 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
   if (!isOpen || !movie) return null;
 
   const toggleFavorite = async () => {
-    if (!user) return alert("Please sign in to favorite movies!");
+    if (!user) {
+      setShowSignInModal(true);
+      return;
+    }
     setLoading(true);
 
     try {
@@ -150,6 +155,12 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
           </div>
         </div>
       </div>
+
+      <SignInModal 
+        isOpen={showSignInModal} 
+        onClose={() => setShowSignInModal(false)} 
+        actionName="favorite movies" 
+        />
     </div>
   );
-};
+};    
