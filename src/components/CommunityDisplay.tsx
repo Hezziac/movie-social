@@ -23,6 +23,7 @@ import { useAuth } from "../context/AuthContext";
 import { EditCommunityModal } from "./EditCommunityModal";
 import { Settings } from "@mui/icons-material";
 import { useQueryClient } from "@tanstack/react-query";
+import { AuthModal } from "./AuthModal";
 
 interface Props {
   communityId: number;
@@ -86,6 +87,7 @@ export const CommunityDisplay = ({ communityId }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // 2. Parallel fetch using Promise.all
   const { data, isLoading, error } = useQuery({
@@ -105,7 +107,10 @@ export const CommunityDisplay = ({ communityId }: Props) => {
 
   // Mutation for Joining/Leaving
   const toggleJoin = async () => {
-    if (!user) return alert("Please log in to join communities!");
+    if (!user) {
+      setIsAuthModalOpen(true); // Open the modal
+      return;
+    }
 
     if (membership) {
       // Already a member -> Leave
@@ -212,6 +217,12 @@ export const CommunityDisplay = ({ communityId }: Props) => {
         </p>
       )}
     </div>
+    
+    <AuthModal 
+      isOpen={isAuthModalOpen} 
+      onClose={() => setIsAuthModalOpen(false)} 
+      actionName="join communities"
+    />
     {community && (
         <EditCommunityModal 
           isOpen={isEditModalOpen}
