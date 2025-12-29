@@ -17,6 +17,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+import { SignInModal } from "./SignInModal";
 
 interface Props {
   postId: number;
@@ -81,8 +83,8 @@ const fetchVotes = async (postId: number): Promise<Vote[]> => {
 
 export const LikeButton = ({ postId }: Props) => {
   const { user } = useAuth();
-
   const queryClient = useQueryClient();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const {
     data: votes,
@@ -105,6 +107,15 @@ export const LikeButton = ({ postId }: Props) => {
     },
   });
 
+  // NEW: Helper function to intercept clicks
+  const handleVote = (value: number) => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+    } else {
+      mutate(value);
+    }
+  };
+
   if (isLoading) {
     return <div>Loading votes...</div>;
   }
@@ -122,7 +133,7 @@ export const LikeButton = ({ postId }: Props) => {
   return (
     <div className="flex items-center space-x-4 my-4">
       <button
-        onClick={() => mutate(1)}
+        onClick={() => handleVote(1)}
         className={`px-3 py-1 cursor-pointer rounded transition-colors duration-150 ${
           userVote === 1 ? "bg-green-500 text-white" : "bg-gray-200 text-black"
         }`}
@@ -130,13 +141,19 @@ export const LikeButton = ({ postId }: Props) => {
         👍 {likes}
       </button>
       <button
-        onClick={() => mutate(-1)}
+        onClick={() => handleVote(-1)}
         className={`px-3 py-1 cursor-pointer rounded transition-colors duration-150 ${
           userVote === -1 ? "bg-red-500 text-white" : "bg-gray-200 text-black"
         }`}
       >
         👎 {dislikes}
       </button>
+
+      <SignInModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        actionName="vote on posts" 
+      />
     </div>
   );
 };
