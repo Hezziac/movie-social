@@ -9,7 +9,7 @@
  * - **Debugging Redirect Loops**: GitHub Copilot and Perplexity AI were 
  * instrumental in fixing a bug where this page wouldn't load or would loop 
  * infinitely. AI helped me implement the 'initialLoad' state and the 
- * '.single()' query to check for existing profiles correctly.
+ * '.single()' query to check for existing profiles correctly. (switch to .maybeSingle() after adding url upload to signup flow)
  * - **Username Implementation**: I came up with the idea to auto-generate a 
  * random placeholder username to reduce signup friction. I used AI to help 
  * write the specific JavaScript logic for 'generateDefaultUsername' and to 
@@ -22,6 +22,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../supabase-client";
 import { useNavigate } from "react-router";
+import { AvatarUpload } from "./ProfilePage/AvatarUpload";
 
 export function ProfileSetupPage() {
   const { user } = useAuth();
@@ -30,6 +31,7 @@ export function ProfileSetupPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [initialLoad, setInitialLoad] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // UX Logic: I decided to implement an automatic username generator to 
@@ -48,9 +50,9 @@ export function ProfileSetupPage() {
       // automatically sent to their dashboard instead of seeing the setup form again.
       supabase
         .from("profiles")
-        .select("username") // We need the username to redirect to a dynamic URL
+        .select("username, avatar_url") // We need the username to redirect to a dynamic URL
         .eq("id", user.id)
-        .single()
+        .maybeSingle()
         .then(({ data }) => {
           if (data && data.username) {
             navigate(`/profile/${data.username}`);
@@ -65,18 +67,21 @@ export function ProfileSetupPage() {
     
     if (!user) {
       setError("No user session found");
-      console.log("No user session found");
       return;
     }
     
-    if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+    // Username Validation
+    // Updated Regex to allow dots '.' 
+    // This allows alphanumeric, underscores, and dots, but ensures it's 3-20 chars.
+    if (!/^[a-zA-Z0-9._]{3,20}$/.test(username)) {
       setError(
-        "Username must be 3-20 characters (ONLY letters, numbers, and underscores '-' & '_')"
+        "Username must be 3-20 characters (letters, numbers, underscores '_', or dots '.')"
       );
       return;
     }
     
     try {
+      // Check if username is taken
       const { count } = await supabase
       .from("profiles")
       .select("*", { count: "exact" })
@@ -87,10 +92,12 @@ export function ProfileSetupPage() {
         return;
       }
       
+      // Save Profile
       const { error } = await supabase.from("profiles").upsert({
         id: user.id,
         username,
         bio,
+        avatar_url: avatarUrl,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       });
@@ -114,6 +121,17 @@ export function ProfileSetupPage() {
           </h2>
           {error && <div className="text-red-500 mb-4">{error}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* 4. The Avatar Upload Section */}
+            <div className="flex flex-col items-center pb-4 border-b border-white/5">
+              <label className="block text-gray-400 text-sm font-bold uppercase mb-4 tracking-wider">Profile Picture</label>
+              <AvatarUpload 
+                uid={user?.id || ""} 
+                url={avatarUrl} 
+                onUpload={(_event, filePath) => setAvatarUrl(filePath)} 
+              />
+            </div>
+
             <div>
               <label className="block text-gray-300 mb-2">Username</label>
               <input
@@ -134,9 +152,9 @@ export function ProfileSetupPage() {
             </div>
             <button
               type="submit"
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-4 px-4 rounded-xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-purple-500/20"
             >
-              Complete Setup
+              Start Exploring
             </button>
           </form>
         </div>
