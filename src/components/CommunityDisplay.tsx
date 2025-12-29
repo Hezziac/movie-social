@@ -175,16 +175,22 @@ export const CommunityDisplay = ({ communityId }: Props) => {
 
         {/* JOIN BUTTON ADDED HERE */}
         <div className="mt-6">
-          <button
-            onClick={toggleJoin}
-            className={`px-8 py-2 rounded-full font-bold transition-all duration-300 transform hover:scale-105 border-2 ${
-              membership
-                ? "bg-transparent border-gray-500 text-gray-400 hover:border-red-500 hover:text-red-500"
-                : "bg-purple-600 border-purple-600 text-white hover:bg-purple-700"
-            }`}
-          >
-            {membership ? "Leave Community" : "Join Community"}
-          </button>
+          {!isOwner ? (
+            <button
+              onClick={toggleJoin}
+              className={`px-8 py-2 rounded-full font-bold transition-all duration-300 transform hover:scale-105 border-2 ${
+                membership
+                  ? "bg-transparent border-gray-500 text-gray-400 hover:border-red-500 hover:text-red-500"
+                  : "bg-purple-600 border-purple-600 text-white hover:bg-purple-700"
+              }`}
+            >
+              {membership ? "Leave Community" : "Join Community"}
+            </button>
+          ) : (
+            <div className="px-8 py-2 rounded-full font-bold bg-purple-900/50 border border-purple-400 text-purple-300">
+              Community Creator
+            </div>
+          )}
         </div>
 
         {community?.description && (

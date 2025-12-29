@@ -29,10 +29,31 @@ interface CommunityInput {
 
 // Function now requires the full payload
 const createCommunity = async (community: CommunityInput) => {
-  // Supabase will automatically handle the 'type' default of 'public' and 'created_at'
-  const { error, data } = await supabase.from("communities").insert(community);
+  // 1. Insert the community and return the created row (including id)
+  const { data, error } = await supabase
+    .from("communities")
+    .insert(community)
+    .select()
+    .single();
 
   if (error) throw new Error(error.message);
+
+  // 2. Automatically add the creator as the first member of the community
+  try {
+    const communityId = (data as any)?.id;
+    if (communityId) {
+      const { error: memberError } = await supabase.from("community_members").insert({
+        user_id: community.creator_id,
+        community_id: communityId,
+      });
+      if (memberError) {
+        console.error("Failed to add creator as member:", memberError);
+      }
+    }
+  } catch (err) {
+    console.error("Unexpected error adding creator as member:", err);
+  }
+
   return data;
 };
 
