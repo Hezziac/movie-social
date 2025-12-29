@@ -21,7 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { PostItem } from "./PostItem";
 import { Movie } from "../context/tmdb-client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { KeyboardArrowDown } from "@mui/icons-material";
 
 export interface Post {
@@ -193,7 +193,33 @@ export const PostList = () => {
     };
   }, []);
 
-  
+  const [isRestoring, setIsRestoring] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && data && containerRef.current) {
+      const savedScrollPos = sessionStorage.getItem("feedScrollPos");
+      if (savedScrollPos) {
+        setIsRestoring(true); // Disable snapping via class name
+
+        // Use requestAnimationFrame to ensure the DOM is ready to move
+        requestAnimationFrame(() => {
+          if (containerRef.current) {
+            containerRef.current.scrollTo({
+              top: parseInt(savedScrollPos, 10) || 0,
+              behavior: "instant",
+            });
+
+            // Wait a tiny bit for the scroll to finish before re-enabling snap
+            setTimeout(() => {
+              setIsRestoring(false);
+            }, 50); 
+          }
+        });
+      }
+    }
+  }, [isLoading, data]);
+
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -216,7 +242,9 @@ export const PostList = () => {
        to achieve a cleaner "mobile-app" aesthetic on desktop. */
     <div
       ref={containerRef}
-      className="w-full overflow-y-auto snap-y snap-mandatory no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none]"
+      className={`w-full overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] ${
+        isRestoring ? "" : "snap-y snap-mandatory" 
+      }`}
       style={{
         height: '100dvh',
         paddingBottom: 'env(safe-area-inset-bottom)'
