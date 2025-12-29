@@ -61,23 +61,6 @@ export const PostList = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // RESTORE SCROLL POSITION
-  useEffect(() => {
-    if (!isLoading && data && containerRef.current) {
-      const savedScrollPos = sessionStorage.getItem("feedScrollPos");
-      if (savedScrollPos) {
-        // Small timeout to ensure the DOM has rendered the posts
-        setTimeout(() => {
-          containerRef.current?.scrollTo({
-            top: parseInt(savedScrollPos, 10) || 0,
-            behavior: "instant", // Use instant so it doesn't flicker
-          });
-        }, 100);
-      }
-    }
-  }, [isLoading, data]);
-
-  
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -194,31 +177,79 @@ export const PostList = () => {
   }, []);
 
   const [isRestoring, setIsRestoring] = useState(false);
-
+  // 1. RESTORE POSITION: Fast, one-time teleport
   useEffect(() => {
     if (!isLoading && data && containerRef.current) {
       const savedScrollPos = sessionStorage.getItem("feedScrollPos");
       if (savedScrollPos) {
-        setIsRestoring(true); // Disable snapping via class name
-
-        // Use requestAnimationFrame to ensure the DOM is ready to move
-        requestAnimationFrame(() => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              top: parseInt(savedScrollPos, 10) || 0,
-              behavior: "instant",
-            });
-
-            // Wait a tiny bit for the scroll to finish before re-enabling snap
-            setTimeout(() => {
-              setIsRestoring(false);
-            }, 50); 
-          }
-        });
+        setIsRestoring(true);
+        // Instant teleport
+        containerRef.current.scrollTop = parseInt(savedScrollPos, 10);
+        // Turn snapping back on almost immediately
+        setTimeout(() => setIsRestoring(false), 50);
       }
     }
   }, [isLoading, data]);
 
+  // 2. OPTIMIZED EVENT LISTENERS
+  useEffect(() => {
+    const container = containerRef.current;
+    // IMPORTANT: If we are currently restoring, do NOT attach listeners yet.
+    // This prevents the "heavy/glitchy" feeling.
+    if (!container || isRestoring) return;
+
+    let isScrolling = false;
+    let startY: number;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (isScrolling) return;
+      isScrolling = true;
+
+      const direction = e.deltaY > 0 ? 1 : -1;
+      container.scrollBy({
+        top: window.innerHeight * direction,
+        behavior: "smooth", // This is the smooth feel you like
+      });
+
+      setTimeout(() => (isScrolling = false), 800);
+      e.preventDefault();
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".image-zoom-container")) {
+        startY = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".image-zoom-container") && startY && !isScrolling) {
+        isScrolling = true;
+        const endY = e.changedTouches[0].clientY;
+        const diff = startY - endY;
+        if (Math.abs(diff) > 50) {
+          const direction = diff > 0 ? 1 : -1;
+          container.scrollBy({
+            top: window.innerHeight * direction,
+            behavior: "smooth",
+          });
+        }
+        setTimeout(() => (isScrolling = false), 800);
+      }
+    };
+
+    // Attach with passive: false to allow e.preventDefault()
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    container.addEventListener("touchstart", handleTouchStart);
+    container.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      container.removeEventListener("wheel", handleWheel);
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isRestoring]); // Re-run this whenever isRestoring changes!
 
   if (isLoading) {
     return (
@@ -243,8 +274,8 @@ export const PostList = () => {
     <div
       ref={containerRef}
       className={`w-full overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] ${
-        isRestoring ? "" : "snap-y snap-mandatory" 
-      }`}
+        isRestoring ? "" : "snap-y snap-mandatory"
+      } ${isRestoring ? "opacity-0" : "opacity-100 transition-opacity duration-300"}`}
       style={{
         height: '100dvh',
         paddingBottom: 'env(safe-area-inset-bottom)'
