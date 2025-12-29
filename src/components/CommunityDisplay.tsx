@@ -58,15 +58,12 @@ const fetchCommunity = async (id: number): Promise<Community | null> => {
   return data;
 };
 
-const fetchCommunityPosts = async (
-  id: number
-): Promise<PostWithCommunity[]> => {
+const fetchCommunityPosts = async (id: number): Promise<PostWithCommunity[]> => {
   const { data, error } = await supabase
-    .from("posts")
-    .select("*, communities(title), movie:movie_id (*)")
-    .eq("community_id", Number(id)) // CAST NUMBER TO MATCH DB TYPE
-    .order("created_at", { ascending: false });
-  console.log("Joined DATA: ", data);
+    .rpc("get_posts_with_counts", { 
+       community_id_filter: id 
+    });
+
   if (error) throw error;
   return data || [];
 };

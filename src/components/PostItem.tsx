@@ -200,7 +200,14 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
   const { mutate } = useMutation({
     mutationFn: () => vote(1), // THUMBS UP ONLY
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] }); // Refresh ALL posts
+      // 1. Refresh the general feed
+    queryClient.invalidateQueries({ queryKey: ["posts"] });
+    
+    // 2. Refresh the community-specific feed
+    queryClient.invalidateQueries({ queryKey: ["communityData"] });
+    
+    // 3. Optional: Refresh single post details if the user is on that page
+    queryClient.invalidateQueries({ queryKey: ["post", post.id] });
     },
   });
 
