@@ -1,13 +1,13 @@
 import { Google } from "@mui/icons-material";
 import { supabase } from "../supabase-client";
 
-interface AuthModalProps {
+interface SignInModalProps {
   isOpen: boolean;
   onClose: () => void;
   actionName: string; // e.g., "join communities" or "like posts"
 }
 
-export const AuthModal = ({ isOpen, onClose, actionName }: AuthModalProps) => {
+export const SignInModal = ({ isOpen, onClose, actionName }: SignInModalProps) => {
   if (!isOpen) return null;
 
   const handleGoogleLogin = async () => {

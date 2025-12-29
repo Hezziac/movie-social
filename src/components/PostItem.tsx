@@ -28,7 +28,7 @@ import { isMobile } from "../context/isMobile";
 import { useAuth } from "../context/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
-import { AuthModal } from "./SignInModal";
+import { SignInModal } from "./SignInModal";
 
 interface Props {
   post: Post;
@@ -438,7 +438,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
 
       {isLast && <div className="h-16 w-full"></div>}
 
-      <AuthModal 
+      <SignInModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
         actionName="like posts"

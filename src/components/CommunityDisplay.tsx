@@ -23,7 +23,7 @@ import { useAuth } from "../context/AuthContext";
 import { EditCommunityModal } from "./EditCommunityModal";
 import { Settings } from "@mui/icons-material";
 import { useQueryClient } from "@tanstack/react-query";
-import { AuthModal } from "./SignInModal";
+import { SignInModal } from "./SignInModal";
 
 interface Props {
   communityId: number;
@@ -218,7 +218,7 @@ export const CommunityDisplay = ({ communityId }: Props) => {
       )}
     </div>
     
-    <AuthModal 
+    <SignInModal 
       isOpen={isAuthModalOpen} 
       onClose={() => setIsAuthModalOpen(false)} 
       actionName="join communities"
