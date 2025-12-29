@@ -79,7 +79,7 @@ export const PostList = () => {
       const direction = e.deltaY > 0 ? 1 : -1;
       container.scrollBy({
         top: window.innerHeight * direction,
-        behavior: "smooth",
+        behavior: "instant",
       });
       
       setTimeout(() => (isScrolling = false), 800); // SET SCROLL SPEED
@@ -107,7 +107,7 @@ export const PostList = () => {
           const direction = diff > 0 ? 1 : -1;
           container.scrollBy({
             top: window.innerHeight * direction,
-            behavior: "smooth",
+            behavior: "instant",
           });
         }
 
@@ -122,7 +122,7 @@ export const PostList = () => {
         const direction = e.code === "ArrowDown" ? 1 : -1;
         container.scrollBy({
           top: window.innerHeight * direction,
-          behavior: "smooth",
+          behavior: "instant",
         });
       }
     };
