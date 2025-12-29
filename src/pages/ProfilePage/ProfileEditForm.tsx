@@ -54,8 +54,8 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, user,
     // Security & Validation: Implemented with AI assistance to ensure usernames 
     // follow specific patterns (3-20 chars, alphanumeric) to prevent database errors 
     // or injection attempts.
-    if (!/^[a-zA-Z0-9_]{3,20}$/.test(formData.username)) {
-      setError("Username must be 3-20 characters (letters, numbers, underscores).");
+    if (!/^[a-zA-Z0-9._]{3,20}$/.test(formData.username)) { // Added the dot here
+      setError("Username must be 3-20 characters (letters, numbers, underscores, or dots).");
       setIsSaving(false);
       return;
     }
