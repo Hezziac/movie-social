@@ -68,7 +68,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, user,
           .from("profiles")
           .select("id", { count: "exact" })
           .eq("username", formData.username)
-          .single();
+          .maybeSingle();
 
         if (count && count > 0) {
           setError("Username is already taken.");
