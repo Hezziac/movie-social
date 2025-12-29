@@ -70,7 +70,7 @@ export const PostList = () => {
         setTimeout(() => {
           containerRef.current?.scrollTo({
             top: parseInt(savedScrollPos, 10) || 0,
-            behavior: "auto", // instant-like behavior without flicker
+            behavior: "instant", // Use instant so it doesn't flicker
           });
         }, 100);
       }
