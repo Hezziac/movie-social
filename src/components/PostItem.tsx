@@ -40,6 +40,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
   const hasImage = !!post.image_url;
   const isTextOnly = !hasImage;
 
+  const [avatarError, setAvatarError] = useState(false);
+
   // Sign in modal state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
@@ -280,14 +282,17 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
             {/* 💡 1. Wrap the avatar and info with a Link to the profile using the username */}
             <div className="flex items-center gap-3 p-4 absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/70 to-transparent">
               <Link to={`/profile/${post.username}`} className="flex items-center gap-3">
-                {post.avatar_url ? (
+                {post.avatar_url && !avatarError ? (
                   <img
                     src={post.avatar_url}
                     alt="User Avatar"
                     className="w-10 h-10 rounded-full object-cover border-2 border-white/20"
+                    onError={() => setAvatarError(true)}
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tl from-purple-500 to-pink-500" />
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tl from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
+                    {post.username?.charAt(0).toUpperCase()}
+                  </div>
                 )}
               </Link>
               
