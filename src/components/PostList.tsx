@@ -126,6 +126,7 @@ export const PostList = () => {
       } ${isRestoring ? "opacity-0" : "opacity-100 transition-opacity duration-300"}`}
       style={{
         height: '100dvh',
+        scrollBehavior: isRestoring ? 'auto' : 'smooth',
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}
     >
