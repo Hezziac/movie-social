@@ -137,9 +137,9 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
 
         {/* Input Field */}
         <form onSubmit={handleSendMessage} 
-          className="absolute bottom-0 left-0 right-0 p-4 bg-black/40 border-t border-white/10"
+          className="absolute bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-white/10 z-20"
           style={{ 
-            paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' // 👈 This adds the safe space + extra breathing room
+            paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' // Ensures it's at least 1rem but respects the notch if present
           }}
           >
           <div className="flex gap-2">
