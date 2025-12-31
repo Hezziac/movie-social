@@ -129,7 +129,12 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
       </div>
 
         {/* Input Field */}
-        <form onSubmit={handleSendMessage} className="absolute bottom-0 left-0 right-0 p-4 bg-black/40 border-t border-white/10">
+        <form onSubmit={handleSendMessage} 
+          className="absolute bottom-0 left-0 right-0 p-4 bg-black/40 border-t border-white/10"
+          style={{ 
+            paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' // 👈 This adds the safe space + extra breathing room
+          }}
+          >
           <div className="flex gap-2">
             <input 
               type="text" 
@@ -137,9 +142,6 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Message the community..."
               className="flex-1 bg-gray-800 border border-white/10 rounded-full px-4 py-2 text-white focus:outline-none focus:border-purple-500"
-              style={{ 
-                paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' // 👈 This adds the safe space + extra breathing room
-              }}
             />
             <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-full transition">
               <Send fontSize="small" />
