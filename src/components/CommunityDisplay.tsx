@@ -18,7 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { PostItem } from "./PostItem";
 import { Post } from "./PostList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { EditCommunityModal } from "./EditCommunityModal";
 import { ChatBubbleOutline, Settings } from "@mui/icons-material";
@@ -90,7 +90,7 @@ export const CommunityDisplay = ({ communityId }: Props) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-
+  
   // 2. Parallel fetch using Promise.all
   const { data, isLoading, error } = useQuery({
     queryKey: ["communityData", communityId, user?.id], // Add user?.id to key so it refetches on login/logout
@@ -127,6 +127,37 @@ export const CommunityDisplay = ({ communityId }: Props) => {
     // Tell React Query to refresh the data
     queryClient.invalidateQueries({ queryKey: ["communityData", communityId] });
   };
+
+  // CHAT DRAWER STATE
+  useEffect(() => {
+    if (isChatOpen) {
+      // Save the current scroll position so the page doesn't jump to the top
+      const scrollY = window.scrollY;
+      
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflowY = 'hidden';
+    } else {
+      // When closing, retrieve the saved scroll position
+      const scrollY = document.body.style.top;
+      
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflowY = '';
+      
+      // Scroll the window back to where the user was
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
+
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflowY = '';
+    };
+  }, [isChatOpen]);
 
   // community ownership
   const isOwner = user && community && user.id === community.creator_id;
