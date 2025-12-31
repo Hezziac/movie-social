@@ -93,7 +93,9 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
       />
 
       {/* The Drawer Panel */}
-      <div className={`fixed top-0 right-0 h-full w-full md:w-[400px] bg-gray-900 z-[101] shadow-2xl transition-transform duration-300 transform ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
+      <div className={`fixed top-0 right-0 h-full w-full md:w-[400px] bg-gray-900 z-[101] shadow-2xl transition-transform duration-300 transform ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+           style={{ height: '100dvh' }}
+      >
         
         {/* Header */}
         <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/20">
@@ -108,8 +110,13 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
           </button>
         </div>
 
-        {/* Message Area (Mocking for now) */}
-        <div className="flex-1 h-[calc(100vh-140px)] overflow-y-auto p-4 space-y-4 flex flex-col">
+        {/* Message Area */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col overscroll-contain touch-pan-y"
+              style={{ 
+                // We remove the hardcoded height calculation and let flex-1 handle it
+                WebkitOverflowScrolling: 'touch',
+                paddingBottom: '2rem' // 👈 Adds extra space at the bottom of the list
+              }}>
           <div className="text-center text-gray-500 text-sm my-4">
             Welcome to the {communityName} chat!
           </div>
