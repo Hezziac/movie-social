@@ -115,7 +115,8 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
               style={{ 
                 // We remove the hardcoded height calculation and let flex-1 handle it
                 WebkitOverflowScrolling: 'touch',
-                paddingBottom: '2rem' // 👈 Adds extra space at the bottom of the list
+                paddingBottom: '2rem', // 👈 Adds extra space at the bottom of the list
+                height: 'calc(100dvh - 140px)' // Back to a standard height
               }}>
           <div className="text-center text-gray-500 text-sm my-4">
             Welcome to the {communityName} chat!
@@ -133,6 +134,11 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
             </div>
           </div>
         ))}
+
+        {/* 💡 THE SPACER: This gives room for about 2-3 messages 
+            so the last message can always be scrolled ABOVE the input box */}
+        <div className="h-32 w-full flex-shrink-0" aria-hidden="true" />
+        
       </div>
 
         {/* Input Field */}
