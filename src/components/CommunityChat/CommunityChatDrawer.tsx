@@ -94,12 +94,11 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
 
       {/* The Drawer Panel */}
       <div 
-        className={`absolute top-0 right-0 w-full md:w-[400px] bg-gray-900 z-[101] shadow-2xl transition-transform duration-300 transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        } flex flex-col`} 
+        className={`fixed top-0 right-0 w-full md:w-[400px] bg-gray-900 z-[101] shadow-2xl transition-transform duration-300 transform ${
+    isOpen ? "translate-x-0" : "translate-x-full"
+  } flex flex-col h-[100dvh]`}
         style={{ 
           height: '100%', // Use 100% of the parent which is already locked
-          position: 'fixed' // We keep fixed but ensure the internal structure is flex
         }}
       >
         
@@ -117,11 +116,13 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
         </div>
 
         {/* Message Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col overscroll-contain touch-pan-y"
-              style={{ 
-                WebkitOverflowScrolling: 'touch',
-                paddingBottom: '1rem', // 👈 Adds extra space at the bottom of the list
-              }}>
+        <div 
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col overscroll-contain touch-pan-y"
+          style={{ 
+            WebkitOverflowScrolling: 'touch',
+            paddingBottom: '1rem', // 👈 Adds extra space at the bottom of the list
+          }}>
           <div className="text-center text-gray-500 text-sm my-4">
             Welcome to the {communityName} chat!
           </div>
@@ -138,11 +139,6 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
             </div>
           </div>
         ))}
-
-        {/* 💡 THE SPACER: This gives room for about 2-3 messages 
-            so the last message can always be scrolled ABOVE the input box */}
-        <div className="h-32 w-full flex-shrink-0" aria-hidden="true" />
-        
       </div>
 
         {/* Input Field */}
@@ -150,7 +146,7 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
           onSubmit={handleSendMessage} 
           className="p-4 bg-gray-900 border-t border-white/10 z-20 flex-shrink-0"
           style={{ 
-            paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' // Ensures it's at least 1rem but respects the notch if present
+            paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' // 👈 Adds 1rem PLUS the iPhone home bar height
           }}
           >
           <div className="flex gap-2">
