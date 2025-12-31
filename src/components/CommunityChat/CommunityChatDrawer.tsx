@@ -118,7 +118,6 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
                 // We remove the hardcoded height calculation and let flex-1 handle it
                 WebkitOverflowScrolling: 'touch',
                 paddingBottom: '2rem', // 👈 Adds extra space at the bottom of the list
-                height: 'calc(100dvh - 140px)' // Back to a standard height
               }}>
           <div className="text-center text-gray-500 text-sm my-4">
             Welcome to the {communityName} chat!
