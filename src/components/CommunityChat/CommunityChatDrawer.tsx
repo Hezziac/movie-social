@@ -93,10 +93,14 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
       />
 
       {/* The Drawer Panel */}
-      <div className={`fixed top-0 right-0 w-full md:w-[400px] bg-gray-900 z-[101] shadow-2xl transition-transform duration-300 transform ${
-            isOpen ? "translate-x-0" : "translate-x-full"
-            } flex flex-col`} // 👈 Added flex and flex-col
-          style={{ height: '100dvh' }}
+      <div 
+        className={`absolute top-0 right-0 w-full md:w-[400px] bg-gray-900 z-[101] shadow-2xl transition-transform duration-300 transform ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        } flex flex-col`} 
+        style={{ 
+          height: '100%', // Use 100% of the parent which is already locked
+          position: 'fixed' // We keep fixed but ensure the internal structure is flex
+        }}
       >
         
         {/* Header */}
@@ -115,9 +119,8 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
         {/* Message Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col overscroll-contain touch-pan-y"
               style={{ 
-                // We remove the hardcoded height calculation and let flex-1 handle it
                 WebkitOverflowScrolling: 'touch',
-                paddingBottom: '2rem', // 👈 Adds extra space at the bottom of the list
+                paddingBottom: '1rem', // 👈 Adds extra space at the bottom of the list
               }}>
           <div className="text-center text-gray-500 text-sm my-4">
             Welcome to the {communityName} chat!
