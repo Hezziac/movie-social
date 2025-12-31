@@ -93,12 +93,14 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
       />
 
       {/* The Drawer Panel */}
-      <div className={`fixed top-0 right-0 h-full w-full md:w-[400px] bg-gray-900 z-[101] shadow-2xl transition-transform duration-300 transform ${isOpen ? "translate-x-0" : "translate-x-full"}`}
-           style={{ height: '100dvh' }}
+      <div className={`fixed top-0 right-0 w-full md:w-[400px] bg-gray-900 z-[101] shadow-2xl transition-transform duration-300 transform ${
+            isOpen ? "translate-x-0" : "translate-x-full"
+            } flex flex-col`} // 👈 Added flex and flex-col
+          style={{ height: '100dvh' }}
       >
         
         {/* Header */}
-        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/20">
+        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/20 flex-shrink-0">
           <div>
             <h3 className="text-white font-bold text-lg">{communityName} Chat</h3>
             <span className="text-xs text-purple-400 uppercase tracking-widest font-bold">
@@ -142,8 +144,9 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
       </div>
 
         {/* Input Field */}
-        <form onSubmit={handleSendMessage} 
-          className="absolute bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-white/10 z-20"
+        <form 
+          onSubmit={handleSendMessage} 
+          className="p-4 bg-gray-900 border-t border-white/10 flex-shrink-0"
           style={{ 
             paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' // Ensures it's at least 1rem but respects the notch if present
           }}
