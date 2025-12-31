@@ -146,7 +146,7 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
         {/* Input Field */}
         <form 
           onSubmit={handleSendMessage} 
-          className="p-4 bg-gray-900 border-t border-white/10 flex-shrink-0"
+          className="p-4 bg-gray-900 border-t border-white/10 z-20 flex-shrink-0"
           style={{ 
             paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' // Ensures it's at least 1rem but respects the notch if present
           }}
