@@ -45,6 +45,7 @@ const createCommunity = async (community: CommunityInput) => {
       const { error: memberError } = await supabase.from("community_members").insert({
         user_id: community.creator_id,
         community_id: communityId,
+        role: 'owner',
       });
       if (memberError) {
         console.error("Failed to add creator as member:", memberError);
