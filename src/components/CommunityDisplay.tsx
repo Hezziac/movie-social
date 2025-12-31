@@ -21,9 +21,10 @@ import { Post } from "./PostList";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { EditCommunityModal } from "./EditCommunityModal";
-import { Settings } from "@mui/icons-material";
+import { ChatBubbleOutline, Settings } from "@mui/icons-material";
 import { useQueryClient } from "@tanstack/react-query";
 import { SignInModal } from "./SignInModal";
+import { CommunityChatDrawer} from "./CommunityChat/CommunityChatDrawer";
 
 interface Props {
   communityId: number;
@@ -88,6 +89,7 @@ export const CommunityDisplay = ({ communityId }: Props) => {
   const queryClient = useQueryClient();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // 2. Parallel fetch using Promise.all
   const { data, isLoading, error } = useQuery({
@@ -135,7 +137,9 @@ export const CommunityDisplay = ({ communityId }: Props) => {
       </div>
     );
   }
-  
+
+  const isMember = !!membership;
+  const userRole = membership?.role || 'member';
   if (error) return <div>Error loading data</div>;
 
   return (
@@ -143,15 +147,14 @@ export const CommunityDisplay = ({ communityId }: Props) => {
     {/* Hero Banner Section: Custom UI design implemented with 
         Tailwind CSS, utilizing AI to assist with the 
         background overlay and blur effects. */}
-    <div className="relative h-[300px] w-full flex items-center justify-center overflow-hidden mb-8">
-      {/* Background Image Layer */}
+    <div className="relative h-[450px] w-full flex items-center justify-center overflow-hidden mb-8">
+      {/* Background Layers */}
       {community?.image_url ? (
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 hover:scale-105"
           style={{ backgroundImage: `url(${community.image_url})` }}
         />
       ) : (
-        /* Fallback gradient if no image exists  */
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-900/20 to-black" />
       )}
       
@@ -159,24 +162,23 @@ export const CommunityDisplay = ({ communityId }: Props) => {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
 
       {/* Edit Community Button (Only visible to owner) */}
-        {isOwner && (
-          <button 
-            onClick={() => setIsEditModalOpen(true)}
-            className="absolute top-6 right-6 z-20 bg-black/40 hover:bg-purple-600 text-white p-2 rounded-full backdrop-blur-md border border-white/10 transition-all"
-            title="Community Settings"
-          >
-            <Settings />
-          </button>
-        )}
+      {isOwner && (
+        <button 
+          onClick={() => setIsEditModalOpen(true)}
+          className="absolute top-6 right-6 z-20 bg-black/40 hover:bg-purple-600 text-white p-2 rounded-full backdrop-blur-md border border-white/10 transition-all"
+        >
+          <Settings />
+        </button>
+      )}
 
       {/* Title Content Layer */}
-      <div className="relative z-10 text-center px-4">
+      <div className="relative z-10 text-center px-4 flex flex-col items-center">
         <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-2xl leading-tight py-2">
           {community?.title || `Community ${communityId}`}
         </h1>
 
-        {/* JOIN BUTTON ADDED HERE */}
-        <div className="mt-6">
+        {/* Join / Creator Badge */}
+        <div className="mt-4">
           {!isOwner ? (
             <button
               onClick={toggleJoin}
@@ -195,11 +197,24 @@ export const CommunityDisplay = ({ communityId }: Props) => {
           )}
         </div>
 
+        {/* Description */}
         {community?.description && (
-          <p className="text-gray-300 mt-8 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed">
+          <p className="text-gray-300 mt-6 max-w-2xl mx-auto text-base md:text-lg leading-relaxed line-clamp-3">
             {community.description}
           </p>
         )}
+
+        {/* 💬 NEW INTEGRATED CHAT BUTTON */}
+        {isMember && (
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="mt-6 flex items-center gap-2 px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full text-white transition-all duration-300 group"
+          >
+            <ChatBubbleOutline className="text-purple-400 group-hover:scale-110 transition-transform" />
+            <span className="font-semibold text-sm">Community Chat</span>
+          </button>
+        )}
+
       </div>
     </div>
 
@@ -218,6 +233,15 @@ export const CommunityDisplay = ({ communityId }: Props) => {
       )}
     </div>
     
+    {/* 🚀 THE DRAWER COMPONENT */}
+    <CommunityChatDrawer 
+      isOpen={isChatOpen} 
+      onClose={() => setIsChatOpen(false)} 
+      communityId={communityId}
+      communityName={community?.title || "Community"}
+      userRole={userRole} 
+    />
+
     <SignInModal 
       isOpen={isAuthModalOpen} 
       onClose={() => setIsAuthModalOpen(false)} 
