@@ -30,6 +30,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
   const [newPhotoFile, setNewPhotoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialPhoto);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -41,6 +42,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
       setContent(initialContent);
       setPreviewUrl(initialPhoto);
       setNewPhotoFile(null);
+      setIsUploading(false);
     }
   }, [initialTitle, initialContent, initialPhoto, isOpen]);
   
@@ -67,11 +69,13 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
 
   const handleUpdate = async () => {
     setIsSaving(true);
+    if (isUploading) return; 
     try {
       let finalImageUrl = previewUrl;
 
       // 2. If a NEW file was selected, upload it first
       if (newPhotoFile) {
+        setIsUploading(true);
         const fileExt = newPhotoFile.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const filePath = `post-images/${fileName}`;
@@ -85,6 +89,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
         // Get the public URL
         const { data: urlData } = supabase.storage.from("posts").getPublicUrl(filePath);
         finalImageUrl = urlData.publicUrl;
+        setIsUploading(false);
       }
 
       const { error: postUpdateError } = await supabase
@@ -153,6 +158,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
       alert("Error updating post.");
     } finally {
       setIsSaving(false);
+      setIsUploading(false);
     }
   };
 
