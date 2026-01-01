@@ -120,6 +120,13 @@ export const PostDetail = ({ postId }: Props) => {
           </h1>
           <p className="text-gray-400 text-sm group-hover:underline">
             @{data.profile?.username} • {new Date(data.created_at).toLocaleDateString()}
+
+            {/* Logic: Only show if updated_at exists and is different from created_at */}
+            {data.updated_at && new Date(data.updated_at) > new Date(data.created_at) && (
+              <span className="ml-1 opacity-60 italic text-[10px]">
+                • edited
+              </span>
+            )}
           </p>
         </Link>
 
