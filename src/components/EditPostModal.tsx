@@ -81,19 +81,19 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
         const filePath = `post-images/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("posts") 
+          .from("post-images") 
           .upload(filePath, newPhotoFile);
 
         if (uploadError) throw uploadError;
 
         // Get the public URL
-        const { data: urlData } = supabase.storage.from("posts").getPublicUrl(filePath);
+        const { data: urlData } = supabase.storage.from("post-images").getPublicUrl(filePath);
         finalImageUrl = urlData.publicUrl;
         setIsUploading(false);
       }
 
       const { error: postUpdateError } = await supabase
-        .from("posts")
+        .from("post-images")
         .update({ 
           title, 
           content, 
