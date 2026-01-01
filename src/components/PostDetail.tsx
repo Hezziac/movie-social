@@ -118,17 +118,20 @@ export const PostDetail = ({ postId }: Props) => {
               );
             })}
           </h1>
-          <p className="text-gray-400 text-sm group-hover:underline">
-            @{data.profile?.username} • {new Date(data.created_at).toLocaleDateString()}
-
-            {/* Logic: Only show if updated_at exists and is different from created_at */}
+          {/* Sub-header Block: Profile Link, Date, and Edited Status */}
+          <div className="flex flex-col mt-1"> {/* 👈 Use flex-col to stack them */}
+            <p className="text-gray-400 text-sm group-hover:underline">
+              @{data.profile?.username} • {new Date(data.created_at).toLocaleDateString()}
+            </p>
+            
+            {/* Edited Timestamp: Now on its own line below the name */}
             {data.updated_at && 
             (new Date(data.updated_at).getTime() - new Date(data.created_at).getTime() > 2000) && (
-              <span className="ml-1 opacity-60 italic text-[10px] text-purple-200">
-                • edited
+              <span className="text-[10px] text-purple-500/60 italic font-light">
+                • Edited {new Date(data.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             )}
-          </p>
+          </div>
         </Link>
 
         {/* Edit Button Section */}
