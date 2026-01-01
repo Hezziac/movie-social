@@ -7,11 +7,12 @@
  * operation, provide immediate feedback via the onSave callback and Updated to 
  * handle Tag Highlighting and Relational Tag Synchronization.
  */
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "../supabase-client";
-import { Close, Save, DeleteForever } from "@mui/icons-material";
+import { Close, Save, DeleteForever, NoPhotography } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import { ConfirmModal } from "./ConfirmModal";
+import { ImageUploader } from "./ImageUploader";
 
 interface Props {
   isOpen: boolean;
@@ -19,22 +20,34 @@ interface Props {
   postId: number;
   initialTitle: string;
   initialContent: string;
+  initialPhoto: string | null;
   onSave: () => void;
 }
 
-export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialContent, onSave }: Props) => {
+export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialContent, initialPhoto,onSave }: Props) => {
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
+  const [newPhotoFile, setNewPhotoFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(initialPhoto);
   const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const highlightRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (isOpen) {
+      setTitle(initialTitle);
+      setContent(initialContent);
+      setPreviewUrl(initialPhoto);
+      setNewPhotoFile(null);
+    }
+  }, [initialTitle, initialContent, initialPhoto, isOpen]);
+  
   if (!isOpen) return null;
 
   const handleScroll = () => {
-  if (textareaRef.current && highlightRef.current) {
+    if (textareaRef.current && highlightRef.current) {
       highlightRef.current.scrollTop = textareaRef.current.scrollTop;
     }
   };
@@ -55,9 +68,31 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
   const handleUpdate = async () => {
     setIsSaving(true);
     try {
+      let finalImageUrl = previewUrl;
+
+      // 2. If a NEW file was selected, upload it first
+      if (newPhotoFile) {
+        const fileExt = newPhotoFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `post-images/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("posts") 
+          .upload(filePath, newPhotoFile);
+
+        if (uploadError) throw uploadError;
+
+        // Get the public URL
+        const { data: urlData } = supabase.storage.from("posts").getPublicUrl(filePath);
+        finalImageUrl = urlData.publicUrl;
+      }
+
       const { error: postUpdateError } = await supabase
         .from("posts")
-        .update({ title, content })
+        .update({ 
+          title, 
+          content, 
+          image_url: finalImageUrl })
         .eq("id", postId);
 
       if (postUpdateError) throw postUpdateError;
@@ -141,9 +176,15 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
     }
   };
 
+  // Helper to remove photo
+  const handleRemovePhoto = () => {
+    setNewPhotoFile(null);
+    setPreviewUrl(null);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-gray-900 border border-white/10 w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-gray-900 border border-white/10 w-full max-w-lg rounded-2xl overflow-y-auto max-h-[90vh] shadow-2xl">
         <div className="flex items-center justify-between p-4 border-b border-white/5">
           <h2 className="text-white font-bold">Edit Post</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition">
@@ -152,6 +193,36 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
         </div>
 
         <div className="p-6 space-y-4">
+          
+          {/* Image Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-gray-500 uppercase ml-1">Post Photo</label>
+              {previewUrl && (
+                <button 
+                  onClick={handleRemovePhoto}
+                  className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors"
+                >
+                  <NoPhotography sx={{ fontSize: 14 }} /> Remove Photo
+                </button>
+              )}
+            </div>
+
+            {/* Preview of current/new image */}
+            {previewUrl && (
+              <div className="relative w-full h-48 rounded-xl overflow-hidden border border-white/10 bg-black">
+                <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+              </div>
+            )}
+
+            <ImageUploader 
+              onImageChange={(file, url) => {
+                setNewPhotoFile(file);
+                setPreviewUrl(url);
+              }}
+            />
+          </div>
+
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Title</label>
             <input
@@ -209,12 +280,12 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
         </div>
       </div>
     <ConfirmModal 
-        isOpen={showConfirm}
-        onClose={() => setShowConfirm(false)}
-        onConfirm={handleDelete} // This calls the database function directly
-        title="Delete Post?"
-        message="This action cannot be undone. All likes and comments on this movie post will be permanently removed."
-      />
+      isOpen={showConfirm}
+      onClose={() => setShowConfirm(false)}
+      onConfirm={handleDelete} // This calls the database function directly
+      title="Delete Post?"
+      message="This action cannot be undone. All likes and comments on this movie post will be permanently removed."
+    />
     </div>
   );
 };
