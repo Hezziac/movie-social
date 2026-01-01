@@ -277,7 +277,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
           </button>
           <button
             onClick={handleUpdate}
-            disabled={isSaving}
+            disabled={isSaving|| isUploading}
             className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2 rounded-full font-bold transition flex items-center gap-2 disabled:opacity-50"
           >
             <Save fontSize="small" />
