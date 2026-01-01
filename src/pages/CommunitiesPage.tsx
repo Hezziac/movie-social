@@ -15,10 +15,12 @@ import { CommunityList } from "../components/CommunityList";
 
 export const CommunitiesPage = () => {
   return (
-    <div className="pt-20">
-      <h2 className="text-6xl font-bold mb-6 text-center bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent hyphens-auto">
-        <span>Community</span>
-        <span>.Groups</span>
+    <div className="pt-20 px-4">
+      <h2 className="text-4xl md:text-6xl font-bold mb-6 text-center bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent leading-tight">
+        <div className="flex flex-col md:flex-row items-center justify-center md:gap-3">
+          <span>Community</span>
+          <span>.Groups</span>
+        </div>
       </h2>
       <CommunityList />
     </div>
