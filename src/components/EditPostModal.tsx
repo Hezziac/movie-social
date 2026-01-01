@@ -24,7 +24,7 @@ interface Props {
   onSave: () => void;
 }
 
-export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialContent, initialPhoto,onSave }: Props) => {
+export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialContent, initialPhoto, onSave }: Props) => {
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
   const [newPhotoFile, setNewPhotoFile] = useState<File | null>(null);
