@@ -93,7 +93,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
       }
 
       const { error: postUpdateError } = await supabase
-        .from("post-images")
+        .from("post")
         .update({ 
           title, 
           content, 
