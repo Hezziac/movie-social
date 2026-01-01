@@ -68,8 +68,8 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
   };
 
   const handleUpdate = async () => {
+    if (isUploading || isSaving) return; 
     setIsSaving(true);
-    if (isUploading) return; 
     try {
       let finalImageUrl = previewUrl;
 
