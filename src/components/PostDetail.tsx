@@ -198,6 +198,7 @@ export const PostDetail = ({ postId }: Props) => {
         postId={postId}
         initialTitle={data.title}
         initialContent={data.content}
+        initialPhoto={data.image_url}
         onSave={() => queryClient.invalidateQueries({ queryKey: ["post", postId] })}
       />
 

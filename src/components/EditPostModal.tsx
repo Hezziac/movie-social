@@ -184,7 +184,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-gray-900 border border-white/10 w-full max-w-lg rounded-2xl overflow-y-auto max-h-[90vh] shadow-2xl">
+      <div className="bg-gray-900 border border-white/10 w-full max-w-lg rounded-2xl overflow-y-auto max-h-[90vh] shadow-2xl relative">
         <div className="flex items-center justify-between p-4 border-b border-white/5">
           <h2 className="text-white font-bold">Edit Post</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition">
