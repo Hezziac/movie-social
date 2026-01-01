@@ -124,7 +124,7 @@ export const PostDetail = ({ postId }: Props) => {
             {/* Logic: Only show if updated_at exists and is different from created_at */}
             {data.updated_at && 
             (new Date(data.updated_at).getTime() - new Date(data.created_at).getTime() > 2000) && (
-              <span className="ml-1 opacity-60 italic text-[10px] text-gray-500">
+              <span className="ml-1 opacity-60 italic text-[10px] text-purple-200">
                 • edited
               </span>
             )}
