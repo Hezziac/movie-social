@@ -42,6 +42,7 @@ export const CreatePost = () => {
   // Form state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [isImageUploading, setIsImageUploading] = useState(false);
   
   // FIX: State should be number | null to match DB bigint
   const [communityId, setCommunityId] = useState<number | null>(null);
@@ -361,6 +362,7 @@ export const CreatePost = () => {
           setImageUrl(url);
           setSelectedAspectRatio(aspectRatio);
         }}
+        onUploadStateChange={setIsImageUploading}
       />
 
       {/* Movie Selection */}
@@ -447,10 +449,12 @@ export const CreatePost = () => {
       <div className="pt-2">
         <button
           type="submit"
-          disabled={isPending || isSuccess}
+          disabled={isPending || isSuccess || isImageUploading}
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {isPending ? (
+          {isImageUploading ? (
+            "Uploading Image..."
+          ) : isPending ? (
             <>
               <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

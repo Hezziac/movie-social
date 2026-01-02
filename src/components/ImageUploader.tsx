@@ -13,7 +13,7 @@
  * for fixing "blob leakage" and ensuring images render correctly without memory leaks.
  * - **Async Upload Flow**: AI assisted in structuring the try/catch block for 
  * immediate background uploading to Supabase.
- */
+ */ 
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase-client'; // Adjust path as needed
@@ -22,10 +22,11 @@ import { AspectRatio } from '../context/AspectRatios'; // Import AspectRatio typ
 interface ImageUploaderProps {
   // Callback to inform parent about image selection/upload and aspect ratio
   onImageChange: (file: File | null, url: string | null, aspectRatio: AspectRatio) => void;
+  onUploadStateChange?: (isUploading: boolean) => void;
   bucketName?: string; // Optional: specify a different bucket if needed
 }
 
-export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange, bucketName = "post-images" }) => {
+export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange, onUploadStateChange, bucketName = "post-images" }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [publicUrl, setPublicUrl] = useState<string | null>(null); 
   // const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>("original");
@@ -69,6 +70,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange, buc
     // If a file is selected, immediately upload it and get its URL
     if (file) {
       setUploading(true);
+      if (onUploadStateChange) onUploadStateChange(true);
       try {
         const fileExt = file.name.split('.').pop();
         // Generate a unique file path (you might need user ID here if not public bucket)
@@ -102,6 +104,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange, buc
         onImageChange(null, null, "original"); // Reset parent state on error
       } finally {
         setUploading(false);
+        if (onUploadStateChange) onUploadStateChange(false);
       }
     } else {
       setPublicUrl(null); // Reset URL
@@ -116,6 +119,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageChange, buc
     setPublicUrl(null); // Clear public URL
     // setSelectedAspectRatio("original");
     onImageChange(null, null, "original"); // Notify parent to clear image
+    if (onUploadStateChange) onUploadStateChange(false);
   };
 
   // Effect to notify parent if aspect ratio changes after file selection
