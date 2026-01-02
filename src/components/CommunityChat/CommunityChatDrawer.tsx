@@ -16,6 +16,21 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+
+  const handleUpdateMessage = async (msgId: string) => {
+    const { error } = await supabase
+      .from("community_messages")
+      .update({ content: editContent })
+      .eq("id", msgId);
+
+    if (error) {
+      console.error("Error updating:", error);
+    } else {
+      setEditingId(null); // Close editor on success
+    }
+  };
 
   // 1. FETCH INITIAL MESSAGES & SUBSCRIBE TO REALTIME
   useEffect(() => {
@@ -127,18 +142,72 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
             Welcome to the {communityName} chat!
           </div>
           
-          {messages.map((msg) => (
-          <div key={msg.id} className={`flex flex-col ${msg.user_id === user?.id ? 'items-end' : 'items-start'}`}>
-            <span className="text-[10px] text-gray-500 mb-1 px-2">
-              {msg.author_username} • {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
-            <div className={`p-3 rounded-2xl max-w-[85%] ${
-              msg.user_id === user?.id ? 'bg-purple-600 rounded-tr-none text-white' : 'bg-gray-800 rounded-tl-none text-gray-200'
-            }`}>
-              {msg.content}
-            </div>
-          </div>
-        ))}
+          {messages.map((msg) => {
+            const isMe = msg.user_id === user?.id;
+            const isEditing = editingId === msg.id;
+
+            return (
+              <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} group`}>
+                {/* Author Name & Time */}
+                <span className="text-[10px] text-gray-500 mb-1 px-2">
+                  {msg.author_username} • {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {msg.updated_at && (
+                    <span className="ml-1 text-purple-400 italic"> (edited)</span>
+                  )}
+                </span>
+
+                <div className={`flex items-center gap-2 max-w-[85%] ${isMe ? 'flex-row' : 'flex-row-reverse'}`}>
+                  {/* Action Buttons: Only show for my messages and if not currently editing */}
+                  {isMe && !isEditing && !msg.is_deleted && (
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingId(msg.id);
+                          setEditContent(msg.content);
+                        }}
+                        className="text-[10px] text-gray-400 hover:text-purple-400"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Message Bubble or Editor */}
+                  <div className={`p-3 rounded-2xl ${
+                    isMe ? 'bg-purple-600 rounded-tr-none text-white' : 'bg-gray-800 rounded-tl-none text-gray-200'
+                  } ${isEditing ? 'w-full min-w-[200px]' : ''}`}>
+                    {isEditing ? (
+                      <div className="flex flex-col gap-2">
+                        <textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          className="bg-black/20 border border-white/20 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-white/40 resize-none"
+                          rows={2}
+                          autoFocus
+                        />
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => setEditingId(null)}
+                            className="text-[10px] uppercase font-bold text-gray-300"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => handleUpdateMessage(msg.id)}
+                            className="text-[10px] uppercase font-bold text-white bg-white/20 px-2 py-1 rounded"
+                          >
+                            Save
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <span>{msg.content}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
       </div>
 
         {/* Input Field */}
