@@ -13,7 +13,7 @@
  * for the same movie data, staying within rate limits and improving speed.
  * - **Error Handling**: AI assisted in refactoring the 'makeRequest' wrapper to 
  * provide consistent error catching and TypeScript return types across all API calls.
- */
+ */ 
 
 // Movie Type
 export interface Movie {

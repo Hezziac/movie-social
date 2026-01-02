@@ -5,7 +5,7 @@
  * - **Database Sync**: AI helped implement the logic to first check if a movie 
  * exists in the 'movies' table before inserting the favorite link, 
  * preventing foreign key errors.
- */
+ */ 
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../context/AuthContext";
@@ -67,7 +67,8 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
           title: movie.title,
           poster_path: movie.poster_path,
           release_date: movie.release_date,
-          overview: movie.overview
+          overview: movie.overview,
+          vote_average: movie.vote_average
         });
 
         if (movieError) throw movieError;
@@ -94,6 +95,7 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
       {/* Backdrop Click to Close */}
       <div className="absolute inset-0" onClick={onClose} />
+
       <div className="relative bg-gray-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-y-auto max-h-[90vh] shadow-2xl flex flex-col md:flex-row scrollbar-hide">
         {/* Fixed Close Button (Top Right) */}
         <button 
@@ -119,9 +121,22 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
         <div className="p-6 md:p-8 flex-1 flex flex-col">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">{movie.title}</h2>
           
-          <div className="flex items-center gap-2 text-purple-400 mb-4 font-medium">
-            <CalendarMonth fontSize="small" />
-            <span>{new Date(movie.release_date).getFullYear()}</span>
+          <div className="flex items-center gap-4 text-purple-400 mb-4 font-medium">
+            {/* Year */}
+            <div className="flex items-center gap-1.5 text-purple-400 font-medium text-sm">
+              <CalendarMonth sx={{ fontSize: 18 }} />
+              <span>{new Date(movie.release_date).getFullYear()}</span>
+            </div>
+
+            {/* ✅ TMDB RATING DISPLAY */}
+            {movie.vote_average > 0 && (
+              <div className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/40 px-2.5 py-0.5 rounded-full">
+                <span className="text-yellow-500 text-xs">⭐</span>
+                <span className="text-yellow-500 text-sm font-bold">
+                  {movie.vote_average.toFixed(1)}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Overview Section with Read More */}
