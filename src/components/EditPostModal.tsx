@@ -232,8 +232,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
 
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase mb-1 ml-1">Title</label>
-            <input
-              type="text"
+            <textarea
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 outline-none transition"

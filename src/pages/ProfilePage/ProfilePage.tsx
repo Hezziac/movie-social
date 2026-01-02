@@ -134,7 +134,7 @@ export function ProfilePage() {
             </div>
             
             {/* Bio */}
-            <p className="text-white">{profile.bio || "No bio yet"}</p>
+            <p className="text-white text-sm md:text-base whitespace-pre-wrap break-words">{profile.bio || "No bio yet"}</p>
           </div>
         </div>
 
