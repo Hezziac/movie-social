@@ -209,6 +209,13 @@ export const Navbar = () => {
         }}
       />
 
+      {/* 1. THE INVISIBLE BACKDROP: Only shows when menu is open */}
+      {menuOpen && (
+        <div 
+          className="fixed inset-0 z-30 bg-black/20 backdrop-blur-[2px] md:hidden" 
+          onClick={closeNav}
+        />
+      )}
       {/* Mobile Menu - updated icons */}
       {menuOpen && (
         <div className="md:hidden bg-[rgba(10,10,10,0.9)]">
