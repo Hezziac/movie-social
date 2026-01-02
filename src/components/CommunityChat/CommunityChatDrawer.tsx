@@ -20,6 +20,8 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
   const [editContent, setEditContent] = useState("");
 
   const handleUpdateMessage = async (msgId: string) => {
+    if (!editContent.trim()) return;
+
     const { error } = await supabase
       .from("community_messages")
       .update({ content: editContent })
@@ -53,11 +55,16 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
     const channel = supabase
       .channel(`community-chat-${communityId}`)
       .on('postgres_changes', { 
-          event: 'INSERT', 
+          event: '*', 
           schema: 'public', 
           table: 'community_messages',
           filter: `community_id=eq.${communityId}` 
       }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setMessages((prev) => [...prev, payload.new]);
+        } else if (payload.eventType === 'UPDATE') {
+          setMessages((prev) => prev.map(msg => msg.id === payload.new.id ? payload.new : msg));
+        }
         setMessages((prev) => [...prev, payload.new]);
       })
       .subscribe();
@@ -157,15 +164,15 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
                 </span>
 
                 <div className={`flex items-center gap-2 max-w-[85%] ${isMe ? 'flex-row' : 'flex-row-reverse'}`}>
-                  {/* Action Buttons: Only show for my messages and if not currently editing */}
+                  {/* Action Buttons: Visible on hover (Desktop) or always visible for 'Me' on mobile */}
                   {isMe && !isEditing && !msg.is_deleted && (
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                    <div className="md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => {
                           setEditingId(msg.id);
                           setEditContent(msg.content);
                         }}
-                        className="text-[10px] text-gray-400 hover:text-purple-400"
+                        className="text-[10px] bg-white/5 hover:bg-white/10 border border-white/10 px-2 py-1 rounded-md text-purple-400 font-bold"
                       >
                         Edit
                       </button>
