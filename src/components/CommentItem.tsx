@@ -50,6 +50,8 @@ export const CommentItem = ({ comment, postId }: Props) => {
   const [showReply, setShowReply] = useState<boolean>(false);
   const [replyText, setReplyText] = useState<string>("");
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(comment.content);
 
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -70,6 +72,21 @@ export const CommentItem = ({ comment, postId }: Props) => {
       return data;
     },
     enabled: !!user?.id,
+  });
+
+  // 2. NEW EDIT MUTATION (Renamed to 'mutateEdit' to avoid red lines)
+  const { mutate: mutateEdit, isPending: isEditingPending } = useMutation({
+    mutationFn: async (newContent: string) => {
+      const { error } = await supabase
+        .from("comments")
+        .update({ content: newContent })
+        .eq("id", comment.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      setIsEditing(false);
+    },
   });
 
   const { mutate, isPending, isError } = useMutation({
@@ -133,7 +150,7 @@ export const CommentItem = ({ comment, postId }: Props) => {
   };
 
   return (
-    <div className="pl-4 border-l border-white/10">
+    <div className="pl-4 border-l border-white/10 mt-4">
       <div className="mb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -142,25 +159,70 @@ export const CommentItem = ({ comment, postId }: Props) => {
             </span>
             <span className="text-xs text-gray-500">
               {new Date(comment.created_at).toLocaleString()}
+              {/* EDITED BADGE */}
+              {comment.updated_at && (new Date(comment.updated_at).getTime() - new Date(comment.created_at).getTime() > 2000) && (
+                <span className="ml-1 opacity-60 italic text-[10px] text-purple-500">• edited</span>
+              )}
             </span>
+            <div className="flex gap-3">
+              {/* NEW EDIT BUTTON - Only show if it's the author and not deleted */}
+              {isAuthor && comment.author !== "[deleted]" && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="text-xs text-gray-500 hover:text-purple-400"
+                >
+                  Edit
+                </button>
+              )}
+
+              {(isAuthor || isPostOwner) && comment.author !== "[deleted]" && (
+                <button
+                  onClick={() => {
+                    if (confirm("Delete this comment? CANNOT BE RESTORED!\nThis will replace it with a '[Deleted Comment]' placeholder.")) {
+                      mutateDelete();
+                    }
+                  }}
+                  className="text-xs text-red-500 hover:text-red-400"
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Delete button (comment author or post owner) Structure by Github Co-Pilot */}
-          {(isAuthor || isPostOwner) && comment.author !== "[deleted]" && (
-            <button
-              onClick={() => {
-                if (confirm("Delete this comment? CANNOT BE RESTORED!\nThis will replace it with '[Deleted Comment]'.")) {
-                  mutateDelete();
-                }
-              }}
-              className="text-xs text-red-500 hover:text-red-400"
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </button>
-          )}
+          {/* (Delete handled above) */}
         </div>
 
-        <p className={`${comment.author === "[deleted]" ? "text-gray-500 italic" : "text-gray-300"}`}>{comment.content}</p>
+        {/* 5. DYNAMIC CONTENT AREA (Text vs Editor) */}
+        {isEditing ? (
+          <div className="mt-2 space-y-2">
+            <textarea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              className="w-full border border-white/10 bg-black/40 p-2 rounded text-gray-200 text-sm focus:border-purple-500 outline-none"
+              rows={2}
+            />
+            <div className="flex gap-2">
+              <button 
+                onClick={() => mutateEdit(editText)}
+                disabled={isEditingPending}
+                className="text-xs bg-purple-600 px-3 py-1 rounded text-white disabled:opacity-50"
+              >
+                {isEditingPending ? "Saving..." : "Save"}
+              </button>
+              <button 
+                onClick={() => { setIsEditing(false); setEditText(comment.content); }}
+                className="text-xs text-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className={`${comment.author === "[deleted]" ? "text-gray-500 italic" : "text-gray-300"}`}>
+            {comment.content}
+          </p>
+        )}
 
         {comment.author !== "[deleted]" && (
           <button

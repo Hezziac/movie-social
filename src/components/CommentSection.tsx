@@ -37,6 +37,7 @@ export interface Comment {
   user_id: string;
   created_at: string;
   author: string;
+  updated_at?: string | null;
 }
 
 const createComment = async (
