@@ -65,7 +65,6 @@ export const CommunityChatDrawer = ({ isOpen, onClose, communityId, communityNam
         } else if (payload.eventType === 'UPDATE') {
           setMessages((prev) => prev.map(msg => msg.id === payload.new.id ? payload.new : msg));
         }
-        setMessages((prev) => [...prev, payload.new]);
       })
       .subscribe();
 
