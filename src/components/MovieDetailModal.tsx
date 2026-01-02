@@ -119,25 +119,31 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
 
         {/* Details Section */}
         <div className="p-6 md:p-8 flex-1 flex flex-col">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">{movie.title}</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
+            {movie.title}
+          </h2>
           
-          <div className="flex items-center gap-4 text-purple-400 mb-4 font-medium">
-            {/* Year */}
-            <div className="flex items-center gap-1.5 text-purple-400 font-medium text-sm">
-              <CalendarMonth sx={{ fontSize: 18 }} />
-              <span>{new Date(movie.release_date).getFullYear()}</span>
-            </div>
-
-            {/* ✅ TMDB RATING DISPLAY */}
-            {movie.vote_average > 0 && (
-              <div className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/40 px-2.5 py-0.5 rounded-full">
-                <span className="text-yellow-500 text-xs">⭐</span>
-                <span className="text-yellow-500 text-sm font-bold">
-                  {movie.vote_average.toFixed(1)}
-                </span>
-              </div>
-            )}
+          <div className="flex items-center gap-4 mb-4">
+          {/* Release Year */}
+          <div className="flex items-center gap-1.5 text-purple-400 font-medium text-sm">
+            <CalendarMonth sx={{ fontSize: 18 }} />
+            <span>{movie.release_date ? new Date(movie.release_date).getFullYear() : "N/A"}</span>
           </div>
+
+          {/* TMDB Rating Badge: Only shows if vote_average exists and is > 0 */}
+          {movie.vote_average && movie.vote_average > 0 ? (
+            <div className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-0.5 rounded-full shadow-[0_0_10px_rgba(234,179,8,0.1)]">
+              <span className="text-yellow-500 text-xs">⭐</span>
+              <span className="text-yellow-500 text-sm font-bold leading-none">
+                {movie.vote_average.toFixed(1)}
+              </span>
+            </div>
+          ) : (
+            <div className="text-[10px] text-gray-500 italic px-2 py-0.5 border border-white/5 rounded-full">
+              No rating
+            </div>
+          )}
+        </div>
 
           {/* Overview Section with Read More */}
           <div className="mb-6">
