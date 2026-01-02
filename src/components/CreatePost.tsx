@@ -170,6 +170,7 @@ export const CreatePost = () => {
             release_date: selectedMovie.release_date || null,
             poster_path: selectedMovie.poster_path,
             overview: selectedMovie.overview || null,
+            vote_average: selectedMovie.vote_average || null,
           },
           {
             onConflict: "id",
