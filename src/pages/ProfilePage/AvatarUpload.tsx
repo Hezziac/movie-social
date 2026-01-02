@@ -24,9 +24,10 @@ interface AvatarUploadProps {
   uid: string; // The user's unique ID
   url: string | null; // The current avatar URL
   onUpload: (event: React.ChangeEvent<HTMLInputElement>, filePath: string) => void; // Callback to parent when upload is complete
+  onUploadStateChange?: (isUploading: boolean) => void;
 }
 
-export const AvatarUpload: React.FC<AvatarUploadProps> = ({ uid, url, onUpload }) => {
+export const AvatarUpload: React.FC<AvatarUploadProps> = ({ uid, url, onUpload, onUploadStateChange }) => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(url);
   const [uploading, setUploading] = useState(false);
 
@@ -38,6 +39,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ uid, url, onUpload }
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploading(true);
+      if (typeof (onUploadStateChange) === 'function') onUploadStateChange(true);
 
       if (!event.target.files || event.target.files.length === 0) {
         throw new Error('You must select an image to upload.');
@@ -95,6 +97,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({ uid, url, onUpload }
       
     } finally {
       setUploading(false);
+      if (typeof (onUploadStateChange) === 'function') onUploadStateChange(false);
     }
   };
 

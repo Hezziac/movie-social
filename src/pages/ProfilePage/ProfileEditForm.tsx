@@ -13,7 +13,7 @@
  * final save operation.
  * - **Error Handling**: AI assisted in creating the try/catch flow to provide 
  * user-friendly error messages for database conflicts or network issues.
- */
+ */ 
 
 import React, { useState } from 'react';
 import { supabase } from '../../supabase-client';
@@ -40,6 +40,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, user,
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url); // New state for avatar URL
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
 
   const handleUpdate = async () => {
     setError(null);
@@ -111,6 +112,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, user,
             setAvatarUrl(newUrl); // Update local state with new avatar URL
             // Optionally, you might want to auto-save here or indicate unsaved changes
           }}
+          onUploadStateChange={setIsAvatarUploading}
         />
       )}
 
@@ -136,7 +138,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, user,
         <button
           onClick={handleUpdate}
           className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex-1"
-          disabled={isSaving}
+          disabled={isSaving || isAvatarUploading}
         >
           {isSaving ? 'Saving...' : 'Save'}
         </button>

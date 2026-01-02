@@ -6,7 +6,7 @@
  * - **Database Logic**: Refactored with AI to handle the Supabase '.update()' 
  * operation, provide immediate feedback via the onSave callback and Updated to 
  * handle Tag Highlighting and Relational Tag Synchronization.
- */
+ */ 
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "../supabase-client";
 import { Close, Save, DeleteForever, NoPhotography } from "@mui/icons-material";
@@ -226,6 +226,7 @@ export const EditPostModal = ({ isOpen, onClose, postId, initialTitle, initialCo
                 setNewPhotoFile(file);
                 setPreviewUrl(url);
               }}
+              onUploadStateChange={setIsUploading}
             />
           </div>
 
