@@ -89,9 +89,6 @@ const AppRoutes = () => {
       {/* Configuration Fix: AI helped me implement these catch-all routes 
           to resolve routing conflicts caused by the Vite base path 
           configuration during deployment. */}
-      {/* Catch-all for Vite base path */}
-      <Route path="/movie-social" element={<Home />} />
-      <Route path="/movie-social/*" element={<Home />} />
 
       {/* This is the public-facing profile page. It is not wrapped. */}
       <Route path="/profile/:username" element={<ProfilePage />} />

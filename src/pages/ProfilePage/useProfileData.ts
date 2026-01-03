@@ -100,76 +100,81 @@ export const useProfileData = (username: string | undefined) => {
 
     // This function loads both the profile and its associated posts.
     const loadProfileAndPosts = async () => {
-    try {
-        setLoading(true); // Start loading
-
-        // Relational Fetching: Refactored query to fetch not just counts, 
-        // but the actual profile data (username, avatar) for the followers 
-        // and following lists via the 'follows' table.
-        const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select(`
-                id, username, bio, avatar_url, created_at, updated_at, 
-                followers_count, following_count,
-                followers:follows!following_id (
-                    follower:profiles!follower_id (id, username, avatar_url)
-                ),
-                following:follows!follower_id (
-                    following:profiles!following_id (id, username, avatar_url)
-                )
-            `)
-        .eq("username", username)
-        .single();
-
-        if (profileError || !profileData) {
-        console.error("Profile not found:", profileError);
-        setProfile(null);
-        setUserPosts([]); // Clear posts if profile not found
-        } else {
-            setProfile(profileData);
-            // Flatten the nested data so the Modal can read it easily
-            const followers_data = profileData.followers?.map((f: any) => f.follower) || [];
-            const following_data = profileData.following?.map((f: any) => f.following) || [];
-
-            setProfile({
-                ...profileData,
-                followers_data,
-                following_data
-            });
-            // Check follow status for the current logged-in user, if available
-            if (user && profileData?.id) {
-                checkFollowStatus(user.id, profileData.id).catch((err) => {
-                    console.warn("Failed to check follow status:", err);
-                });
-            }
         
-        // Fetch posts AND favorite movies for the user we are LOOKING AT
-        const [posts, favorites] = await Promise.all([
-            fetchUserPosts(profileData.id),
-            fetchFavoriteMovies(profileData.id)
-        ]);
-        setUserPosts(posts as PostWithRelations[]);
-        setFavoriteMovies(favorites);
-        setStats({
-            posts: posts.length,
-            followers: profileData.followers_count || 0,
-            following: profileData.following_count || 0
-        });
-        }
-    } catch (err) {
-        console.error("Error loading profile or posts:", err);
-        setProfile(null); // Clear profile state on error
-        setUserPosts([]); // Clear posts on error
-    } finally {
-        setLoading(false); // Always turn off loading
-    }
-    };
+        if (!username) return; // Safety check
+        try {
+            setLoading(true); // Start loading
 
-    useEffect(() => {
-    if (username) {
-        loadProfileAndPosts();
-    }
-    }, [username]); // Only re-run when the username in the URL changes
+            // ✅ FIX: Decode the username from the URL to handle dots and special characters
+            const decodedUsername = decodeURIComponent(username);
+
+            // Relational Fetching: Refactored query to fetch not just counts, 
+            // but the actual profile data (username, avatar) for the followers 
+            // and following lists via the 'follows' table.
+            const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select(`
+                    id, username, bio, avatar_url, created_at, updated_at, 
+                    followers_count, following_count,
+                    followers:follows!following_id (
+                        follower:profiles!follower_id (id, username, avatar_url)
+                    ),
+                    following:follows!follower_id (
+                        following:profiles!following_id (id, username, avatar_url)
+                    )
+                `)
+            .eq("username", decodedUsername)
+            .single();
+
+            if (profileError || !profileData) {
+            console.error("Profile not found:", profileError);
+            setProfile(null);
+            setUserPosts([]); // Clear posts if profile not found
+            } else {
+                setProfile(profileData);
+                // Flatten the nested data so the Modal can read it easily
+                const followers_data = profileData.followers?.map((f: any) => f.follower) || [];
+                const following_data = profileData.following?.map((f: any) => f.following) || [];
+
+                setProfile({
+                    ...profileData,
+                    followers_data,
+                    following_data
+                });
+                // Check follow status for the current logged-in user, if available
+                if (user && profileData?.id) {
+                    checkFollowStatus(user.id, profileData.id).catch((err) => {
+                        console.warn("Failed to check follow status:", err);
+                    });
+                }
+            
+            // Fetch posts AND favorite movies for the user we are LOOKING AT
+            const [posts, favorites] = await Promise.all([
+                fetchUserPosts(profileData.id),
+                fetchFavoriteMovies(profileData.id)
+            ]);
+            setUserPosts(posts as PostWithRelations[]);
+            setFavoriteMovies(favorites);
+            setStats({
+                posts: posts.length,
+                followers: profileData.followers_count || 0,
+                following: profileData.following_count || 0
+            });
+            }
+        } catch (err) {
+            console.error("Error loading profile or posts:", err);
+            setProfile(null); // Clear profile state on error
+            setUserPosts([]); // Clear posts on error
+        } finally {
+            setLoading(false); // Always turn off loading
+        }
+        };
+
+        useEffect(() => {
+        if (username) {
+            loadProfileAndPosts();
+        }
+        }, [username]); // Only re-run when the username in the URL changes
 
         // Check if current user follows the profile target
         const checkFollowStatus = async (currentUserId: string, targetUserId: string) => {
