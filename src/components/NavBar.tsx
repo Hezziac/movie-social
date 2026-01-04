@@ -19,7 +19,7 @@
  * fixed dimensions, we ensured the 180px source image scales perfectly to 
  * navbar height without distorting or breaking the responsive layout.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router"; // Fixed import (use "react-router-dom" instead of "react-router")
 import { useAuth } from "../context/AuthContext";
 import {
@@ -51,6 +51,24 @@ export const Navbar = () => {
     setMenuOpen(false);
   };
 
+  // Close mobile menu when clicking or touching outside the nav
+  const navRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const handleOutside = (e: MouseEvent | TouchEvent) => {
+      if (!menuOpen) return;
+      const target = (e as MouseEvent).target as Node | null;
+      if (navRef.current && target && !navRef.current.contains(target)) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("mousedown", handleOutside);
+    window.addEventListener("touchstart", handleOutside);
+    return () => {
+      window.removeEventListener("mousedown", handleOutside);
+      window.removeEventListener("touchstart", handleOutside);
+    };
+  }, [menuOpen]);
+
   // Custom Profile logic: Refactored with AI to bridge the Auth context 
   // with the Supabase 'profiles' table to display custom usernames.
   // Fetch profile from Supabase if user is logged in
@@ -78,7 +96,7 @@ export const Navbar = () => {
   const displayName = profile?.username || user?.email;
 
   return (
-    <nav className="fixed top-0 w-full z-40 bg-[rgba(10,10,10,0.8)] backdrop-blur-lg border-b border-white/10 shadow-lg h-16">
+    <nav ref={navRef} className="fixed top-0 w-full z-40 bg-[rgba(10,10,10,0.8)] backdrop-blur-lg border-b border-white/10 shadow-lg h-16">
       <div className="max-w-5xl mx-auto px-4 h-full">
         <div className="flex justify-between items-center h-full">
           {/* Brand Logo Section: Refactored with AI to include image + text */}
@@ -204,18 +222,18 @@ export const Navbar = () => {
         onClose={() => setSearchOpen(false)} 
         onSelect={(_movie) => {
           setSearchOpen(false);
-          // Redirect to a specific movie view if needed
-          // navigate(`/movie/${movie.id}`); 
         }}
       />
 
-      {/* 1. THE INVISIBLE BACKDROP: Only shows when menu is open */}
+      {/* 1. THE INVISIBLE BACKDROP: Covers the whole screen behind the nav */}
       {menuOpen && (
         <div 
-          className="fixed inset-0 z-30 bg-black/20 backdrop-blur-[2px] md:hidden" 
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden" 
           onClick={closeNav}
         />
       )}
+
+
       {/* Mobile Menu - updated icons */}
       {menuOpen && (
         <div className="md:hidden bg-[rgba(10,10,10,0.9)]">
