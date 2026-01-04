@@ -50,6 +50,20 @@ export function NotificationsPage() {
     }
   });
 
+  // 3. Mark single notification as read
+  const markSingleRead = useMutation({
+    mutationFn: async (notificationId: string) => {
+      await supabase
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("id", notificationId);
+    },
+    onSuccess: () => {
+      // Invalidate queries to refresh the UI state
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    }
+  });
+
   const getIcon = (type: string) => {
     switch (type) {
       case 'chat': return <ChatBubble className="text-blue-400" fontSize="small" />;
@@ -87,8 +101,16 @@ export function NotificationsPage() {
               <Link
                 key={n.id}
                 to={n.type === 'chat' ? `/community/${n.target_id}` : `/profile/${n.actor?.username}`}
+                // Trigger mutation on click
+                onClick={() => {
+                  if (!n.is_read) {
+                    markSingleRead.mutate(n.id);
+                  }
+                }}
                 className={`flex items-center gap-4 p-4 rounded-2xl transition-all border ${
-                  n.is_read ? 'bg-transparent border-transparent opacity-60' : 'bg-white/5 border-white/5 shadow-lg'
+                  n.is_read 
+                    ? 'bg-transparent border-transparent opacity-50 grayscale-[0.5]' 
+                    : 'bg-white/5 border-white/5 shadow-lg shadow-purple-500/5'
                 } hover:bg-white/10`}
               >
                 {/* Actor Avatar / Fallback */}
