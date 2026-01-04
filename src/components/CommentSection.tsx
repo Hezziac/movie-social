@@ -38,6 +38,7 @@ export interface Comment {
   created_at: string;
   author: string;
   updated_at?: string | null;
+  profiles?: { username: string };
 }
 
 const createComment = async (
@@ -64,12 +65,39 @@ const createComment = async (
 const fetchComments = async (postId: number): Promise<Comment[]> => {
   const { data, error } = await supabase
     .from("comments") //access the {tableName} table
-    .select("*") //select all items -
+    .select(`
+      id,
+      post_id,
+      parent_comment_id,
+      content,
+      user_id,
+      created_at,
+      updated_at,
+      author,
+      profiles (
+        username,
+        avatar_url
+      )
+    `)
     .eq("post_id", postId)
     .order("created_at", { ascending: true });
 
   if (error) throw new Error(error.message);
-  return data as Comment[];
+  // We map through the results to "flatten" the live username into the 'author' field
+  return (data as any[]).map((comment) => {
+    // 1. Check if the comment was soft-deleted
+    const isSoftDeleted = comment.author === "[deleted]";
+
+    return {
+      ...comment,
+      // 2. Logic: If it's deleted, stay "[deleted]". 
+      // Otherwise, try to use the live username from profiles.
+      // Fallback to the original author column if the join fails.
+      author: isSoftDeleted 
+        ? "[deleted]" 
+        : (comment.profiles?.username || comment.author || "[Unknown User]")
+    };
+  }) as Comment[];
 };
 
 export const CommentSection = ({ postId }: Props) => {
@@ -101,7 +129,7 @@ export const CommentSection = ({ postId }: Props) => {
   } = useQuery<Comment[], Error>({
     queryKey: ["comments", postId],
     queryFn: () => fetchComments(postId),
-    refetchInterval: 5000, // could effect cost (every 5 sec it fetches likes( wothout refesh?))
+    refetchInterval: 60000, // could effect cost (every 60 sec it fetches likes( wothout refesh?))
   });
 
   const { mutate, isPending, isError } = useMutation({
