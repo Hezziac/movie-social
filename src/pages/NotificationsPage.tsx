@@ -7,7 +7,8 @@ import {
   Favorite, 
   PersonAdd, 
   NotificationsNone,
-  DoneAll
+  DoneAll,
+  AccountCircle
 } from "@mui/icons-material";
 import { Link } from "react-router";
 
@@ -90,14 +91,26 @@ export function NotificationsPage() {
                   n.is_read ? 'bg-transparent border-transparent opacity-60' : 'bg-white/5 border-white/5 shadow-lg'
                 } hover:bg-white/10`}
               >
-                {/* Actor Avatar */}
-                <div className="relative">
+                {/* Actor Avatar / Fallback */}
+              <div className="relative flex-shrink-0">
+                {n.actor?.avatar_url ? (
                   <img 
-                    src={n.actor?.avatar_url || "/default-avatar.png"} 
+                    src={n.actor.avatar_url} 
                     className="w-12 h-12 rounded-full object-cover border border-white/10"
-                    alt=""
+                    alt={`${n.actor.username}'s avatar`}
+                    // Error handling just in case the URL exists but is broken
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).parentElement!.classList.add('broken-img');
+                    }}
                   />
-                  <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-1 border border-white/10">
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center border border-white/10">
+                    <AccountCircle className="text-gray-500" sx={{ fontSize: 32 }} />
+                  </div>
+                )}
+                {/* Notification Type Icon Badge */}
+                  <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-1 border border-white/10 shadow-sm flex items-center justify-center">
                     {getIcon(n.type)}
                   </div>
                 </div>
