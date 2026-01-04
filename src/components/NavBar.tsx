@@ -96,236 +96,238 @@ export const Navbar = () => {
   const displayName = profile?.username || user?.email;
 
   return (
-    <nav ref={navRef} className="fixed top-0 w-full z-40 bg-[rgba(10,10,10,0.8)] backdrop-blur-lg border-b border-white/10 shadow-lg h-16">
-      <div className="max-w-5xl mx-auto px-4 h-full">
-        <div className="flex justify-between items-center h-full">
-          {/* Brand Logo Section: Refactored with AI to include image + text */}
-          <Link to="/" onClick={handleHomeClick} className="flex items-center gap-3 group">
-            <img 
-              src="/logo.png" 
-              alt="Social.Cine Logo" 
-              /* h-8 (32px) is the sweet spot for a 64px (h-16) navbar */
-              className="h-8 w-auto object-contain transition-transform group-hover:scale-110" 
-            />
-            <span className="font-mono text-xl font-bold text-white tracking-tight">
-              Social<span className="text-purple-500">.Cine</span>
-            </span>
-          </Link>
-
-          {/* Desktop Links */}
-          <div className="hidden md:flex items-center space-x-8">
-            {user ? (
-              <Link
-                to="/search"
-                className="text-gray-300 hover:text-white transition-colors flex items-center gap-1"
-              >
-                <Search />
-                <span>Search</span>
-              </Link>
-            ) : (
-              <Link to="/" onClick={handleHomeClick} className="text-gray-300 hover:text-white transition-colors">
-                Home
-              </Link>
-            )}
-
-            <Link
-              to="/communities"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Communities
-            </Link>
-            {user && (
-            <>
-            {user && (
-              <Link
-                to="/create-hub"
-                className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-full text-sm font-bold transition-colors flex items-center gap-1"
-              >
-                CREATE +
-              </Link>
-            )}
-            
-          </>)}
-          </div>
-
-          {/* Desktop Auth */}
-          <div className="hidden md:flex items-center">
-            {user ? (
-              <div className="flex items-center space-x-4">
-                {/* Avatar and Display Name as link to profile */}
-                <Link
-                  to={profile?.username ? `/profile/${profile.username}` : "/profile"}
-                  className="flex items-center space-x-2 group"
-                >
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt="User Avatar"
-                      className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-purple-500"
-                    />
-                  ) : (
-                    <AccountCircle className="text-gray-300 text-2xl group-hover:text-purple-500" />
-                  )}
-                  <span className="text-gray-300 group-hover:text-purple-500">{displayName}</span>
-                </Link>
-
-                {/* Sign Out Button */}
-                <button
-                  onClick={signOut}
-                  className="bg-red-500 px-3 py-1 rounded"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              /* Sign In Buttons - Now with Google */
-              <div className="flex space-x-2">
-                <button
-                  onClick={signInWithGitHub}
-                  className="bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded flex items-center"
-                >
-                  <GitHub className="w-4 h-4 mr-2" />
-                  GitHub
-                </button>
-                <button
-                  onClick={signInWithGoogle}
-                  className="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded flex items-center"
-                >
-                  <Google className="w-4 h-4 mr-2" />
-                  Google
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Menu: Implementation assisted by AI to ensure 
-          proper overlay visibility and background blur effects. */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setMenuOpen((prev) => !prev)}
-              className="text-gray-300 focus:outline-none"
-              aria-label="Toggle menu"
-            >
-              {menuOpen ? (
-                <Close className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Movie Search Modal Integration */}
-      <MovieSearchModal 
-        isOpen={searchOpen} 
-        onClose={() => setSearchOpen(false)} 
-        onSelect={(_movie) => {
-          setSearchOpen(false);
-        }}
+    <>
+    {/* 1. THE INVISIBLE BACKDROP: Covers the whole screen behind the nav */}
+    {menuOpen && (
+      <div 
+        className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden" 
+        onClick={closeNav}
       />
-
-      {/* 1. THE INVISIBLE BACKDROP: Covers the whole screen behind the nav */}
-      {menuOpen && (
-        <div 
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden" 
-          onClick={closeNav}
-        />
-      )}
-
-
-      {/* Mobile Menu - updated icons */}
-      {menuOpen && (
-        <div className="md:hidden bg-[rgba(10,10,10,0.9)]">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {/* Always visible links */}
-            {user ? (
-              <Link
-                to="/search"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
-                onClick={closeNav}
-              >
-                <div className="flex items-center gap-2">
-                  <Search className="w-5 h-5" />
-                  <span>Search Movies</span>
-                </div>
-                </Link>
-            ) : (
-              <Link to="/" onClick={handleHomeClick} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">
-                Home
-              </Link>
-            )}
-            
-            <Link
-              to="/communities"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
-              onClick={closeNav}
-            >
-              Communities
+    )}
+      <nav ref={navRef} className="fixed top-0 w-full z-40 bg-[rgba(10,10,10,0.8)] backdrop-blur-sm border-b border-white/10 shadow-lg h-16">
+        <div className="max-w-5xl mx-auto px-4 h-full">
+          <div className="flex justify-between items-center h-full">
+            {/* Brand Logo Section: Refactored with AI to include image + text */}
+            <Link to="/" onClick={handleHomeClick} className="flex items-center gap-3 group">
+              <img 
+                src="/logo.png" 
+                alt="Social.Cine Logo" 
+                /* h-8 (32px) is the sweet spot for a 64px (h-16) navbar */
+                className="h-8 w-auto object-contain transition-transform group-hover:scale-110" 
+              />
+              <span className="font-mono text-xl font-bold text-white tracking-tight">
+                Social<span className="text-purple-500">.Cine</span>
+              </span>
             </Link>
 
-            {/* ONLY for logged-in users - same as desktop */}
-            {user && (
+            {/* Desktop Links */}
+            <div className="hidden md:flex items-center space-x-8">
+              {user ? (
+                <Link
+                  to="/search"
+                  className="text-gray-300 hover:text-white transition-colors flex items-center gap-1"
+                >
+                  <Search />
+                  <span>Search</span>
+                </Link>
+              ) : (
+                <Link to="/" onClick={handleHomeClick} className="text-gray-300 hover:text-white transition-colors">
+                  Home
+                </Link>
+              )}
+
+              <Link
+                to="/communities"
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Communities
+              </Link>
+              {user && (
               <>
+              {user && (
                 <Link
                   to="/create-hub"
-                  className="block px-3 py-2 rounded-md text-base font-bold text-purple-400 hover:text-white hover:bg-gray-700"
-                  onClick={closeNav}
+                  className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-full text-sm font-bold transition-colors flex items-center gap-1"
                 >
                   CREATE +
                 </Link>
-              </>
+              )}
+              
+            </>)}
+            </div>
+
+            {/* Desktop Auth */}
+            <div className="hidden md:flex items-center">
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  {/* Avatar and Display Name as link to profile */}
+                  <Link
+                    to={profile?.username ? `/profile/${profile.username}` : "/profile"}
+                    className="flex items-center space-x-2 group"
+                  >
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt="User Avatar"
+                        className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-purple-500"
+                      />
+                    ) : (
+                      <AccountCircle className="text-gray-300 text-2xl group-hover:text-purple-500" />
+                    )}
+                    <span className="text-gray-300 group-hover:text-purple-500">{displayName}</span>
+                  </Link>
+
+                  {/* Sign Out Button */}
+                  <button
+                    onClick={signOut}
+                    className="bg-red-500 px-3 py-1 rounded"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                /* Sign In Buttons - Now with Google */
+                <div className="flex space-x-2">
+                  <button
+                    onClick={signInWithGitHub}
+                    className="bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded flex items-center"
+                  >
+                    <GitHub className="w-4 h-4 mr-2" />
+                    GitHub
+                  </button>
+                  <button
+                    onClick={signInWithGoogle}
+                    className="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded flex items-center"
+                  >
+                    <Google className="w-4 h-4 mr-2" />
+                    Google
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Menu: Implementation assisted by AI to ensure 
+            proper overlay visibility and background blur effects. */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setMenuOpen((prev) => !prev)}
+                className="text-gray-300 focus:outline-none"
+                aria-label="Toggle menu"
+              >
+                {menuOpen ? (
+                  <Close className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Movie Search Modal Integration */}
+        <MovieSearchModal 
+          isOpen={searchOpen} 
+          onClose={() => setSearchOpen(false)} 
+          onSelect={(_movie) => {
+            setSearchOpen(false);
+          }}
+        />
+
+
+
+        {/* Mobile Menu - updated icons */}
+        {menuOpen && (
+          <div className="md:hidden bg-[rgba(10,10,10,0.9)]">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              {/* Always visible links */}
+              {user ? (
+                <Link
+                  to="/search"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
+                  onClick={closeNav}
+                >
+                  <div className="flex items-center gap-2">
+                    <Search className="w-5 h-5" />
+                    <span>Search Movies</span>
+                  </div>
+                  </Link>
+              ) : (
+                <Link to="/" onClick={handleHomeClick} className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">
+                  Home
+                </Link>
+              )}
+              
+              <Link
+                to="/communities"
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
+                onClick={closeNav}
+              >
+                Communities
+              </Link>
+
+              {/* ONLY for logged-in users - same as desktop */}
+              {user && (
+                <>
+                  <Link
+                    to="/create-hub"
+                    className="block px-3 py-2 rounded-md text-base font-bold text-purple-400 hover:text-white hover:bg-gray-700"
+                    onClick={closeNav}
+                  >
+                    CREATE +
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Mobile Auth Section */}
+            <div className="px-4 py-2 border-t border-white/10">
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <Link
+                  to={profile?.username ? `/profile/${profile.username}` : "/profile"}
+                  onClick={closeNav} // Important: close the menu when navigating
+                  className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
+                >
+                {profile?.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt="User Avatar"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <AccountCircle className="text-gray-300 text-2xl" />
+                )}
+                <span className="text-gray-300">{displayName}</span>
+                <button
+                  onClick={signOut}
+                  className="bg-red-500 px-3 py-1 rounded w-full mt-2 text-center text-white font-medium cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </Link> 
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <button
+                  onClick={signInWithGitHub}
+                  className="bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded w-full flex items-center justify-center"
+                >
+                  <GitHub className="w-4 h-4 mr-2" />
+                  Sign in with GitHub
+                </button>
+                <button
+                  onClick={signInWithGoogle}
+                  className="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded w-full flex items-center justify-center"
+                >
+                  <Google className="w-4 h-4 mr-2" />
+                  Sign in with Google
+                </button>
+              </div>
             )}
           </div>
-
-          {/* Mobile Auth Section */}
-          <div className="px-4 py-2 border-t border-white/10">
-          {user ? (
-            <div className="flex items-center space-x-4">
-              <Link
-                to={profile?.username ? `/profile/${profile.username}` : "/profile"}
-                onClick={closeNav} // Important: close the menu when navigating
-                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
-              >
-              {profile?.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt="User Avatar"
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-              ) : (
-                <AccountCircle className="text-gray-300 text-2xl" />
-              )}
-              <span className="text-gray-300">{displayName}</span>
-              <button
-                onClick={signOut}
-                className="bg-red-500 px-3 py-1 rounded w-full mt-2 text-center text-white font-medium cursor-pointer"
-              >
-                Sign Out
-              </button>
-            </Link> 
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <button
-                onClick={signInWithGitHub}
-                className="bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded w-full flex items-center justify-center"
-              >
-                <GitHub className="w-4 h-4 mr-2" />
-                Sign in with GitHub
-              </button>
-              <button
-                onClick={signInWithGoogle}
-                className="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded w-full flex items-center justify-center"
-              >
-                <Google className="w-4 h-4 mr-2" />
-                Sign in with Google
-              </button>
-            </div>
-          )}
         </div>
-      </div>
-    )}
-    </nav>
+      )}
+      </nav>
+  </>
   );
 };
