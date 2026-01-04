@@ -30,6 +30,7 @@ import { JSX, useEffect, useState } from "react";
 import { ProfileSetupPage } from "./pages/ProfileSetupPage";
 import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { supabase } from "./supabase-client";
+import { NotificationsPage } from "./pages/NotificationsPage";
 
 // Security Logic: AI helped refactor this wrapper to be "lean." It handles 
 // unauthorized access by redirecting unauthenticated users back to 
@@ -99,6 +100,7 @@ const AppRoutes = () => {
       <Route path="/create" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
       <Route path="/community/create" element={<ProtectedRoute><CreateCommunityPage /></ProtectedRoute>} />
       <Route path="/search" element={<ProtectedRoute><MovieSearchPage /></ProtectedRoute>} />
+      <Route path="/notifications" element={<><NotificationsPage /></>} />
 
       {/* This is a special route for new users. It is also protected. */}
       <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetupPage /></ProtectedRoute>} />
