@@ -100,7 +100,7 @@ const AppRoutes = () => {
       <Route path="/create" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
       <Route path="/community/create" element={<ProtectedRoute><CreateCommunityPage /></ProtectedRoute>} />
       <Route path="/search" element={<ProtectedRoute><MovieSearchPage /></ProtectedRoute>} />
-      <Route path="/notifications" element={<><NotificationsPage /></>} />
+      <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
 
       {/* This is a special route for new users. It is also protected. */}
       <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetupPage /></ProtectedRoute>} />
