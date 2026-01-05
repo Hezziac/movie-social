@@ -222,14 +222,14 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
     const previousPosts = queryClient.getQueryData(["posts"]);
 
     // Optimistically update the cache
-    queryClient.setQueryData(["posts"], (old: any) => {
-      if (!old) return old;
-      return old.map((p: any) => 
-        p.id === post.id 
-          ? { ...p, like_count: (p.like_count ?? 0) + 1 } // Visual bump
-          : p
-      );
-    });
+    // queryClient.setQueryData(["posts"], (old: any) => {
+    //   if (!old) return old;
+    //   return old.map((p: any) => 
+    //     p.id === post.id 
+    //       ? { ...p, like_count: (p.like_count ?? 0) + 1 } // Visual bump
+    //       : p
+    //   );
+    // });
 
     // Return context object with the snapshotted value
     return { previousPosts };
@@ -244,14 +244,13 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
         queryClient.setQueryData(["posts"], context.previousPosts);
       }
     },
-  // 3. Always refetch after success or error to ensure we are in sync with server
-  onSettled: () => {
-    // Only invalidate so the data is marked "old", but don't force a refresh
-    queryClient.invalidateQueries({ 
-      queryKey: ["posts"], 
-      refetchType: 'none' 
-    });
-  },
+  onSuccess: () => {
+      // Use refetchQueries instead of invalidateQueries to avoid the "Loading Spinner" flicker.
+      // This keeps the current UI visible until the fresh numbers arrive from Supabase.
+      queryClient.refetchQueries({ queryKey: ["posts"] });
+      queryClient.refetchQueries({ queryKey: ["communityData"] });
+      queryClient.refetchQueries({ queryKey: ["post", post.id] });
+    },
   });
 
   // Manual object construction to bridge flat SQL data to MovieTile interface.
