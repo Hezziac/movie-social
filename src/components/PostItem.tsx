@@ -246,11 +246,11 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
     },
   // 3. Always refetch after success or error to ensure we are in sync with server
   onSettled: () => {
-    // 1. DO NOT use invalidateQueries here, it's too aggressive for a feed.
-    // 2. Just trigger the refetches. This keeps the optimistic UI stable
-    // until the real server data comes back to replace it silently.
-    queryClient.refetchQueries({ queryKey: ["communityData"] });
-    queryClient.refetchQueries({ queryKey: ["post", post.id] });
+    // Only invalidate so the data is marked "old", but don't force a refresh
+    queryClient.invalidateQueries({ 
+      queryKey: ["posts"], 
+      refetchType: 'none' 
+    });
   },
   });
 
