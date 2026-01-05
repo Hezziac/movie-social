@@ -29,6 +29,8 @@ import {
   Close,
   AccountCircle,
   Search,
+  Notifications,
+  NotificationsNone,
 } from "@mui/icons-material";
 import { supabase } from "../supabase-client";
 import { MovieSearchModal } from "./MovieSearchModal";
@@ -46,7 +48,44 @@ export const Navbar = () => {
     const resetEvent = new CustomEvent("resetHomeScroll");
     window.dispatchEvent(resetEvent);
   };
+  
+  const [unreadCount, setUnreadCount] = useState(0);
+  // Fetch unread notification count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (!user) return;
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("is_read", false);
 
+      if (!error) setUnreadCount(count || 0);
+    };
+
+    fetchUnreadCount();
+  }, [user]);
+
+  // Add NotificationBell beside the avatar in desktop view and to the left of the mobile menu
+  const NotificationBell = () => (
+    <Link
+      to="/notifications"
+      className="relative p-2 text-gray-400 hover:text-white transition-colors"
+    >
+      {unreadCount > 0 ? (
+        <>
+          <Notifications className="text-purple-500" />
+          <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-[#0a0a0a]">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
+        </>
+      ) : (
+        <NotificationsNone />
+      )}
+    </Link>
+  );
+
+  
   const closeNav = () => {
     setMenuOpen(false);
   };
@@ -161,6 +200,7 @@ export const Navbar = () => {
               {user ? (
                 <div className="flex items-center space-x-4">
                   {/* Avatar and Display Name as link to profile */}
+                  <NotificationBell /> {/* Notification Bell */}
                   <Link
                     to={profile?.username ? `/profile/${profile.username}` : "/profile"}
                     className="flex items-center space-x-2 group"
@@ -209,17 +249,20 @@ export const Navbar = () => {
             {/* Mobile Menu: Implementation assisted by AI to ensure 
             proper overlay visibility and background blur effects. */}
             <div className="md:hidden">
-              <button
-                onClick={() => setMenuOpen((prev) => !prev)}
-                className="text-gray-300 focus:outline-none"
-                aria-label="Toggle menu"
-              >
-                {menuOpen ? (
-                  <Close className="w-6 h-6" />
-                ) : (
-                  <Menu className="w-6 h-6" />
-                )}
-              </button>
+              <div className="flex items-center space-x-2">
+                {user && <NotificationBell />} {/* Notification Bell */}
+                <button
+                  onClick={() => setMenuOpen((prev) => !prev)}
+                  className="text-gray-300 focus:outline-none"
+                  aria-label="Toggle menu"
+                >
+                  {menuOpen ? (
+                    <Close className="w-6 h-6" />
+                  ) : (
+                    <Menu className="w-6 h-6" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -237,7 +280,7 @@ export const Navbar = () => {
 
         {/* Mobile Menu - updated icons */}
         {menuOpen && (
-          <div className="md:hidden bg-[rgba(10,10,10,0.9)]">
+          <div className="md:hidden bg-[rgba(10,10,10,0.9)] border-t border-white/10">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {/* Always visible links */}
               {user ? (
