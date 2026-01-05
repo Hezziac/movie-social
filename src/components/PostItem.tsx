@@ -249,7 +249,6 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
     // 1. DO NOT use invalidateQueries here, it's too aggressive for a feed.
     // 2. Just trigger the refetches. This keeps the optimistic UI stable
     // until the real server data comes back to replace it silently.
-    queryClient.refetchQueries({ queryKey: ["posts"] });
     queryClient.refetchQueries({ queryKey: ["communityData"] });
     queryClient.refetchQueries({ queryKey: ["post", post.id] });
   },
