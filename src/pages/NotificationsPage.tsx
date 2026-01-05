@@ -10,11 +10,26 @@ import {
   DoneAll,
   AccountCircle
 } from "@mui/icons-material";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router"; // Add useNavigate
 
 export function NotificationsPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate(); // Add navigate hook
+
+  // Helper to determine where the notification should go
+  const getNotificationLink = (n: any) => {
+    switch (n.type) {
+      case "chat":
+        return `/community/${n.target_id}`;
+      case "like":
+        return `/post/${n.target_id}`; // Routes to the specific post
+      case "follow":
+        return `/profile/${n.actor?.username}`;
+      default:
+        return "#";
+    }
+  };
 
   // 1. Fetch Notifications
   const { data: notifications, isLoading } = useQuery({
@@ -102,12 +117,9 @@ export function NotificationsPage() {
             {notifications?.map((n) => (
               <Link
                 key={n.id}
-                to={n.type === 'chat' ? `/community/${n.target_id}` : `/profile/${n.actor?.username}`}
-                // Trigger mutation on click
+                to={getNotificationLink(n)}
                 onClick={() => {
-                  if (!n.is_read) {
-                    markSingleRead.mutate(n.id);
-                  }
+                  if (!n.is_read) markSingleRead.mutate(n.id);
                 }}
                 className={`flex items-center gap-4 p-4 rounded-2xl transition-all border ${
                   n.is_read 
@@ -142,7 +154,17 @@ export function NotificationsPage() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm">
-                    <span className="font-bold">{n.actor?.username}</span> 
+                    {/* Clickable Username */}
+                    <span
+                      className="font-bold hover:underline cursor-pointer text-white"
+                      onClick={(e) => {
+                        e.preventDefault(); // Stop the main Link from firing
+                        e.stopPropagation(); // Stop the event from bubbling up
+                        navigate(`/profile/${n.actor?.username}`);
+                      }}
+                    >
+                      {n.actor?.username}
+                    </span>
                     {" "}{n.content}
                   </p>
                   <span className="text-[10px] text-gray-500 uppercase tracking-tighter">
