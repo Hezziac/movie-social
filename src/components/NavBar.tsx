@@ -34,6 +34,7 @@ import {
 } from "@mui/icons-material";
 import { supabase } from "../supabase-client";
 import { MovieSearchModal } from "./MovieSearchModal";
+import { useQuery } from "@tanstack/react-query"; // Ensure this is imported
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -49,22 +50,24 @@ export const Navbar = () => {
     window.dispatchEvent(resetEvent);
   };
   
-  const [unreadCount, setUnreadCount] = useState(0);
-  // Fetch unread notification count
-  useEffect(() => {
-    const fetchUnreadCount = async () => {
-      if (!user) return;
+  // Replace the useState and useEffect for unreadCount with this useQuery block
+  // Use useQuery instead of useEffect for global cache syncing
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ["unreadCount", user?.id], 
+    queryFn: async () => {
+      if (!user) return 0;
       const { count, error } = await supabase
         .from("notifications")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id)
         .eq("is_read", false);
 
-      if (!error) setUnreadCount(count || 0);
-    };
-
-    fetchUnreadCount();
-  }, [user]);
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!user?.id,
+    refetchInterval: 60000 * 5, // Check every 5 mins as a backup
+  });
 
   // Add NotificationBell beside the avatar in desktop view and to the left of the mobile menu
   const NotificationBell = () => (
@@ -72,7 +75,7 @@ export const Navbar = () => {
       to="/notifications"
       className="relative p-2 text-gray-400 hover:text-white transition-colors"
     >
-      {unreadCount > 0 ? (
+      {(unreadCount ?? 0) > 0 ? (
         <>
           <Notifications className="text-purple-500" />
           <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-[#0a0a0a]">

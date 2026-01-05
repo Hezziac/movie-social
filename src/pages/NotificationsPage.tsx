@@ -61,6 +61,8 @@ export function NotificationsPage() {
     onSuccess: () => {
       // Invalidate queries to refresh the UI state
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      // 2. Refresh the count in the Navbar
+      queryClient.invalidateQueries({ queryKey: ["unreadCount", user?.id] });
     }
   });
 
