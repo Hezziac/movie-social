@@ -213,16 +213,51 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
   // that triggers the vote(1) mutation without navigating away from the feed.
   const { mutate } = useMutation({
     mutationFn: () => vote(1), // THUMBS UP ONLY
-    onSuccess: () => {
-      // 1. Refresh the general feed
-    queryClient.invalidateQueries({ queryKey: ["posts"] });
-    
-    // 2. Refresh the community-specific feed
-    queryClient.invalidateQueries({ queryKey: ["communityData"] });
-    
-    // 3. Optional: Refresh single post details if the user is on that page
-    queryClient.invalidateQueries({ queryKey: ["post", post.id] });
+    onMutate: async () => {
+    // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+    await queryClient.cancelQueries({ queryKey: ["posts"] });
+    await queryClient.cancelQueries({ queryKey: ["communityData"] });
+
+    // 2. Snapshot the previous value for rollback
+    const previousPosts = queryClient.getQueryData(["posts"]);
+
+    // Optimistically update the cache
+    queryClient.setQueryData(["posts"], (old: any) => {
+      if (!old) return old;
+      return old.map((p: any) => 
+        p.id === post.id 
+          ? { ...p, like_count: (p.like_count ?? 0) + 1 } // Visual bump
+          : p
+      );
+    });
+
+    // Return context object with the snapshotted value
+    return { previousPosts };
+  },
+  
+  // If the mutation fails, use the context to roll back
+    onError: (err, newVote, context) => {
+      console.error("Like mutation failed:", err);
+      console.log("Attempted vote value:", newVote); // Usually 'undefined' here since mutationFn takes no args, or '1' if you passed it
+      
+      if (context?.previousPosts) {
+        queryClient.setQueryData(["posts"], context.previousPosts);
+      }
     },
+  // 3. Always refetch after success or error to ensure we are in sync with server
+  onSettled: () => {
+    // 1. We use invalidateQueries here, but we tell it NOT to show a loading state
+    // This keeps the UI stable while it fetches the background update
+    queryClient.invalidateQueries({ 
+      queryKey: ["posts"],
+      refetchType: 'none' // 👈 This prevents the hard "reset" and jumping
+    });
+
+    // 2. Actually trigger a silent refetch in the background
+    queryClient.refetchQueries({ queryKey: ["posts"] });
+    queryClient.refetchQueries({ queryKey: ["communityData"] });
+    queryClient.refetchQueries({ queryKey: ["post", post.id] });
+  },
   });
 
   // Manual object construction to bridge flat SQL data to MovieTile interface.
