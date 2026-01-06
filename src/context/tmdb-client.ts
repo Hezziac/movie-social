@@ -24,6 +24,7 @@ export interface Movie {
     overview: string;
     vote_average: number;
     // Add other fields as needed
+    isNSFW?: boolean;
 }
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -93,13 +94,13 @@ const NSFW_KEYWORDS = [
   'hentai', 'pornstar', 'brazzers', 'lust'
 ];
 
-// Helper function to check if a movie is safe
-const isSafeContent = (movie: any): boolean => {
-  const title = (movie.title || "").toLowerCase();
-  const overview = (movie.overview || "").toLowerCase();
-
-  // If any banned word is in the title or description, return false
-  return !NSFW_KEYWORDS.some(word => title.includes(word) || overview.includes(word));
+// Helper to attach the flag
+const attachSafetyFlag = (movie: any): Movie => {
+    if (!movie) return movie;
+    const title = (movie.title || "").toLowerCase();
+    const overview = (movie.overview || "").toLowerCase();
+    const isNSFW = NSFW_KEYWORDS.some(word => title.includes(word) || overview.includes(word));
+    return { ...movie, isNSFW };
 };
 
 // Update getPopularMovies to filter NSFW content
@@ -112,8 +113,10 @@ export const getPopularMovies = async (): Promise<Movie[]> => {
 
   try {
     const data = await makeRequest("movie/popular", { include_adult: "false" });
-    // FILTER RESULTS HERE
-    const filteredResults = (data.results || []).filter(isSafeContent);
+    // 1. Map to add the flag, 2. Filter to remove flagged items
+    const filteredResults = (data.results || [])
+      .map(attachSafetyFlag)
+      .filter((movie: Movie) => !movie.isNSFW); // 👈 This hides them again
 
     popularMoviesCache.data = filteredResults;
     popularMoviesCache.timestamp = now;
@@ -133,8 +136,9 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
       language: "en-US",
     });
 
-    // FILTER SEARCH RESULTS HERE
-    return (data.results || []).filter(isSafeContent);
+    return (data.results || [])
+      .map(attachSafetyFlag)
+      .filter((movie: Movie) => !movie.isNSFW);
 
   } catch (error) {
     console.error("Error searching movies:", error);
@@ -147,7 +151,9 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
 export const getMovieDetails = async (id: number): Promise<Movie | null> => {
   try {
     const data = await makeRequest(`movie/${id}`);
-    return data as Movie;
+    // We DON'T filter here, just flag. 
+    // This allows the detail page to show the "Blurred/18+" gate for existing content.
+    return attachSafetyFlag(data) as Movie;
   } catch (error) {
     console.error("Error fetching movie details:", error);
     return null;
