@@ -21,7 +21,7 @@ import { Post } from "./PostList";
 import { MovieTile } from "./MovieTile";
 // import { Movie } from "../context/tmdb-client";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useGesture } from "@use-gesture/react";
 import { isMobile } from "../context/isMobile";
 // imports for likebutton functionality 
@@ -46,7 +46,10 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   // 1. Create the handler
-  const handleLikeClick = () => {
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.preventDefault(); 
+    e.stopPropagation();
+
     if (!user) {
       setIsAuthModalOpen(true); // Open modal if guest
     } else {
@@ -214,42 +217,23 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
   const { mutate } = useMutation({
     mutationFn: () => vote(1), // THUMBS UP ONLY
     onMutate: async () => {
-    // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-    await queryClient.cancelQueries({ queryKey: ["posts"] });
-    await queryClient.cancelQueries({ queryKey: ["communityData"] });
-
-    // 2. Snapshot the previous value for rollback
-    const previousPosts = queryClient.getQueryData(["posts"]);
-
-    // Optimistically update the cache
-    // queryClient.setQueryData(["posts"], (old: any) => {
-    //   if (!old) return old;
-    //   return old.map((p: any) => 
-    //     p.id === post.id 
-    //       ? { ...p, like_count: (p.like_count ?? 0) + 1 } // Visual bump
-    //       : p
-    //   );
-    // });
-
-    // Return context object with the snapshotted value
-    return { previousPosts };
+      // iOS stability: Cancel specifically only the posts key
+      await queryClient.cancelQueries({ queryKey: ["posts"] });
+      // We don't need to return previousPosts if we aren't rolling back
   },
-  
-  // If the mutation fails, use the context to roll back
-    onError: (err, newVote, context) => {
-      console.error("Like mutation failed:", err);
-      console.log("Attempted vote value:", newVote); // Usually 'undefined' here since mutationFn takes no args, or '1' if you passed it
-      
-      if (context?.previousPosts) {
-        queryClient.setQueryData(["posts"], context.previousPosts);
-      }
-    },
   onSuccess: () => {
-      // Use refetchQueries instead of invalidateQueries to avoid the "Loading Spinner" flicker.
-      // This keeps the current UI visible until the fresh numbers arrive from Supabase.
-      queryClient.refetchQueries({ queryKey: ["posts"] });
-      queryClient.refetchQueries({ queryKey: ["communityData"] });
-      queryClient.refetchQueries({ queryKey: ["post", post.id] });
+      // 🚨 Change refetchQueries to invalidateQueries with refetchType 'none'
+      // This is the "Magic" for iPhone: it marks the data as stale but 
+      // doesn't force an immediate hard-re-render of the whole list.
+      queryClient.invalidateQueries({ 
+        queryKey: ["posts"],
+        refetchType: 'all' // This will trigger a background fetch without a "hard" reload
+      });
+      queryClient.invalidateQueries({ queryKey: ["communityData"] });
+      queryClient.invalidateQueries({ queryKey: ["post", post.id] });
+    },
+  onError: (err) => {
+      console.error("Like mutation failed:", err);
     },
   });
 
@@ -441,7 +425,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                 <div className="flex flex-col items-center">
                   {/* LIKE BUTTON FUNCTIONALITY */}
                   <button 
-                    onClick={handleLikeClick}
+                    onClick={(e) => handleLikeClick(e)}
                     className="p-2 rounded-full transition-all hover:bg-white/20 bg-white/10"
                     title={!user ? "Sign in to like" : "Like post"}
                   >
