@@ -215,25 +215,54 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
   // Heart "Quick-Like" implementation: Assisted by AI to create a shortcut 
   // that triggers the vote(1) mutation without navigating away from the feed.
   const { mutate } = useMutation({
-    mutationFn: () => vote(1), // THUMBS UP ONLY
+    mutationFn: () => vote(1),
+
+    // 1. THIS IS THE KEY FOR IPHONE:
     onMutate: async () => {
-      // iOS stability: Cancel specifically only the posts key
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
       await queryClient.cancelQueries({ queryKey: ["posts"] });
-      // We don't need to return previousPosts if we aren't rolling back
-  },
-  onSuccess: () => {
-      // 🚨 Change refetchQueries to invalidateQueries with refetchType 'none'
-      // This is the "Magic" for iPhone: it marks the data as stale but 
-      // doesn't force an immediate hard-re-render of the whole list.
+
+      // Snapshot the previous value
+      const previousPosts = queryClient.getQueryData(["posts"]);
+
+      // Optimistically update the cache IMMEDIATELY
+      queryClient.setQueryData(["posts"], (old: any) => {
+        if (!old) return old;
+        return old.map((p: any) => {
+          if (p.id === post.id) {
+            // Check if user has already liked it (requires user_has_voted in your post data)
+            // If you don't have that field, we just toggle based on current visual state
+            const isCurrentlyLiked = p.user_has_voted === 1; 
+            
+            return { 
+              ...p, 
+              like_count: isCurrentlyLiked 
+                ? Math.max(0, (p.like_count ?? 1) - 1) 
+                : (p.like_count ?? 0) + 1,
+              user_has_voted: isCurrentlyLiked ? 0 : 1
+            };
+          }
+          return p;
+        });
+      });
+
+      return { previousPosts };
+    },
+
+    // If the mutation fails, use the context to roll back
+    onError: (err, newVote, context) => {
+      if (context?.previousPosts) {
+        queryClient.setQueryData(["posts"], context.previousPosts);
+      }
+    },
+
+    // Always refetch in the background to sync with server
+    onSettled: () => {
+      // We use invalidate with refetchType none to prevent the "jump"
       queryClient.invalidateQueries({ 
         queryKey: ["posts"],
-        refetchType: 'all' // This will trigger a background fetch without a "hard" reload
+        refetchType: 'none' 
       });
-      queryClient.invalidateQueries({ queryKey: ["communityData"] });
-      queryClient.invalidateQueries({ queryKey: ["post", post.id] });
-    },
-  onError: (err) => {
-      console.error("Like mutation failed:", err);
     },
   });
 
