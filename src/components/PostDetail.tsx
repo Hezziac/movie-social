@@ -198,7 +198,7 @@ export const PostDetail = ({ postId }: Props) => {
         )}
 
         {/* Post Text Content */}
-        <div className="flex justify-center text-gray-300 whitespace-pre-line">
+        <div className="flex justify-center text-gray-300 whitespace-pre-line p-4">
           {data.content}
         </div>
       </div>

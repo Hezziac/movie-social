@@ -25,10 +25,14 @@ export const MovieTile = ({ movie }: Props) => {
     <div className="relative group w-24 h-32 md:w-32 md:h-44">
       {/* Custom UI: Glow effect and hover transitions pinpointed and 
           implemented with AI to match the project's purple/pink theme. */}
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg blur opacity-0 group-hover:opacity-75 transition-opacity duration-300 z-0"></div>
-      
+      {/* 1. Glow Effect: Only show if NOT NSFW */}
+      {!movie.isNSFW && (
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg blur opacity-0 group-hover:opacity-75 transition-opacity duration-300 z-0"></div>
+      )}      
       {/* Main tile */}
-      <div className="relative w-full h-full bg-gray-900/90 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-700/50 shadow-lg transition-transform group-hover:border-purple-400/30">
+      <div className={`relative w-full h-full bg-gray-900/90 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-700/50 shadow-lg transition-transform ${
+        !movie.isNSFW ? "group-hover:border-purple-400/30" : ""
+      }`}>
         {movie.poster_path ? (
           <div className="relative w-full h-full">
             <img
@@ -64,12 +68,14 @@ export const MovieTile = ({ movie }: Props) => {
       </div>
       
       {/* Title overlay on hover */}
-      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-20">
-        <p className="text-xs text-white font-medium truncate">{movie.title}</p>
-        {movie.release_date && (
-          <p className="text-xs text-gray-400">{movie.release_date.split('-')[0]}</p>
-        )}
-      </div>
+      {!movie.isNSFW && (
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-20">
+          <p className="text-xs text-white font-medium truncate">{movie.title}</p>
+          {movie.release_date && (
+            <p className="text-xs text-gray-400">{movie.release_date.split('-')[0]}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
