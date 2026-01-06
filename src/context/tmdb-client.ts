@@ -13,7 +13,7 @@
  * for the same movie data, staying within rate limits and improving speed.
  * - **Error Handling**: AI assisted in refactoring the 'makeRequest' wrapper to 
  * provide consistent error catching and TypeScript return types across all API calls.
- */ 
+ */
 
 // Movie Type
 export interface Movie {
@@ -96,7 +96,10 @@ export const getPopularMovies = async (): Promise<Movie[]> => {
   }
 
   try {
-    const data = await makeRequest("movie/popular");
+    // Explicitly set include_adult to false here
+    const data = await makeRequest("movie/popular", {
+      include_adult: "false"
+    });
     popularMoviesCache.data = data.results || []; // Ensure array fallback
     popularMoviesCache.timestamp = now;
     return popularMoviesCache.data;
@@ -110,6 +113,8 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
   try {
     const data = await makeRequest("search/movie", {
       query: encodeURIComponent(query),
+      include_adult: "false", // 👈 This is the critical line to filter NSFW content
+      language: "en-US",      // Optional: helps maintain consistent results
     });
     return data.results || [];
   } catch (error) {
