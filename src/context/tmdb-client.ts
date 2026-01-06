@@ -87,7 +87,22 @@ const makeRequest = async (
   return requestPromise;
 };
 
+// Add a list of words you want to block entirely from your app
+const NSFW_KEYWORDS = [
+  'porn', 'xxx', 'sex', 'erotic', 'hardcore', 
+  'hentai', 'pornstar', 'brazzers', 'lust'
+];
 
+// Helper function to check if a movie is safe
+const isSafeContent = (movie: any): boolean => {
+  const title = (movie.title || "").toLowerCase();
+  const overview = (movie.overview || "").toLowerCase();
+
+  // If any banned word is in the title or description, return false
+  return !NSFW_KEYWORDS.some(word => title.includes(word) || overview.includes(word));
+};
+
+// Update getPopularMovies to filter NSFW content
 export const getPopularMovies = async (): Promise<Movie[]> => {
   const now = Date.now();
   if (popularMoviesCache.data.length > 0 && 
@@ -96,27 +111,31 @@ export const getPopularMovies = async (): Promise<Movie[]> => {
   }
 
   try {
-    // Explicitly set include_adult to false here
-    const data = await makeRequest("movie/popular", {
-      include_adult: "false"
-    });
-    popularMoviesCache.data = data.results || []; // Ensure array fallback
+    const data = await makeRequest("movie/popular", { include_adult: "false" });
+    // FILTER RESULTS HERE
+    const filteredResults = (data.results || []).filter(isSafeContent);
+
+    popularMoviesCache.data = filteredResults;
     popularMoviesCache.timestamp = now;
-    return popularMoviesCache.data;
+    return filteredResults;
   } catch (error) {
     console.error("Error fetching popular movies:", error);
-    return []; // Always return array (never null)
+    return [];
   }
 };
 
+// Update searchMovies to filter NSFW content
 export const searchMovies = async (query: string): Promise<Movie[]> => {
   try {
     const data = await makeRequest("search/movie", {
       query: encodeURIComponent(query),
-      include_adult: "false", // 👈 This is the critical line to filter NSFW content
-      language: "en-US",      // Optional: helps maintain consistent results
+      include_adult: "false",
+      language: "en-US",
     });
-    return data.results || [];
+
+    // FILTER SEARCH RESULTS HERE
+    return (data.results || []).filter(isSafeContent);
+
   } catch (error) {
     console.error("Error searching movies:", error);
     return [];
