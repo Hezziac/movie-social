@@ -29,6 +29,8 @@ import { useAuth } from "../context/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 import { SignInModal } from "./SignInModal";
+import { MovieDetailModal } from "./MovieDetailModal";
+import { Movie } from "../context/tmdb-client";
 
 interface Props {
   post: Post;
@@ -44,7 +46,8 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
 
   // Sign in modal state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+
   // 1. Create the handler
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault(); 
@@ -250,6 +253,9 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
   // We check for movie_id and movie_title to ensure we have something meaningful.
   const hasMovieData = post.movie_id && post.movie_title;
 
+  // Add the NSFW_KEYWORDS 
+  const NSFW_KEYWORDS = ['porn', 'xxx', 'sex', 'erotic', 'hardcore', 'hentai', 'pornstar', 'brazzers', 'lust'];
+
   // 2. Conditionally construct the Movie object structure that MovieTile expects.
   // We use the new flat properties (e.g., post.movie_title) to build the nested object.
   const movieForTile = hasMovieData ? {
@@ -261,7 +267,27 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
       // so we use placeholders since your SQL function doesn't return them.
       overview: post.movie?.overview ||'', 
       vote_average: 0, 
+      isNSFW: NSFW_KEYWORDS.some(word => 
+        (post.movie_title?.toLowerCase().includes(word)) 
+        // || ((post as any).movie_overview?.toLowerCase().includes(word))
+      )
   } : null;
+
+  // 4. Handle movie click
+  const handleMovieClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (movieForTile) {
+      // If it's NSFW and user isn't logged in, show sign in
+      if (movieForTile.isNSFW && !user) {
+        setIsAuthModalOpen(true);
+      } else {
+        // Otherwise open the detail modal
+        setSelectedMovie(movieForTile);
+      }
+    }
+  };
 
   return (
     <>
@@ -397,13 +423,13 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                 >
                   {/* MOVIE TILE */}
                   {movieForTile && (
-                    <div className={`z-30 flex-shrink-0 ${
+                    <button className={`z-30 flex-shrink-0 ${
                       hasImage 
                         ? "w-20 md:w-32" // Smaller tile on mobile overlay
                         : "w-full flex justify-center max-w-[180px] mb-2" // Centered tile for text-only
-                    }`}>
+                      }`} onClick={handleMovieClick}>
                       <MovieTile movie={movieForTile} />
-                    </div>
+                    </button>
                   )}
 
                   {/* 📝 POST CONTENT: Always visible -- Refactored by GitHub Co-Pilot for the design I would like*/}
@@ -467,6 +493,14 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
         onClose={() => setIsAuthModalOpen(false)} 
         actionName="like posts"
       />
+
+      {selectedMovie && (
+        <MovieDetailModal
+          movie={selectedMovie}
+          isOpen={!!selectedMovie}
+          onClose={() => setSelectedMovie(null)}
+        />
+      )}
     </>
   );
 };

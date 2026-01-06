@@ -183,7 +183,7 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
           {/* Overview Section with Read More */}
           <div className="mb-6">
             <p className="text-gray-300 text-sm md:text-base leading-relaxed whitespace-pre-line">
-              {displayedOverview || "No overview available."}
+              {displayedOverview || "No overview available here.\nClick Post (Comment icon '💬' or title) to see the details here"}
             </p>
             {shouldShowReadMore && (
               <button 
