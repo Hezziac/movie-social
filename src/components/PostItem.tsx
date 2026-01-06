@@ -250,7 +250,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
     },
 
     // If the mutation fails, use the context to roll back
-    onError: (err, newVote, context) => {
+    onError: (_, __, context) => {
       if (context?.previousPosts) {
         queryClient.setQueryData(["posts"], context.previousPosts);
       }
