@@ -26,6 +26,7 @@ import { MovieDetailModal } from "../../components/MovieDetailModal";
 export function ProfilePage() {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
 
   const { username } = useParams<{ username: string }>();
   const {
@@ -43,6 +44,7 @@ export function ProfilePage() {
     title: "",
     users: [],
   });
+
   const [activeTab, setActiveTab] = useState<"posts" | "movies">("posts");
   const [selectedMovie, setSelectedMovie] = useState<any | null>(null);
 
@@ -62,16 +64,21 @@ export function ProfilePage() {
       <div className="max-w-4xl mx-auto">
         {/* Profile Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
-          {/* Profile Picture */}
-          {profile.avatar_url ? (
-            <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0">
-            <img src={profile.avatar_url} alt={`${profile.username}'s avatar`} className="w-full h-full rounded-full object-cover" />
-            </div>
-          ) : (
-            <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-800 border-2 border-purple-600 flex-shrink-0">
-              <span className="text-3xl md:text-5xl text-gray-400">👤</span>
-            </div>
-          )}
+          {/* Profile Picture - Fixed with 404 error handling */}
+          <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-purple-600/30">
+            {profile.avatar_url && !avatarError ? (
+              <img 
+                src={profile.avatar_url} 
+                alt={`${profile.username}'s avatar`} 
+                className="w-full h-full object-cover"
+                onError={() => setAvatarError(true)} // This catches the broken link and triggers fallback
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                <span className="text-3xl md:text-5xl text-gray-400 opacity-50">👤</span>
+              </div>
+            )}
+          </div>
           
           {/* Profile Info */}
           <div className="flex-1">
