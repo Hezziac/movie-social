@@ -26,6 +26,8 @@ export function NotificationsPage() {
         return `/post/${n.target_id}`; // Routes to the specific post
       case "follow":
         return `/profile/${n.actor?.username}`;
+      case "comment":
+        return `/post/${n.target_id}`; // Routes to the specific post
       default:
         return "#";
     }
@@ -86,6 +88,7 @@ export function NotificationsPage() {
       case 'chat': return <ChatBubble className="text-blue-400" fontSize="small" />;
       case 'like': return <Favorite className="text-red-500" fontSize="small" />;
       case 'follow': return <PersonAdd className="text-purple-500" fontSize="small" />;
+      case 'comment': return <ChatBubble className="text-green-400" fontSize="small" />;
       default: return <NotificationsNone className="text-gray-400" fontSize="small" />;
     }
   };
