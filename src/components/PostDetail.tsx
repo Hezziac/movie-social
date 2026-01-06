@@ -42,13 +42,17 @@ const fetchPostById = async (id: number): Promise<Post & { movie?: Movie; profil
     .select(`
       *,
       movie:movie_id (*),
-      profile:user_id (username)
+      profile:user_id (username),
+      comments(count)
     `)
     .eq("id", id)
     .single();
 
   if (error) throw new Error(error.message);
-  return data;
+  return {
+    ...data,
+    comment_count: data.comments?.[0]?.count || 0
+  };
 };
 
 // Add the NSFW_KEYWORDS array
