@@ -63,63 +63,59 @@ export function ProfilePage() {
     <div className="min-h-screen bg-black p-4">
       <div className="max-w-4xl mx-auto">
         {/* Profile Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
-          {/* Profile Picture - Fixed with 404 error handling */}
-          <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-purple-600/30">
-            {profile.avatar_url && !avatarError ? (
-              <img 
-                src={profile.avatar_url} 
-                alt={`${profile.username}'s avatar`} 
-                className="w-full h-full object-cover"
-                onError={() => setAvatarError(true)} // This catches the broken link and triggers fallback
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                <span className="text-3xl md:text-5xl text-gray-400 opacity-50">👤</span>
-              </div>
-            )}
-          </div>
-          
-          {/* Profile Info */}
-          <div className="flex-1">
-            {/* Relationship Logic: Refactored with AI to dynamically toggle 
-                between 'Edit Profile' (for the owner) and 'Follow/Unfollow' 
-                (for visitors), ensuring a secure and personalized experience. */}
-            {/* Username and Edit Button */}
-            <div className="flex items-center gap-4 mb-4">
-              <h1 className="text-xl font-bold text-white">{profile.username}</h1>
-
-              {user && user.id === profile.id ? (
-                !isEditing && (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="bg-gray-800 text-white text-sm px-4 py-1.5 rounded-lg border border-gray-700 hover:bg-gray-700"
-                  >
-                    Edit Profile
-                  </button>
-                )
+        <div className="mb-8">
+          <div className="flex flex-row items-center gap-6 mb-4">
+            {/* Profile Picture - Fixed with 404 error handling */}
+            <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-purple-600">
+              {profile.avatar_url && !avatarError ? (
+                <img 
+                  src={profile.avatar_url} 
+                  alt={`${profile.username}'s avatar`} 
+                  className="w-full h-full object-cover"
+                  onError={() => setAvatarError(true)} 
+                />
               ) : (
-                <button
-                  onClick={() => toggleFollow(user?.id, profile.id)}
-                  className={`px-6 py-1.5 rounded-lg font-medium transition ${
-                    isFollowing
-                      ? "bg-gray-800 text-white border border-gray-700 hover:bg-red-900/20 hover:text-red-500 hover:border-red-500"
-                      : "bg-purple-600 text-white hover:bg-purple-700"
-                  }`}
-                >
-                  {isFollowing ? "Unfollow" : "Follow"}
-                </button>
+                <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                  <span className="text-3xl md:text-5xl text-gray-400">👤</span>
+                </div>
               )}
             </div>
             
-            {/* Stats */}
-            <div className="flex gap-6 mb-4">
-              <div>
-                <span className="text-white font-bold">{stats.posts}</span>{" "}
-                <span className="text-gray-400">posts</span>
+            {/* Profile Info (Username and Stats only) */}
+            <div className="flex-1">
+              {/* Username and Edit Button */}
+              <div className="flex items-center gap-4 mb-4">
+                <h1 className="text-xl font-bold text-white">{profile.username}</h1>
+
+                {user && user.id === profile.id ? (
+                  !isEditing && (
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="bg-gray-800 text-white text-sm px-4 py-1.5 rounded-lg border border-gray-700 hover:bg-gray-700"
+                    >
+                      Edit Profile
+                    </button>
+                  )
+                ) : (
+                  <button
+                    onClick={() => toggleFollow(user?.id, profile.id)}
+                    className={`px-4 py-1.5 rounded-lg font-medium transition ${
+                      isFollowing
+                        ? "bg-gray-800 text-white border border-gray-700 hover:bg-red-900/20 hover:text-red-500 hover:border-red-500"
+                        : "bg-purple-600 text-white hover:bg-purple-700"
+                    }`}
+                  >
+                    {isFollowing ? "Unfollow" : "Follow"}
+                  </button>
+                )}
               </div>
-              <div>
-                {/* Followers Button */}
+              
+              {/* Stats */}
+              <div className="flex gap-6">
+                <div>
+                  <span className="text-white font-bold">{stats.posts}</span>{" "}
+                  <span className="text-gray-400">posts</span>
+                </div>
                 <button 
                   onClick={() => setFollowModal({ open: true, title: "Followers", users: profile.followers_data || [] })}
                   className="hover:opacity-70 transition"
@@ -127,9 +123,6 @@ export function ProfilePage() {
                   <span className="text-white font-bold">{stats.followers}</span>{" "}
                   <span className="text-gray-400">followers</span>
                 </button>
-              </div>
-              <div>
-                {/* Following Button */}
                 <button 
                   onClick={() => setFollowModal({ open: true, title: "Following", users: profile.following_data || [] })}
                   className="hover:opacity-70 transition"
@@ -139,9 +132,14 @@ export function ProfilePage() {
                 </button>
               </div>
             </div>
-            
-            {/* Bio */}
-            <p className="text-white text-sm md:text-base whitespace-pre-wrap break-words">{profile.bio || "No bio yet"}</p>
+          </div>
+
+          {/* Bio - Now outside the flex container to take full width below */}
+          <div className="mt-2">
+            <p className="text-white text-sm md:text-base font-semibold">{profile.full_name}</p> {/* Optional: Add display name here if you have one */}
+            <p className="text-white text-sm md:text-base whitespace-pre-wrap break-words">
+              {profile.bio || "No bio yet"}
+            </p>
           </div>
         </div>
 
