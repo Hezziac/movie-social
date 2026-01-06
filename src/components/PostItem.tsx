@@ -212,55 +212,33 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
     }
   };
 
-  // Heart "Quick-Like" implementation: Assisted by AI to create a shortcut 
-  // that triggers the vote(1) mutation without navigating away from the feed.
+  // Add local state at the top of the component
+  const [localLikeCount, setLocalLikeCount] = useState(post.like_count ?? 0);
+  const [isLikedLocally, setIsLikedLocally] = useState(false); // We start false if we don't know
+
+  // Updated Mutation
   const { mutate } = useMutation({
     mutationFn: () => vote(1),
-
-    // 1. THIS IS THE KEY FOR IPHONE:
     onMutate: async () => {
-      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      // INSTANT UI UPDATE: This is what stops the iPhone jump. 
+      // We change the number locally so the user sees it immediately.
+      const currentlyLiked = isLikedLocally;
+      setIsLikedLocally(!currentlyLiked);
+      setLocalLikeCount(prev => currentlyLiked ? prev - 1 : prev + 1);
+
+      // Stop React Query from refreshing the whole list right now
       await queryClient.cancelQueries({ queryKey: ["posts"] });
-
-      // Snapshot the previous value
-      const previousPosts = queryClient.getQueryData(["posts"]);
-
-      // Optimistically update the cache IMMEDIATELY
-      queryClient.setQueryData(["posts"], (old: any) => {
-        if (!old) return old;
-        return old.map((p: any) => {
-          if (p.id === post.id) {
-            // Check if user has already liked it (requires user_has_voted in your post data)
-            // If you don't have that field, we just toggle based on current visual state
-            const isCurrentlyLiked = p.user_has_voted === 1; 
-            
-            return { 
-              ...p, 
-              like_count: isCurrentlyLiked 
-                ? Math.max(0, (p.like_count ?? 1) - 1) 
-                : (p.like_count ?? 0) + 1,
-              user_has_voted: isCurrentlyLiked ? 0 : 1
-            };
-          }
-          return p;
-        });
-      });
-
-      return { previousPosts };
     },
-
-    // If the mutation fails, use the context to roll back
-    onError: (_, __, context) => {
-      if (context?.previousPosts) {
-        queryClient.setQueryData(["posts"], context.previousPosts);
-      }
+    onError: () => {
+      // Roll back if the internet fails
+      setIsLikedLocally(prev => !prev);
+      setLocalLikeCount(post.like_count ?? 0);
     },
-
-    // Always refetch in the background to sync with server
     onSettled: () => {
-      // We use invalidate with refetchType none to prevent the "jump"
+      // Tell the database to update in the background, 
+      // but DO NOT refresh the UI (refetchType: 'none' is the key)
       queryClient.invalidateQueries({ 
-        queryKey: ["posts"],
+        queryKey: ["posts"], 
         refetchType: 'none' 
       });
     },
@@ -461,7 +439,7 @@ export const PostItem = ({ post, isFirst = false, isLast = false }: Props) => {
                     ❤️
                   </button>
                   <span className="text-xs text-white mt-1">
-                    {post.like_count ?? 0}
+                    {localLikeCount}
                   </span>
                 </div>
 

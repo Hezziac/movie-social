@@ -43,6 +43,7 @@ export interface Post {
   movie_release_date: string | null;
   movie?: Movie;
   updated_at?: string | null;
+  user_has_voted?: number;
 }
 
 export const fetchPosts = async (): Promise<(Post & { movie?: Movie })[]> => {
