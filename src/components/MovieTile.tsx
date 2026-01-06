@@ -30,11 +30,24 @@ export const MovieTile = ({ movie }: Props) => {
       {/* Main tile */}
       <div className="relative w-full h-full bg-gray-900/90 backdrop-blur-sm rounded-lg overflow-hidden border border-gray-700/50 shadow-lg transition-transform group-hover:border-purple-400/30">
         {movie.poster_path ? (
-          <img
-            src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
-            alt={movie.title}
-            className="w-full h-full object-cover"
-          />
+          <div className="relative w-full h-full">
+            <img
+              src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
+              alt={movie.title}
+              // 🚨 Apply heavy blur and grayscale if flagged
+              className={`w-full h-full object-cover transition-all duration-500 ${
+                movie.isNSFW ? "blur-2xl grayscale brightness-50" : ""
+              }`}
+            />
+            {/* 🚨 NSFW Warning Label */}
+            {movie.isNSFW && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="bg-red-600/80 text-[10px] text-white font-bold px-2 py-0.5 rounded backdrop-blur-md border border-white/20">
+                  18+
+                </span>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 p-2">
             <span className="text-2xl mb-1">🎬</span>

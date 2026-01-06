@@ -18,8 +18,16 @@ export const SignInModal = ({ isOpen, onClose, actionName }: SignInModalProps) =
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-gray-900 border border-white/10 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
+    /* 1. Add onClick={onClose} to the background overlay */
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      {/* 2. Add onClick={(e) => e.stopPropagation()} to the modal content */}
+      <div 
+        className="bg-gray-900 border border-white/10 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl"
+        onClick={(e) => e.stopPropagation()} 
+      >
         <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
           <Google className="text-purple-400 text-3xl" />
         </div>

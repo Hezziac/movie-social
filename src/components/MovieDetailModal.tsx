@@ -9,7 +9,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase-client";
 import { useAuth } from "../context/AuthContext";
-import { Favorite, FavoriteBorder, Close, CalendarMonth, ExpandMore, ExpandLess} from "@mui/icons-material";
+import { Favorite, FavoriteBorder, Close, CalendarMonth, ExpandMore, ExpandLess } from "@mui/icons-material";
 import { Movie } from "../context/tmdb-client";
 import { SignInModal } from "./SignInModal";
 
@@ -25,6 +25,16 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
   const [loading, setLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
+
+  const [confirmedNSFW, setConfirmedNSFW] = useState(false);
+
+  // Reset confirmation whenever the modal opens/changes movies
+  useEffect(() => {
+    setConfirmedNSFW(false);
+  }, [movie?.id, isOpen]);
+
+  // Determine if content should be hidden
+  const isHidden = movie?.isNSFW && !confirmedNSFW;
 
   // Check if this movie is already favorited by the user
   useEffect(() => {
@@ -43,6 +53,14 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
   }, [isOpen, movie, user]);
 
   if (!isOpen || !movie) return null;
+
+  const handleRevealOrSignIn = () => {
+    if (!user) {
+      setShowSignInModal(true);
+    } else {
+      setConfirmedNSFW(true);
+    }
+  };
 
   const toggleFavorite = async () => {
     if (!user) {
@@ -111,9 +129,26 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
             
             <img 
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
-              className="w-full h-full object-cover" 
+              // 🚨 Poster blur logic
+              className={`w-full h-full object-cover transition-all duration-700 ${isHidden ? "blur-3xl scale-110 grayscale" : ""}`} 
               alt={movie.title} 
-              />
+            />
+
+            {/* Age confirmation overlay for NSFW content */}
+            {isHidden && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-black/60 backdrop-blur-sm">
+                <h3 className="text-white font-bold mb-2">Restricted Content</h3>
+                <p className="text-[10px] text-gray-400 mb-6 leading-tight">
+                  This title contains adult themes. <br/> Confirm you are 18+ to view.
+                </p>
+                <button 
+                  onClick={handleRevealOrSignIn}
+                  className="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-6 py-2.5 rounded-full transition-all active:scale-95 shadow-lg shadow-red-600/20"
+                >
+                  {user ? "CONFIRM AGE & REVEAL" : "SIGN IN TO VIEW"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -180,8 +215,8 @@ export const MovieDetailModal = ({ movie, isOpen, onClose }: Props) => {
       <SignInModal 
         isOpen={showSignInModal} 
         onClose={() => setShowSignInModal(false)} 
-        actionName="favorite movies" 
-        />
+        actionName="view restricted content" 
+      />
     </div>
   );
-};    
+};

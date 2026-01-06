@@ -1,4 +1,4 @@
- /* [PostDetail.tsx]
+/* [PostDetail.tsx]
  * 
  * Contains the detailed view of a post, including the post's title, content, image, and associated movie.
  * It also includes the like/dislike button and comment section components.
@@ -51,6 +51,9 @@ const fetchPostById = async (id: number): Promise<Post & { movie?: Movie; profil
   return data;
 };
 
+// Add the NSFW_KEYWORDS array
+const NSFW_KEYWORDS = ['porn', 'xxx', 'sex', 'erotic', 'hardcore', 'hentai', 'pornstar', 'brazzers', 'lust'];
+
 export const PostDetail = ({ postId }: Props) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -69,6 +72,15 @@ export const PostDetail = ({ postId }: Props) => {
 
   // Determine if user owns the post
   const isOwner = user?.id === data.user_id;
+
+  // Prepare the movie object with the safety flag
+  const movieWithSafety = data.movie ? {
+    ...data.movie,
+    isNSFW: NSFW_KEYWORDS.some(word => 
+      data.movie?.title?.toLowerCase().includes(word) || 
+      data.movie?.overview?.toLowerCase().includes(word)
+    )
+  } : null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -174,12 +186,13 @@ export const PostDetail = ({ postId }: Props) => {
             refactored with AI assistance to ensure visibility regardless of 
             the post background. */}
         {/* Movie Tile - ALWAYS SHOWS if movie exists (MOVED OUTSIDE image block) */}
-        {data.movie && (
+        {movieWithSafety && (
           <div className="flex justify-center mb-6 pt-4">
             <button 
-              onClick={() => setSelectedMovie(data.movie || null)}
-              className="scale-125 shadow-lg shadow-purple-500/30rounded-xl p-3 bg-black/50 backdrop-blur-sm transition-transform">
-              <MovieTile movie={data.movie} />
+              onClick={() => setSelectedMovie(movieWithSafety)}
+              className="scale-125 shadow-lg shadow-purple-500/30 rounded-xl p-3 bg-black/50 backdrop-blur-sm transition-transform"
+            >
+              <MovieTile movie={movieWithSafety} />
             </button>
           </div>
         )}
