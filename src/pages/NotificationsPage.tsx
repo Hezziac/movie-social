@@ -20,14 +20,14 @@ export function NotificationsPage() {
   // Helper to determine where the notification should go
   const getNotificationLink = (n: any) => {
     switch (n.type) {
+      case "comment":
+        return `/post/${n.target_id}`; // Routes to the specific post
       case "chat":
         return `/community/${n.target_id}`;
       case "like":
         return `/post/${n.target_id}`; // Routes to the specific post
       case "follow":
         return `/profile/${n.actor?.username}`;
-      case "comment":
-        return `/post/${n.target_id}`; // Routes to the specific post
       default:
         return "#";
     }
