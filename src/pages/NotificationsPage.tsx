@@ -23,7 +23,7 @@ export function NotificationsPage() {
       case "comment":
         return `/post/${n.target_id}`; // Routes to the specific post
       case "community_chat":
-      return `/community/${n.community_id}`;
+        return `/community/${n.community_id}`;
       case "chat":
         return `/community/${n.target_id}`;
       case "like":
