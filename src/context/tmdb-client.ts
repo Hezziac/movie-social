@@ -159,3 +159,15 @@ export const getMovieDetails = async (id: number): Promise<Movie | null> => {
     return null;
   }
 };
+
+export const getMovieTrailer = async (movieId: number) => {
+  const response = await fetch(
+    `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${API_KEY}`
+  );
+  const data = await response.json();
+  // Find the first YouTube video of type "Trailer"
+  const trailer = data.results.find(
+    (v: any) => v.site === "YouTube" && v.type === "Trailer"
+  );
+  return trailer ? `https://www.youtube.com/embed/${trailer.key}` : null;
+};
