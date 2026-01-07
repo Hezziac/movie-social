@@ -194,17 +194,7 @@ export const CommunityDisplay = ({ communityId }: Props) => {
       document.body.style.overflowY = '';
     };
   }, [isChatOpen]);
-
-  // community ownership
-  const isOwner = user && community && user.id === community.creator_id;
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-      </div>
-    );
-  }
-
+  
   useEffect(() => {
     if (isChatOpen && user) {
       const markAsRead = async () => {
@@ -221,6 +211,17 @@ export const CommunityDisplay = ({ communityId }: Props) => {
       markAsRead();
     }
   }, [isChatOpen, user, communityId]);
+
+  // community ownership
+  const isOwner = user && community && user.id === community.creator_id;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
 
   const isMember = !!membership;
   const userRole = membership?.role || 'member';
