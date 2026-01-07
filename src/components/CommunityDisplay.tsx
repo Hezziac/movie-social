@@ -73,15 +73,31 @@ const fetchCommunityPosts = async (id: number): Promise<PostWithCommunity[]> => 
 // FETCH membership status 
 const fetchMembershipStatus = async (communityId: number, userId: string | undefined) => {
   if (!userId) return null;
-  const { data, error } = await supabase
+  
+  // 1. Get the actual membership row
+  const { data: membershipData, error } = await supabase
     .from("community_members")
     .select("*")
     .eq("community_id", communityId)
     .eq("user_id", userId)
     .maybeSingle();
   
-  if (error) return null;
-  return data;
+  if (error || !membershipData) return null;
+
+  // 2. Check for unread notifications (this doesn't change your membership data)
+  const { count } = await supabase
+    .from("notifications")
+    .select("*", { count: 'exact', head: true })
+    .eq("user_id", userId)
+    .eq("target_id", communityId.toString())
+    .eq("type", "community_chat")
+    .eq("is_read", false);
+
+  // 3. Return both pieces of info in one object
+  return {
+    ...membershipData,
+    hasUnread: (count ?? 0) > 0
+  };
 };
 
 export const CommunityDisplay = ({ communityId }: Props) => {
@@ -189,6 +205,23 @@ export const CommunityDisplay = ({ communityId }: Props) => {
     );
   }
 
+  useEffect(() => {
+    if (isChatOpen && user) {
+      const markAsRead = async () => {
+        await supabase
+          .from("notifications")
+          .update({ is_read: true })
+          .eq("user_id", user.id)
+          .eq("target_id", communityId.toString())
+          .eq("type", "community_chat");
+        
+        // Refresh the data to hide the red dot
+        queryClient.invalidateQueries({ queryKey: ["communityData", communityId] });
+      };
+      markAsRead();
+    }
+  }, [isChatOpen, user, communityId]);
+
   const isMember = !!membership;
   const userRole = membership?.role || 'member';
   if (error) return <div>Error loading data</div>;
@@ -264,7 +297,14 @@ export const CommunityDisplay = ({ communityId }: Props) => {
             >
               <ChatBubbleOutline className="text-purple-400 group-hover:scale-110 transition-transform" />
               <span className="font-semibold text-sm">Community Chat</span>
-            </button>
+              {/* 🔴 RED DOT WITH ANIMATE PING */}
+              {membership?.hasUnread && (
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-black"></span>
+                </span>
+              )}
+           </button>
 
             {/* 🔔 Notification Toggle Button */}
             <button
