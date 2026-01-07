@@ -115,24 +115,37 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
 
   // Adjusted the iframe and modal layout to ensure the video does not break the modal size and the movie tile is centered below it
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 md:p-12 bg-black/90 backdrop-blur-md">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 md:p-12 bg-black/90 backdrop-blur-md">
       {/* Backdrop Click to Close */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      <div className="relative bg-gray-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[80vh]">
+      <div className="relative bg-gray-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] my-auto">
         
         {/* FIXED CLOSE BUTTON */}
         <button 
           onClick={onClose} 
-          className="absolute top-4 right-4 z-[110] text-white/70 hover:text-white bg-black/40 backdrop-blur-md rounded-full p-1 border border-white/10"
+          className="absolute top-4 right-4 z-[120] text-white/70 hover:text-white bg-black/40 backdrop-blur-md rounded-full p-1.5 border border-white/10 shadow-lg transition-all"
         >
-          <Close />
+          <Close fontSize="small" />
         </button>
 
-        {/* UNIFIED SCROLLABLE AREA */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col">
+        {/* UNIFIED SCROLLABLE AREA - Manually hiding scrollbars via inline style */}
+        <div 
+          className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col"
+          style={{
+            msOverflowStyle: 'none',  /* IE and Edge */
+            scrollbarWidth: 'none',   /* Firefox */
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          {/* Internal pseudo-selector style to target Webkit browsers (Chrome/Safari) */}
+          <style>{`
+            .flex-1::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
           
-          {/* MEDIA SECTION: Always stays at the top of the scroll flow */}
+          {/* MEDIA SECTION: ASPECT-VIDEO */}
           <div className="w-full aspect-video bg-gray-800 flex-shrink-0 relative overflow-hidden z-10">
             {trailerUrl && !isHidden ? (
               <iframe 
@@ -143,15 +156,15 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
                 title="Movie Trailer"
               />
             ) : (
-              <div className="w-full h-full">
+              <div className="w-full h-full relative">
                 {movie.poster_path ? (
                    <img 
-                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+                    src={`https://image.tmdb.org/t/p/w780${movie.poster_path}`} 
                     className={`w-full h-full object-cover transition-all duration-700 ${isHidden ? "blur-3xl scale-110 grayscale" : ""}`} 
                     alt={movie.title} 
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-500">No Preview</div>
+                  <div className="w-full h-full flex items-center justify-center text-gray-500">No Preview Available</div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
               </div>
@@ -164,7 +177,7 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
                 <p className="text-[10px] text-gray-400 mb-6 leading-tight">Confirm you are 18+ to view details.</p>
                 <button 
                   onClick={() => user ? setConfirmedNSFW(true) : setShowSignInModal(true)}
-                  className="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-6 py-2.5 rounded-full transition-all"
+                  className="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-6 py-2.5 rounded-full transition-all active:scale-95"
                 >
                   {user ? "CONFIRM AGE & REVEAL" : "SIGN IN TO VIEW"}
                 </button>
@@ -173,24 +186,24 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
           </div>
 
           {/* DETAILS SECTION */}
-          <div className="p-6 md:p-8 flex flex-col">
+          <div className="p-6 md:p-8 flex flex-col items-center">
             
-            {/* MOVIE TILE: Removed negative margin so it is pushed DOWN below the video */}
+            {/* MOVIE TILE */}
             {!isHidden && (
               <div className="w-full flex justify-center mb-6 z-30">
                 <img 
                   src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`} 
-                  className="w-32 rounded-xl shadow-2xl border-2 border-white/10"
+                  className="w-28 md:w-36 rounded-xl shadow-2xl border-2 border-white/10 transition-transform hover:scale-105"
                   alt="Poster"
                 />
               </div>
             )}
 
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight text-center px-4 uppercase tracking-tight">
               {movie.title}
             </h2>
             
-            <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="flex items-center justify-center gap-4 mb-5">
               <div className="flex items-center gap-1.5 text-purple-400 font-medium text-sm">
                 <CalendarMonth sx={{ fontSize: 18 }} />
                 <span>{movie.release_date ? new Date(movie.release_date).getFullYear() : "N/A"}</span>
@@ -204,33 +217,35 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
               )}
             </div>
 
-            <p className="text-gray-300 text-sm md:text-base leading-relaxed whitespace-pre-line text-center">
+            <p className="text-gray-300 text-sm md:text-base leading-relaxed whitespace-pre-line text-center max-w-prose">
               {movie.overview ? displayedOverview : "Fetching description..."}
             </p>
             
             {movie.overview && movie.overview.length > 180 && (
               <button 
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="text-purple-400 text-sm font-bold mt-2 flex items-center gap-1 hover:text-purple-300 mx-auto"
+                className="text-purple-400 text-sm font-bold mt-3 flex items-center gap-1 hover:text-purple-300 transition-all mx-auto"
               >
                 {isExpanded ? <><ExpandLess fontSize="small"/> Show Less</> : <><ExpandMore fontSize="small"/> Read More</>}
               </button>
             )}
 
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 mb-4 flex justify-center w-full">
               <button
                 onClick={toggleFavorite}
                 disabled={loading}
-                className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold transition-all ${
+                className={`flex items-center gap-2 px-10 py-3 rounded-full font-bold transition-all active:scale-95 shadow-lg ${
                   isFavorited 
                   ? "bg-red-500/10 text-red-500 border border-red-500/50" 
-                  : "bg-white text-black hover:bg-purple-500 hover:text-white"
+                  : "bg-white text-black hover:bg-gray-200"
                 }`}
               >
-                {isFavorited ? <Favorite /> : <FavoriteBorder />}
+                {isFavorited ? <Favorite fontSize="small" /> : <FavoriteBorder fontSize="small" />}
                 {isFavorited ? "Favorited" : "Add to Favorites"}
               </button>
             </div>
+            
+            <span className="text-[10px] text-gray-600 uppercase tracking-widest mt-2">Source: TMDB</span>
           </div>
         </div>
       </div>
