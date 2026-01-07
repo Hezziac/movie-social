@@ -22,6 +22,8 @@ export function NotificationsPage() {
     switch (n.type) {
       case "comment":
         return `/post/${n.target_id}`; // Routes to the specific post
+      case "community_chat":
+      return `/community/${n.community_id}`;
       case "chat":
         return `/community/${n.target_id}`;
       case "like":
@@ -85,6 +87,7 @@ export function NotificationsPage() {
 
   const getIcon = (type: string) => {
     switch (type) {
+      case 'community_chat': return <ChatBubble className="text-blue-400" fontSize="small" />;
       case 'chat': return <ChatBubble className="text-blue-400" fontSize="small" />;
       case 'like': return <Favorite className="text-red-500" fontSize="small" />;
       case 'follow': return <PersonAdd className="text-purple-500" fontSize="small" />;
