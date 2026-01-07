@@ -43,7 +43,8 @@ export function NotificationsPage() {
         .from("notifications")
         .select(`
           *,
-          actor:profiles!actor_id(username, avatar_url)
+          actor:profiles!actor_id(username, avatar_url),
+          membership:community_members!target_id(chat_notifications_enabled)
         `)
         .eq("user_id", user?.id)
         .order("created_at", { ascending: false })
