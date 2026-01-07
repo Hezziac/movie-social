@@ -1,4 +1,4 @@
- /* [CommunityDisplay.tsx]
+/* [CommunityDisplay.tsx]
  * 
  * Contains communitydisplay component, which fetches and displays a community's
  * information and posts. It uses React Query for data fetching and Supabase for
@@ -21,7 +21,7 @@ import { Post } from "./PostList";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { EditCommunityModal } from "./EditCommunityModal";
-import { ChatBubbleOutline, Settings } from "@mui/icons-material";
+import { ChatBubbleOutline, Settings, NotificationsActive, NotificationsOff } from "@mui/icons-material";
 import { useQueryClient } from "@tanstack/react-query";
 import { SignInModal } from "./SignInModal";
 import { CommunityChatDrawer} from "./CommunityChat/CommunityChatDrawer";
@@ -90,6 +90,7 @@ export const CommunityDisplay = ({ communityId }: Props) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isUpdatingNotifs, setIsUpdatingNotifs] = useState(false);
   
   // 2. Parallel fetch using Promise.all
   const { data, isLoading, error } = useQuery({
@@ -126,6 +127,25 @@ export const CommunityDisplay = ({ communityId }: Props) => {
     }
     // Tell React Query to refresh the data
     queryClient.invalidateQueries({ queryKey: ["communityData", communityId] });
+  };
+
+  // Toggle Chat Notifications
+  const toggleNotifications = async () => {
+    if (!membership || isUpdatingNotifs) return;
+    setIsUpdatingNotifs(true);
+
+    const newValue = !membership.chat_notifications_enabled;
+
+    const { error } = await supabase
+      .from("community_members")
+      .update({ chat_notifications_enabled: newValue })
+      .eq("id", membership.id);
+
+    if (!error) {
+      // Refresh data to show new icon state
+      queryClient.invalidateQueries({ queryKey: ["communityData", communityId] });
+    }
+    setIsUpdatingNotifs(false);
   };
 
   // CHAT DRAWER STATE
@@ -237,13 +257,29 @@ export const CommunityDisplay = ({ communityId }: Props) => {
 
         {/* 💬 NEW INTEGRATED CHAT BUTTON */}
         {isMember && (
-          <button
-            onClick={() => setIsChatOpen(true)}
-            className="mt-6 flex items-center gap-2 px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full text-white transition-all duration-300 group"
-          >
-            <ChatBubbleOutline className="text-purple-400 group-hover:scale-110 transition-transform" />
-            <span className="font-semibold text-sm">Community Chat</span>
-          </button>
+          <div className="mt-6 flex items-center gap-2">
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="flex items-center gap-2 px-6 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full text-white transition-all duration-300 group"
+            >
+              <ChatBubbleOutline className="text-purple-400 group-hover:scale-110 transition-transform" />
+              <span className="font-semibold text-sm">Community Chat</span>
+            </button>
+
+            {/* 🔔 Notification Toggle Button */}
+            <button
+              onClick={toggleNotifications}
+              disabled={isUpdatingNotifs}
+              className={`p-2 rounded-full border backdrop-blur-md transition-all ${
+                membership.chat_notifications_enabled 
+                  ? "bg-purple-600/20 border-purple-500/50 text-purple-400 hover:bg-purple-600/40" 
+                  : "bg-gray-800/40 border-white/10 text-gray-500 hover:text-gray-300"
+              }`}
+              title={membership.chat_notifications_enabled ? "Mute Chat" : "Unmute Chat"}
+            >
+              {membership.chat_notifications_enabled ? <NotificationsActive fontSize="small" /> : <NotificationsOff fontSize="small" />}
+            </button>
+          </div>
         )}
 
       </div>
