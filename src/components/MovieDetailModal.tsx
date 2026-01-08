@@ -115,37 +115,39 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
 
   // Adjusted the iframe and modal layout to ensure the video does not break the modal size and the movie tile is centered below it
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 md:p-12 bg-black/90 backdrop-blur-md">
+    /* 1. Use z-[100] to ensure it is above the Navbar (usually z-50) */
+    /* 2. Remove all padding so it can properly center on iPhone */
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md px-4">
       {/* Backdrop Click to Close */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      <div className="relative bg-gray-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] my-auto">
+      {/* 3. Added 'max-h-[75vh]' (slightly shorter) to guarantee space for the Notch/Dynamic Island on iPhone */}
+      <div className="relative bg-gray-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[75vh]">
         
         {/* FIXED CLOSE BUTTON */}
         <button 
           onClick={onClose} 
-          className="absolute top-4 right-4 z-[120] text-white/70 hover:text-white bg-black/40 backdrop-blur-md rounded-full p-1.5 border border-white/10 shadow-lg transition-all"
+          className="absolute top-4 right-4 z-[120] text-white/70 hover:text-white bg-black/40 backdrop-blur-md rounded-full p-1.5 border border-white/10 shadow-lg"
         >
           <Close fontSize="small" />
         </button>
 
-        {/* UNIFIED SCROLLABLE AREA - Manually hiding scrollbars via inline style */}
+        {/* UNIFIED SCROLLABLE AREA */}
         <div 
           className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col"
           style={{
-            msOverflowStyle: 'none',  /* IE and Edge */
-            scrollbarWidth: 'none',   /* Firefox */
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          {/* Internal pseudo-selector style to target Webkit browsers (Chrome/Safari) */}
           <style>{`
             .flex-1::-webkit-scrollbar {
               display: none;
             }
           `}</style>
           
-          {/* MEDIA SECTION: ASPECT-VIDEO */}
+          {/* MEDIA SECTION */}
           <div className="w-full aspect-video bg-gray-800 flex-shrink-0 relative overflow-hidden z-10">
             {trailerUrl && !isHidden ? (
               <iframe 
@@ -170,14 +172,13 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
               </div>
             )}
 
-            {/* NSFW Restricted Overlay */}
             {isHidden && (
               <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 text-center bg-black/60 backdrop-blur-sm">
                 <h3 className="text-white font-bold mb-2">Restricted Content</h3>
                 <p className="text-[10px] text-gray-400 mb-6 leading-tight">Confirm you are 18+ to view details.</p>
                 <button 
                   onClick={() => user ? setConfirmedNSFW(true) : setShowSignInModal(true)}
-                  className="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-6 py-2.5 rounded-full transition-all active:scale-95"
+                  className="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-6 py-2.5 rounded-full"
                 >
                   {user ? "CONFIRM AGE & REVEAL" : "SIGN IN TO VIEW"}
                 </button>
@@ -187,13 +188,11 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
 
           {/* DETAILS SECTION */}
           <div className="p-6 md:p-8 flex flex-col items-center">
-            
-            {/* MOVIE TILE */}
             {!isHidden && (
               <div className="w-full flex justify-center mb-6 z-30">
                 <img 
                   src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`} 
-                  className="w-28 md:w-36 rounded-xl shadow-2xl border-2 border-white/10 transition-transform hover:scale-105"
+                  className="w-28 md:w-36 rounded-xl shadow-2xl border-2 border-white/10"
                   alt="Poster"
                 />
               </div>
@@ -208,7 +207,6 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
                 <CalendarMonth sx={{ fontSize: 18 }} />
                 <span>{movie.release_date ? new Date(movie.release_date).getFullYear() : "N/A"}</span>
               </div>
-
               {movie.vote_average > 0 && (
                 <div className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/30 px-2.5 py-0.5 rounded-full">
                   <span className="text-yellow-500 text-xs">⭐</span>
@@ -217,14 +215,14 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
               )}
             </div>
 
-            <p className="text-gray-300 text-sm md:text-base leading-relaxed whitespace-pre-line text-center max-w-prose">
+            <p className="text-gray-300 text-sm md:text-base leading-relaxed text-center max-w-prose">
               {movie.overview ? displayedOverview : "Fetching description..."}
             </p>
             
             {movie.overview && movie.overview.length > 180 && (
               <button 
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="text-purple-400 text-sm font-bold mt-3 flex items-center gap-1 hover:text-purple-300 transition-all mx-auto"
+                className="text-purple-400 text-sm font-bold mt-3 flex items-center gap-1 mx-auto"
               >
                 {isExpanded ? <><ExpandLess fontSize="small"/> Show Less</> : <><ExpandMore fontSize="small"/> Read More</>}
               </button>
@@ -237,7 +235,7 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
                 className={`flex items-center gap-2 px-10 py-3 rounded-full font-bold transition-all active:scale-95 shadow-lg ${
                   isFavorited 
                   ? "bg-red-500/10 text-red-500 border border-red-500/50" 
-                  : "bg-white text-black hover:bg-gray-200"
+                  : "bg-white text-black"
                 }`}
               >
                 {isFavorited ? <Favorite fontSize="small" /> : <FavoriteBorder fontSize="small" />}
@@ -245,7 +243,7 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
               </button>
             </div>
             
-            <span className="text-[10px] text-gray-600 uppercase tracking-widest mt-2">Source: TMDB</span>
+            <span className="text-[10px] text-gray-600 uppercase mt-2">Source: TMDB</span>
           </div>
         </div>
       </div>
