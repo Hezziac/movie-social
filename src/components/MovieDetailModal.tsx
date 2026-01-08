@@ -115,14 +115,15 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
 
   // Adjusted the iframe and modal layout to ensure the video does not break the modal size and the movie tile is centered below it
   return (
-    /* 1. Use z-[100] to ensure it is above the Navbar (usually z-50) */
-    /* 2. Remove all padding so it can properly center on iPhone */
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md px-4">
+    /* 1. Changed justify-center to justify-start to manually control vertical position */
+    /* 2. Added pt-20 (72px) to clear your navbar and md:pt-0 to keep desktop centered */
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-start md:justify-center bg-black/90 backdrop-blur-md px-4 pt-20 md:pt-0">
+      
       {/* Backdrop Click to Close */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      {/* 3. Added 'max-h-[75vh]' (slightly shorter) to guarantee space for the Notch/Dynamic Island on iPhone */}
-      <div className="relative bg-gray-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[75vh]">
+      {/* 3. Changed max-h to 80vh for a better balance between top and bottom */}
+      <div className="relative bg-gray-900 border border-white/10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[80vh] animate-in fade-in zoom-in duration-200">
         
         {/* FIXED CLOSE BUTTON */}
         <button 
@@ -178,7 +179,7 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
                 <p className="text-[10px] text-gray-400 mb-6 leading-tight">Confirm you are 18+ to view details.</p>
                 <button 
                   onClick={() => user ? setConfirmedNSFW(true) : setShowSignInModal(true)}
-                  className="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-6 py-2.5 rounded-full"
+                  className="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold px-6 py-2.5 rounded-full transition-all"
                 >
                   {user ? "CONFIRM AGE & REVEAL" : "SIGN IN TO VIEW"}
                 </button>
@@ -235,7 +236,7 @@ export const MovieDetailModal = ({ movie: initialMovie, isOpen, onClose }: Props
                 className={`flex items-center gap-2 px-10 py-3 rounded-full font-bold transition-all active:scale-95 shadow-lg ${
                   isFavorited 
                   ? "bg-red-500/10 text-red-500 border border-red-500/50" 
-                  : "bg-white text-black"
+                  : "bg-white text-black hover:bg-gray-200"
                 }`}
               >
                 {isFavorited ? <Favorite fontSize="small" /> : <FavoriteBorder fontSize="small" />}
